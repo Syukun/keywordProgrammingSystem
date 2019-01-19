@@ -1,0 +1,19 @@
+Just Fit Expression Level:
+
+Expression := BinaryConditionalExpression | UnaryConditionalExpression | IfThenElseConditionalExpression | Assignment
+                       Literal | ClassLiteral | this | TypeName.this | FieldAccess | ArrayAccess | MethodInvocation
+
+BinaryConditionalExpression := Expression BinOperator Expression
+UnaryConditionalExpression :=  PreOperatorExpression | PostOperatorExpression
+PreOperatorExpression := PreOperator Expression
+PostOperatorExpression := Expression PostOperator
+IfThenElseConditionalExpression := Expression ? Expression : Expression
+
+
+Assignment := LeftHandSide AssignmentOperator Expression
+LeftHandSide := ExpressionName | FieldAccess | ArrayAccess
+ExpressionName := Identifier | ExpressionName.Identifier
+FieldAccess := Expression.Identifier | super.Identifier | TypeName.super.Identifier
+ArrayAccess := Expression[Expression] | ExpressionName[Expression]
+MethodInvocation := MethodName (Expressions)
+
