@@ -8,7 +8,7 @@
       <javaCompletionProposalComputer
             activate="true"
             categoryId="ShuCompletionProposalComputer"
-            class="plugin.completionProporsalComputer.JavaCompletionProposalComputer">
+            class="plugin.completionProposalComputer.JavaCompletionProposalComputer">
       </javaCompletionProposalComputer>
    </extension>
 

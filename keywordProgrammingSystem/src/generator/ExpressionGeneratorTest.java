@@ -12,7 +12,7 @@ class ExpressionGeneratorTest {
 
 	@Test
 	void test() {
-		Vector<Expression> exps = ExpressionGenerator.generateExpression(2, "a");
+		Vector<Expression> exps = ExpressionGenerator.generateExpression(1, "a");
 		for(Expression exp : exps) {
 			System.out.println(exp.toString());
 		}
