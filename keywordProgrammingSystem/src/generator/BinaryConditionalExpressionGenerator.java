@@ -13,11 +13,11 @@ import dataBase.DataBase;
 public class BinaryConditionalExpressionGenerator extends ExpressionGenerator {
 	Vector<BinaryOperator> binOperators;
 	
-	public Generator[] getParameterGenerators() {
-		return new Generator[] {
-				new ExpressionGenerator(),new ExpressionGenerator()
-		};
-	}
+//	public Generator[] getParameterGenerators() {
+//		return new Generator[] {
+//				new ExpressionGenerator(),new ExpressionGenerator()
+//		};
+//	}
 //	
 //	public Vector<Type> getParameterTypes(){
 //		return null;
@@ -45,15 +45,16 @@ public class BinaryConditionalExpressionGenerator extends ExpressionGenerator {
 		for(BinaryOperator binOperator : this.binOperators) {
 			new ExpressionGenerator() {
 				@Override
-				public Type[] getParameterTypes(){
-					return new Type[] {DataBase.allTypes.get(binOperator.typeName)};
+				public Generator[] getParameterGenerators() {
+					return new Generator[] {
+							new ExpressionGenerator(),new ExpressionGenerator()
+					};
 				}
-//				@Override
-//				public Set<Type> getAllPossibleReceiveTypes(){
-//					Set<Type> allPossibleReceiveType = new HashSet<Type>();
-//					allPossibleReceiveType.add(DataBase.allTypes.get("String"));
-//					return allPossibleReceiveType;
-//				}
+				@Override
+				public Type[] getParameterTypes(){
+					Type t = DataBase.allTypes.get(binOperator.typeName);
+					return new Type[] {t,t};
+				}
 				@Override
 				public void generateWithSubExps(Expression[] subExps,Vector<Expression> result) {
 					result.add(new BinaryConditionalExpression(subExps[0],binOperator,subExps[1]));

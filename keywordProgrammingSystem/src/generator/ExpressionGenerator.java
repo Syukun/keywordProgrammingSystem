@@ -83,7 +83,7 @@ public class ExpressionGenerator implements Generator {
 
 	private static Vector<ExpressionGenerator> allSubGeneratorsIncludeTypeT(Type t, int d) {
 		Vector<ExpressionGenerator> subGeneratorsIncludeTypeT = new Vector<ExpressionGenerator>();
-		for (ExpressionGenerator g : getAllSubGenerators()) {
+		for (ExpressionGenerator g : getAllSubGenerators(d)) {
 			if (g.getAllPossibleReceiveTypes().contains(t)) {
 				g.changeProperty(t.toString());
 				subGeneratorsIncludeTypeT.add(g);
@@ -97,20 +97,29 @@ public class ExpressionGenerator implements Generator {
 		
 	}
 
-	private static ExpressionGenerator[] getAllSubGenerators() {
+	private static ExpressionGenerator[] getAllSubGenerators(int d) {
 		// TODO Auto-generated method stub
-		return new ExpressionGenerator[] { 
-				new StringLiteralGenerator()
-				, new IntLiteralGenerator()
-//				,new BinaryConditionalExpressionGenerator() 
-				};
+		ExpressionGenerator[] res;
+		if(d >1) {
+			res = new ExpressionGenerator[] { 
+					new StringLiteralGenerator()
+					, new IntLiteralGenerator()
+					,new BinaryConditionalExpressionGenerator() 
+					}; 
+		}else {
+			res = new ExpressionGenerator[] {
+					new StringLiteralGenerator()
+					,new IntLiteralGenerator()
+			};
+		}
+		return res;
 	}
 
 	public Set<Type> getAllPossibleReceiveTypes(){
 		Set<Type> allPossibleReceiveType = new HashSet<Type>();
-		allPossibleReceiveType.add(DataBase.allTypes.get("String"));
-		allPossibleReceiveType.add(DataBase.allTypes.get("Integer"));
 		allPossibleReceiveType.add(DataBase.allTypes.get("boolean"));
+		allPossibleReceiveType.add(DataBase.allTypes.get("Integer"));
+		allPossibleReceiveType.add(DataBase.allTypes.get("String"));
 		return allPossibleReceiveType;
 	}
 
