@@ -35,10 +35,10 @@ public class DataBase {
 	}
 
 	private static void initAllBinaryOperators() {
-		allBinaryOperators.add(new BinaryOperator(">", true));
-		allBinaryOperators.add(new BinaryOperator("<", true));
-		allBinaryOperators.add(new BinaryOperator("+", false));
-		allBinaryOperators.add(new BinaryOperator("-", false));
+		allBinaryOperators.add(new BinaryOperator(">","Integer",true));
+		allBinaryOperators.add(new BinaryOperator("<","Integer",true));
+		allBinaryOperators.add(new BinaryOperator("+","Integer", false));
+		allBinaryOperators.add(new BinaryOperator("-","Integer", false));
 	}
 
 	private static void initStringLiterals() {

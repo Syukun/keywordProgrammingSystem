@@ -18,7 +18,7 @@ public class IntLiteralGenerator extends ExpressionGenerator {
 	}
 
 	@Override
-	public Vector<Type> getParameterTypes() {
+	public Type[] getParameterTypes() {
 		// TODO Auto-generated method stub
 		return null;
 	}

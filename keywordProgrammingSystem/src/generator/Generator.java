@@ -13,7 +13,7 @@ public interface Generator {
 	
 	public abstract Generator[] getParameterGenerators();
 
-	public abstract Vector<Type> getParameterTypes();
+	public abstract Type[] getParameterTypes();
 
 	public abstract void generateWithSubExps(Expression[] subExps, Vector<Expression> result);
 

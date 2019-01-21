@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="ShuCompletionProposalComputer"
+         name="ShuCPC"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="ShuCompletionProposalComputer"
+            class="plugin.completionProporsalComputer.JavaCompletionProposalComputer">
+      </javaCompletionProposalComputer>
+   </extension>
+
+</plugin>

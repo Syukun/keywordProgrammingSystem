@@ -4,13 +4,15 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class BinaryOperator {
-	String binaryOperator;
-	boolean isRelationalExpression;
+	public String binaryOperator;
+	public boolean isRelationalExpression;
+	public String typeName;
 	
-	public BinaryOperator(String binaryOperator, boolean isRelationalExpression) {
+	public BinaryOperator(String binaryOperator,String type, boolean isRelationalExpression) {
 		super();
 		this.binaryOperator = binaryOperator;
 		this.isRelationalExpression = isRelationalExpression;
+		this.typeName = type;
 	}
 
 	public String toString() {

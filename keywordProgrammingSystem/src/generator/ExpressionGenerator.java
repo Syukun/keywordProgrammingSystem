@@ -85,10 +85,16 @@ public class ExpressionGenerator implements Generator {
 		Vector<ExpressionGenerator> subGeneratorsIncludeTypeT = new Vector<ExpressionGenerator>();
 		for (ExpressionGenerator g : getAllSubGenerators()) {
 			if (g.getAllPossibleReceiveTypes().contains(t)) {
+				g.changeProperty(t.toString());
 				subGeneratorsIncludeTypeT.add(g);
 			}
 		}
 		return subGeneratorsIncludeTypeT;
+	}
+
+	public void changeProperty(String t) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private static ExpressionGenerator[] getAllSubGenerators() {
@@ -96,7 +102,7 @@ public class ExpressionGenerator implements Generator {
 		return new ExpressionGenerator[] { 
 				new StringLiteralGenerator()
 				, new IntLiteralGenerator()
-//				,new BinaryConditionalExpressionGenerator() 
+				,new BinaryConditionalExpressionGenerator() 
 				};
 	}
 
@@ -108,7 +114,8 @@ public class ExpressionGenerator implements Generator {
 		return allPossibleReceiveType;
 	}
 
-	private void generateExpressionExact(int d, Vector<Expression> result) {
+	
+	public void generateExpressionExact(int d, Vector<Expression> result) {
 		int arity = this.getParameterGenerators().length;
 		if (arity == 0) {
 			if (d == 1) {
@@ -117,7 +124,6 @@ public class ExpressionGenerator implements Generator {
 		} else {
 			generateWithArity(d, arity, result);
 		}
-
 	}
 
 	private void generateWithArity(int d, int arity, Vector<Expression> result) {
@@ -133,7 +139,7 @@ public class ExpressionGenerator implements Generator {
 		if (arity == 0) {
 			generateWithSubExps(subExps, result);
 		} else {
-			Type possibleParaType_arity = this.getParameterTypes().get(arity - 1);
+			Type possibleParaType_arity = this.getParameterTypes()[arity - 1];
 			// need add code about parameter generator name
 			Vector<Expression> candidates = isBitOn(exactFlags, arity - 1)
 					? getPossibleExpressionsUnderDepth(d - 1, possibleParaType_arity)
@@ -179,7 +185,7 @@ public class ExpressionGenerator implements Generator {
 	}
 
 	@Override
-	public Vector<Type> getParameterTypes() {
+	public Type[] getParameterTypes() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -189,5 +195,6 @@ public class ExpressionGenerator implements Generator {
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }
