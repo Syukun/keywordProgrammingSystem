@@ -102,9 +102,11 @@ public class ExpressionGenerator implements Generator {
 		ExpressionGenerator[] res;
 		if(d >1) {
 			res = new ExpressionGenerator[] { 
-					new StringLiteralGenerator()
-					, new IntLiteralGenerator()
-					,new BinaryConditionalExpressionGenerator() 
+//					new StringLiteralGenerator()
+//					, 
+					new IntLiteralGenerator()
+//					,new BinaryConditionalExpressionGenerator()
+					,new MethodInvocationGenerator()
 					}; 
 		}else {
 			res = new ExpressionGenerator[] {

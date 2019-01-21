@@ -1,10 +1,11 @@
 package basic;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class MethodName {
 	String methodName;
-	Type[] types;
+	private Type[] types;
 
 	public MethodName(String methodName, Type[] types) {
 		super();
@@ -16,8 +17,29 @@ public class MethodName {
 		return types[0];
 	}
 
-	public Type getParameterType(int i) {
-		return types[i];
+	public String getParameterType(int i) {
+		return types[i].toString();
 	}
 
+	public String toString() {
+		return this.methodName;
+	}
+	
+	public Type[] getParameterTypes() {
+		int paraNum = this.getParaNumber();
+		Type[] res = new Type[paraNum];
+		for(int i = 0 ; i < paraNum ; i++ ) {
+			res[i] = this.types[i+1];
+		}
+		return res;
+	}
+	public int getParaNumber() {
+		return this.types.length-1;
+	}
+	
+	public BigDecimal getScore(List<String> keywords) {
+		BigDecimal score = ScoreDef.DEFSCORE;
+		ScoreDef.checkInKeyword(score, methodName, keywords);
+		return score;
+	}
 }

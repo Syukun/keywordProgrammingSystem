@@ -24,7 +24,7 @@ public class DataBase {
 		initAllBinaryOperators();
 		initStringLiterals();
 		initIntegerLiterals();
-//		initMethodNames();
+		initMethodNames();
 	}
 
 	private static void initAllTypes() {
@@ -54,7 +54,7 @@ public class DataBase {
 	
 	private static void initMethodNames() {
 		allMethodNames.add(new MethodName("add", 
-				new Type[] {allTypes.get("boolean"),allTypes.get("int"),allTypes.get("int")}));
+				new Type[] {allTypes.get("boolean"),allTypes.get("Integer"),allTypes.get("Integer")}));
 	}
 
 }
