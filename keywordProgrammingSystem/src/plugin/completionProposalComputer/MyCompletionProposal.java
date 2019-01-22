@@ -24,24 +24,25 @@ public class MyCompletionProposal implements ICompletionProposal {
 	@Override
 	public void apply(IDocument document) {
 		int position = context.getViewer().getSelectedRange().x;
+		
 		// context for current text
 		String currentText = document.get();
-//		try {
-//			// line number before keywords line
-//			int line = document.getLineOfOffset(position);
-//			int length = document.getLineLength(line+1);
-//			String keywords = document.get(position-5, 4);
-//			document.set("keywords are : " + keywords);
-//		} catch (BadLocationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		int index = context.getInvocationOffset();
-//		// return all line number
-//		int lineNum = document.getNumberOfLines();
-		String before = currentText.substring(0, index);
-		String after = currentText.substring(index);
-//		document.set(before + getDisplayString() + after);
+		StringBuffer res =new StringBuffer("");
+		
+		try {
+			int line = document.getLineOfOffset(position);
+			int firstPosition = document.getLineOffset(line);
+			int lastPosition = document.getLineOffset(line+1);
+			
+			res.append(currentText.substring(0, firstPosition));
+			res.append(getDisplayString()+"\n");
+			res.append(currentText.substring(lastPosition));
+			document.set(res.toString());
+			
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		context.getViewer().setSelectedRange(position + getDisplayString().length(), -1);
 	}
@@ -59,10 +60,11 @@ public class MyCompletionProposal implements ICompletionProposal {
 	}
 
 	@Override
-	public String getDisplayString() {
-		// TODO Auto-generated method stub
+	public String getDisplayString() {	
 		return this.expression.toString();
 	}
+
+
 
 	@Override
 	public Image getImage() {
