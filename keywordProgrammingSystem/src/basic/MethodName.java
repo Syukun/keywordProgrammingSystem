@@ -39,7 +39,7 @@ public class MethodName {
 	
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		ScoreDef.checkInKeyword(score, methodName, keywords);
+		new ScoreDef().checkInKeyword(score, methodName, keywords);
 		return score;
 	}
 }

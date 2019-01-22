@@ -23,7 +23,7 @@ public class IntegerLiteral extends Literal {
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		ScoreDef.checkInKeyword(score, this.toString(), keywords);
+		score = ScoreDef.checkInKeyword(score, this.toString(), keywords);
 		return score;
 	}
 

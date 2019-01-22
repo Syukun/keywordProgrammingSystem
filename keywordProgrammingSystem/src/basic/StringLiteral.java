@@ -24,7 +24,7 @@ public class StringLiteral extends Literal {
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		ScoreDef.checkInKeyword(score, sl, keywords);
+		new ScoreDef().checkInKeyword(score, sl, keywords);
 		return score;
 	}
 

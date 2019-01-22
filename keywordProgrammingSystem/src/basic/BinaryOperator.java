@@ -21,7 +21,7 @@ public class BinaryOperator {
 
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		ScoreDef.checkInKeyword(score, binaryOperator, keywords);
+		score = new ScoreDef().checkInKeyword(score, binaryOperator, keywords);
 		return score;
 	}
 

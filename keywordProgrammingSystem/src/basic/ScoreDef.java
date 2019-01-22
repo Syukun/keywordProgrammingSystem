@@ -24,16 +24,17 @@ public class ScoreDef {
 	public static final BigDecimal LMVAR = new BigDecimal(Float.toString(0.001f));
 
 	
-	public static void checkInKeyword(BigDecimal score,String word,List<String> keywords) {
+	public static BigDecimal checkInKeyword(BigDecimal score,String word,List<String> keywords) {
 		if(keywords.contains(word)) {
 			score = score.add(WIK);
 			keywords.remove(word);
 		}else {
 			score = score.add(WNIK);
 		}
+		return score;
 	}
 	
-	public static void checkInKeyword_LocalVariable(BigDecimal score,String word,List<String> keywords) {
+	public static BigDecimal checkInKeyword_LocalVariable(BigDecimal score,String word,List<String> keywords) {
 		if(keywords.contains(word)) {
 			score = score.add(WIK);
 			score = score.add(LMVAR);
@@ -41,16 +42,11 @@ public class ScoreDef {
 		}else {
 			score = score.add(WNIK);
 		}
+		return score;
 	}
 	
 	public static void selectMaxBWExpressions(Vector<Expression> result, String keywords) {
-		Collections.sort(result,new Comparator<Expression>() {
-			@Override
-			public int compare(Expression e1, Expression e2) {
-				return e1.getScore(keywords).compareTo(e2.getScore(keywords));
-			}
-			
-		});
+		sortExpression(result,keywords);
 		Vector<Expression> temp = new Vector<Expression>();
 		int count = 0;
 		while(count < RelateBeamSearch.BEAMWIDTH) {
@@ -69,6 +65,17 @@ public class ScoreDef {
 	public static List<String> splitKeyword(String keywords) {
 		return Arrays.asList(keywords.toLowerCase().split("[^\\w]")).stream().distinct().collect(Collectors.toList());
 //		return new ArrayList<String>(Arrays.asList(keywords.toLowerCase().split("[^\\w]")));
+	}
+
+	public static void sortExpression(Vector<Expression> result, String keywords) {
+		Collections.sort(result,new Comparator<Expression>() {
+			@Override
+			public int compare(Expression e1, Expression e2) {
+				return e2.getScore(keywords).compareTo(e1.getScore(keywords));
+			}
+			
+		});
+		
 	}
 	
 }

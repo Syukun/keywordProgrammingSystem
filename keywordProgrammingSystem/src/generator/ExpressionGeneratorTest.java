@@ -2,6 +2,7 @@ package generator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
 import java.util.Vector;
 
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,16 @@ class ExpressionGeneratorTest {
 
 	@Test
 	void test() {
-		Vector<Expression> exps = ExpressionGenerator.generateExpression(2, "1");
+		String keywords = "1";
+		Vector<Expression> exps = ExpressionGenerator.generateExpression(2 , keywords);
 		for (Expression exp : exps) {
-			System.out.println(exp.toString());
+			System.out.println(exp.toString() + " : " +exp.getScore(keywords));
 		}
+//		
+//		IntegerLiteral i1 = new IntegerLiteral(1);
+//		BigDecimal score = i1.getScore(keywords);
+//		System.out.println(score.floatValue());		
+	
 	}
 
 //	@Test

@@ -11,6 +11,7 @@ import basic.Type;
 import dataBase.DataBase;
 
 public class ExpressionGenerator implements Generator {
+	// do not use right now might be used later
 	String className = "Expression";
 	int BW = RelateBeamSearch.BEAMWIDTH;
 //
@@ -55,6 +56,9 @@ public class ExpressionGenerator implements Generator {
 			for (ExpressionGenerator g : allSubGs) {
 				g.generateExpressionExact(d, result);
 			}
+//			if(d==1) {
+//				ScoreDef.sortExpression(result,keywords);
+//			}
 			if (d > 1) {
 				ScoreDef.selectMaxBWExpressions(result, keywords);
 			}
