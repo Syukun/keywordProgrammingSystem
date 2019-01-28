@@ -5,22 +5,19 @@ import java.util.List;
 
 import dataBase.DataBase;
 
-public class StringLiteral extends Literal {
-
-	String sl;
+public class VariableName extends Expression{
+	String varName;
+	String typeName;
 	
-	
-	public StringLiteral(String sl) {
-		super();
-		this.sl = sl;
+	public VariableName(String vName,String typeName) {
+		this.varName = vName;
+		this.typeName = typeName;
 	}
-
-	@Override
+	
 	public String toString() {
-		// TODO Auto-generated method stub
-		return "\""+sl+"\"";
+		return varName;
 	}
-
+	
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
@@ -31,7 +28,6 @@ public class StringLiteral extends Literal {
 	@Override
 	public Type getType() {
 		// TODO Auto-generated method stub
-		return DataBase.allTypes.get("String");
+		return DataBase.allTypes.get(typeName);
 	}
-
 }

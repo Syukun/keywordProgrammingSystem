@@ -35,7 +35,7 @@ public class MyCompletionProposal implements ICompletionProposal {
 			int lastPosition = document.getLineOffset(line+1);
 			
 			res.append(currentText.substring(0, firstPosition));
-			res.append(getDisplayString()+"\n");
+			res.append("\t" + getDisplayString()+"\n");
 			res.append(currentText.substring(lastPosition));
 			document.set(res.toString());
 			

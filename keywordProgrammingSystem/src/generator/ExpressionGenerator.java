@@ -106,16 +106,17 @@ public class ExpressionGenerator implements Generator {
 		ExpressionGenerator[] res;
 		if(d >1) {
 			res = new ExpressionGenerator[] { 
-//					new StringLiteralGenerator()
-//					, 
-					new IntLiteralGenerator()
-//					,new BinaryConditionalExpressionGenerator()
+					new StringLiteralGenerator()
+					,new IntLiteralGenerator()
+					,new BinaryConditionalExpressionGenerator()
 					,new MethodInvocationGenerator()
+					,new VariableNameGenerator()
 					}; 
 		}else {
 			res = new ExpressionGenerator[] {
 					new StringLiteralGenerator()
 					,new IntLiteralGenerator()
+					,new VariableNameGenerator()
 			};
 		}
 		return res;
@@ -126,6 +127,8 @@ public class ExpressionGenerator implements Generator {
 		allPossibleReceiveType.add(DataBase.allTypes.get("boolean"));
 		allPossibleReceiveType.add(DataBase.allTypes.get("Integer"));
 		allPossibleReceiveType.add(DataBase.allTypes.get("String"));
+		allPossibleReceiveType.add(DataBase.allTypes.get("BufferedReader"));
+		allPossibleReceiveType.add(DataBase.allTypes.get("List<String>"));
 		return allPossibleReceiveType;
 	}
 
