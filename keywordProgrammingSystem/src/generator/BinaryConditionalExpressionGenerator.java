@@ -13,6 +13,9 @@ import dataBase.DataBase;
 public class BinaryConditionalExpressionGenerator extends ExpressionGenerator {
 	Vector<BinaryOperator> binOperators;
 	
+	public Table expsLEQDepth_Table;
+	public Table expsAtExactDepth_Table;
+	
 //	public Generator[] getParameterGenerators() {
 //		return new Generator[] {
 //				new ExpressionGenerator(),new ExpressionGenerator()
@@ -22,6 +25,11 @@ public class BinaryConditionalExpressionGenerator extends ExpressionGenerator {
 //	public Vector<Type> getParameterTypes(){
 //		return null;
 //	}
+	
+	public BinaryConditionalExpressionGenerator(Table expsLEQDepth_Table,Table expsAtExactDepth_Table) {
+		this.expsAtExactDepth_Table = expsAtExactDepth_Table;
+		this.expsLEQDepth_Table = expsLEQDepth_Table ;
+	}
 	
 	@Override
 	public void changeProperty(String t) {
@@ -43,7 +51,7 @@ public class BinaryConditionalExpressionGenerator extends ExpressionGenerator {
 	@Override
 	public void generateExpressionExact(int d, Vector<Expression> result) {
 		for(BinaryOperator binOperator : this.binOperators) {
-			new ExpressionGenerator() {
+			new ExpressionGenerator(expsLEQDepth_Table,expsAtExactDepth_Table) {
 				@Override
 				public Generator[] getParameterGenerators() {
 					return new Generator[] {

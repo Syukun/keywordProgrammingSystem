@@ -2,8 +2,12 @@ package plugin.completionProposalComputer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jface.text.BadLocationException;
@@ -14,6 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import basic.Expression;
+import dataBase.DataBase;
 import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements
@@ -31,12 +36,23 @@ public class JavaCompletionProposalComputer implements
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		// modify later
 		String keywords = this.getKeywords(context);
-		for(Expression exp : ExpressionGenerator.generateExpression(4, keywords)) {
+//		String currentText = context.getDocument().get();
+//		ParsingContext(context.getDocument().get());
+		Vector<Expression> exps = new ExpressionGenerator().generateExpression(10, keywords);
+		for(Expression exp : exps) {
 			result.add(new MyCompletionProposal(context,exp));
 		}
 
 
 		return result;
+	}
+
+	private void ParsingContext(String currentText) {
+		ASTParser parser = ASTParser.newParser(AST.JLS11);
+		parser.setSource(currentText.toCharArray());
+		CompilationUnit cu = (CompilationUnit)parser.createAST(null);
+		cu.accept(new MyVisitor());
+		
 	}
 
 	@Override

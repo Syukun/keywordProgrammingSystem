@@ -1,7 +1,9 @@
 package dataBase;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import basic.BinaryOperator;
@@ -13,11 +15,11 @@ import basic.VariableName;
 
 public class DataBase {
 	public static Map<String, Type> allTypes = new HashMap<String, Type>();
-	public static Vector<BinaryOperator> allBinaryOperators = new Vector<BinaryOperator>();
-	public static Vector<StringLiteral> allStringLiterals = new Vector<StringLiteral>();
-	public static Vector<IntegerLiteral> allIntegerLiterals = new Vector<IntegerLiteral>();
-	public static Vector<MethodName> allMethodNames = new Vector<MethodName>();
-	public static Vector<VariableName> allVariableName = new Vector<VariableName>();
+	public static Set<BinaryOperator> allBinaryOperators = new HashSet<BinaryOperator>();
+	public static Set<StringLiteral> allStringLiterals = new HashSet<StringLiteral>();
+	public static Set<IntegerLiteral> allIntegerLiterals = new HashSet<IntegerLiteral>();
+	public static Set<MethodName> allMethodNames = new HashSet<MethodName>();
+	public static Set<VariableName> allVariableName = new HashSet<VariableName>();
 	
 	
 	
@@ -71,6 +73,9 @@ public class DataBase {
 		
 		allMethodNames.add(new MethodName("readLine",
 				new String[] {"String","BufferedReader"}));
+		
+		allMethodNames.add(new MethodName("add",
+				new String[] {"String","String"}));
 	}
 
 }

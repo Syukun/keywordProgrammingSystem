@@ -23,11 +23,17 @@ class ExpressionGeneratorTest {
 	@Test
 	void test() {
 		String keywords = "add line";
-		Vector<Expression> exps = ExpressionGenerator.generateExpression(4, keywords);
+		Vector<Expression> exps = new ExpressionGenerator().generateExpression(3, keywords);
 		for (Expression exp : exps) {
 			System.out.println(exp.toString() + " : " +exp.getScore(keywords));
 		}
-//		
+		
+		System.out.println("**************************************");
+//		Vector<Expression> exps2 = new ExpressionGenerator().generateExpression(1, keywords);
+//		for (Expression exp : exps2) {
+//			System.out.println(exp.toString() + " : " +exp.getScore(keywords));
+//		}
+////		
 //		IntegerLiteral i1 = new IntegerLiteral(1);
 //		BigDecimal score = i1.getScore(keywords);
 //		System.out.println(score.floatValue());		

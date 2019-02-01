@@ -11,6 +11,14 @@ import dataBase.DataBase;
 public class MethodInvocationGenerator extends ExpressionGenerator {
 	Vector<MethodName> methodNames;
 	
+	public Table expsLEQDepth_Table;
+	public Table expsAtExactDepth_Table;
+	
+	public MethodInvocationGenerator(Table expsLEQDepth_Table,Table expsAtExactDepth_Table) {
+		this.expsAtExactDepth_Table = expsAtExactDepth_Table;
+		this.expsLEQDepth_Table = expsLEQDepth_Table ;
+	}
+	
 	@Override
 	public void changeProperty(String t) {
 		Vector<MethodName> res = new Vector<MethodName>();
@@ -25,7 +33,7 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 	@Override
 	public void generateExpressionExact(int d, Vector<Expression> result) {
 		for(MethodName mname : this.methodNames) {
-			new ExpressionGenerator() {
+			new ExpressionGenerator(expsLEQDepth_Table,expsAtExactDepth_Table) {
 				@Override
 				public Generator[] getParameterGenerators() {
 					int paraNum = mname.getParaNumber();
