@@ -32,7 +32,7 @@ public class VariableNameGenerator extends ExpressionGenerator {
 	}
 
 	@Override
-	public Type[] getParameterTypes() {
+	public String[] getParameterTypes() {
 		// TODO Auto-generated method stub
 		return null;
 	}

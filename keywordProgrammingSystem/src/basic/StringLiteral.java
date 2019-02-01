@@ -29,9 +29,9 @@ public class StringLiteral extends Literal {
 	}
 
 	@Override
-	public Type getType() {
+	public String getType() {
 		// TODO Auto-generated method stub
-		return DataBase.allTypes.get("String");
+		return "String";
 	}
 
 }

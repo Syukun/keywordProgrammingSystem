@@ -15,26 +15,22 @@ public class MethodName {
 		this.typeNames = typeNames;
 	}
 
-	public Type getReceiveType() {
-		return DataBase.allTypes.get(typeNames[0]);
+	public String getReceiveType() {
+		return typeNames[0];
 	}
 
 	public String getParameterType(int i) {
 		return typeNames[i];
+	}
+	
+	public String[] getParameterTypes() {
+		return this.typeNames;
 	}
 
 	public String toString() {
 		return this.methodName;
 	}
 	
-	public Type[] getParameterTypes() {
-		int paraNum = this.getParaNumber();
-		Type[] res = new Type[paraNum];
-		for(int i = 0 ; i < paraNum ; i++ ) {
-			res[i] = DataBase.allTypes.get(this.typeNames[i+1]);
-		}
-		return res;
-	}
 	public int getParaNumber() {
 		return this.typeNames.length-1;
 	}

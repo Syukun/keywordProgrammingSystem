@@ -37,7 +37,7 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 				}
 				
 				@Override
-				public Type[] getParameterTypes() {
+				public String[] getParameterTypes() {
 					return mname.getParameterTypes();
 				}
 				

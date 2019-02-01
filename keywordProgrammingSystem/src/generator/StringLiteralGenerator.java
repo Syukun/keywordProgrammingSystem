@@ -18,14 +18,14 @@ public class StringLiteralGenerator extends ExpressionGenerator {
 	}
 
 	@Override
-	public Type[] getParameterTypes() {
+	public String[] getParameterTypes() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public Set<Type> getAllPossibleReceiveTypes(){
-		Set<Type> allPossibleReceiveType = new HashSet<Type>();
-		allPossibleReceiveType.add(DataBase.allTypes.get("String"));
+	public Set<String> getAllPossibleReceiveTypes(){
+		Set<String> allPossibleReceiveType = new HashSet<String>();
+		allPossibleReceiveType.add("String");
 		return allPossibleReceiveType;
 	}
 

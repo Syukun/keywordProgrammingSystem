@@ -26,8 +26,8 @@ public class VariableName extends Expression{
 	}
 
 	@Override
-	public Type getType() {
+	public String getType() {
 		// TODO Auto-generated method stub
-		return DataBase.allTypes.get(typeName);
+		return this.typeName;
 	}
 }

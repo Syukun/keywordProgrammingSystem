@@ -1,6 +1,5 @@
 package generator;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -32,7 +31,7 @@ public class ExpressionGenerator implements Generator {
 		DataBase.initDataBase();
 		
 		Vector<Expression> result = new Vector<Expression>();
-		Set<Type> receiveTypes = new ExpressionGenerator().getAllPossibleReceiveTypes();
+		Set<String> receiveTypes = new ExpressionGenerator().getAllPossibleReceiveTypes();
 		Table.initTable(expsLEQDepth_Table,depth,receiveTypes);
 		Table.initTable(expsAtExactDepth_Table,depth,receiveTypes);	
 		
@@ -41,15 +40,15 @@ public class ExpressionGenerator implements Generator {
 			fillLEQTable(d,keywords,receiveTypes);
 		}
 
-		for (Type t : receiveTypes) {
-			result.addAll(expsLEQDepth_Table.root_table.get(t.toString()).get(depth));
+		for (String t : receiveTypes) {
+			result.addAll(expsLEQDepth_Table.root_table.get(t).get(depth));
 		}
 		ScoreDef.selectMaxBWExpressions(result, keywords);
 		return result;
 	}
 
-	private static void fillExactTable(int d,String keywords, Set<Type> receiveTypes) {
-		for (Type t : receiveTypes) {
+	private static void fillExactTable(int d,String keywords, Set<String> receiveTypes) {
+		for (String t : receiveTypes) {
 			// expression with type t in depth d
 			Vector<Expression> result = new Vector<Expression>();
 			Vector<ExpressionGenerator> allSubGs = allSubGeneratorsIncludeTypeT(t,d);
@@ -62,34 +61,34 @@ public class ExpressionGenerator implements Generator {
 			if (d > 1) {
 				ScoreDef.selectMaxBWExpressions(result, keywords);
 			}
-			expsAtExactDepth_Table.root_table.get(t.toString()).get(d).addAll(result);
+			expsAtExactDepth_Table.root_table.get(t).get(d).addAll(result);
 		}
 
 	}
 
-	private static void fillLEQTable(int d,String keywords, Set<Type> receiveTypes) {
+	private static void fillLEQTable(int d,String keywords, Set<String> receiveTypes) {
 		fillExactTable(d,keywords, receiveTypes);
 		if (d == 1) {
-			for(Type type : receiveTypes) {
-				expsLEQDepth_Table.root_table.get(type.toString()).get(d).addAll(expsAtExactDepth_Table.root_table.get(type.toString()).get(d));
+			for(String type : receiveTypes) {
+				expsLEQDepth_Table.root_table.get(type).get(d).addAll(expsAtExactDepth_Table.root_table.get(type.toString()).get(d));
 			}
 			
 		} else {
-			for (Type t : receiveTypes) {
+			for (String t : receiveTypes) {
 				Vector<Expression> result = new Vector<Expression>();
-				result.addAll(expsAtExactDepth_Table.root_table.get(t.toString()).get(d));
-				result.addAll(expsLEQDepth_Table.root_table.get(t.toString()).get(d-1));
+				result.addAll(expsAtExactDepth_Table.root_table.get(t).get(d));
+				result.addAll(expsLEQDepth_Table.root_table.get(t).get(d-1));
 				ScoreDef.selectMaxBWExpressions(result, keywords);
-				expsLEQDepth_Table.root_table.get(t.toString()).get(d).addAll(result);
+				expsLEQDepth_Table.root_table.get(t).get(d).addAll(result);
 			}
 		}
 	}
 
-	private static Vector<ExpressionGenerator> allSubGeneratorsIncludeTypeT(Type t, int d) {
+	private static Vector<ExpressionGenerator> allSubGeneratorsIncludeTypeT(String t, int d) {
 		Vector<ExpressionGenerator> subGeneratorsIncludeTypeT = new Vector<ExpressionGenerator>();
 		for (ExpressionGenerator g : getAllSubGenerators(d)) {
 			if (g.getAllPossibleReceiveTypes().contains(t)) {
-				g.changeProperty(t.toString());
+				g.changeProperty(t);
 				subGeneratorsIncludeTypeT.add(g);
 			}
 		}
@@ -122,13 +121,13 @@ public class ExpressionGenerator implements Generator {
 		return res;
 	}
 
-	public Set<Type> getAllPossibleReceiveTypes(){
-		Set<Type> allPossibleReceiveType = new HashSet<Type>();
-		allPossibleReceiveType.add(DataBase.allTypes.get("boolean"));
-		allPossibleReceiveType.add(DataBase.allTypes.get("Integer"));
-		allPossibleReceiveType.add(DataBase.allTypes.get("String"));
-		allPossibleReceiveType.add(DataBase.allTypes.get("BufferedReader"));
-		allPossibleReceiveType.add(DataBase.allTypes.get("List<String>"));
+	public Set<String> getAllPossibleReceiveTypes(){
+		Set<String> allPossibleReceiveType = new HashSet<String>();
+		allPossibleReceiveType.add("boolean");
+		allPossibleReceiveType.add("Integer");
+		allPossibleReceiveType.add("String");
+		allPossibleReceiveType.add("BufferedReader");
+		allPossibleReceiveType.add("List<String>");
 		return allPossibleReceiveType;
 	}
 
@@ -157,7 +156,7 @@ public class ExpressionGenerator implements Generator {
 		if (arity == 0) {
 			generateWithSubExps(subExps, result);
 		} else {
-			Type possibleParaType_arity = this.getParameterTypes()[arity - 1];
+			String possibleParaType_arity = this.getParameterTypes()[arity - 1];
 			// need add code about parameter generator name
 			Vector<Expression> candidates = isBitOn(exactFlags, arity - 1)
 					? getPossibleExpressionsUnderDepth(d - 1, possibleParaType_arity)
@@ -176,17 +175,17 @@ public class ExpressionGenerator implements Generator {
 	
 	
 
-	private Vector<Expression> getPossibleExpressionInDepth(int d, Type possibleParaType_arity) {
+	private Vector<Expression> getPossibleExpressionInDepth(int d, String possibleParaType_arity) {
 		Vector<Expression> result = new Vector<Expression>();
-		for(String t_s : possibleParaType_arity.getSubType()) {
+		for(String t_s : Type.getSubType(possibleParaType_arity)) {
 			result.addAll(expsAtExactDepth_Table.root_table.get(t_s).get(d));
 		}
 		return result;
 	}
 
-	private Vector<Expression> getPossibleExpressionsUnderDepth(int d, Type possibleParaType_arity) {
+	private Vector<Expression> getPossibleExpressionsUnderDepth(int d, String possibleParaType_arity) {
 		Vector<Expression> result = new Vector<Expression>();
-		for(String t_s : possibleParaType_arity.getSubType()) {
+		for(String t_s : Type.getSubType(possibleParaType_arity)) {
 			result.addAll(expsLEQDepth_Table.root_table.get(t_s).get(d));
 		}
 		return result;
@@ -203,7 +202,7 @@ public class ExpressionGenerator implements Generator {
 	}
 
 	@Override
-	public Type[] getParameterTypes() {
+	public String[] getParameterTypes() {
 		// TODO Auto-generated method stub
 		return null;
 	}

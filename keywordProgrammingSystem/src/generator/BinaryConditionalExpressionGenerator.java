@@ -51,9 +51,9 @@ public class BinaryConditionalExpressionGenerator extends ExpressionGenerator {
 					};
 				}
 				@Override
-				public Type[] getParameterTypes(){
-					Type t = DataBase.allTypes.get(binOperator.typeName);
-					return new Type[] {t,t};
+				public String[] getParameterTypes(){
+					String t = binOperator.typeName;
+					return new String[] {t,t};
 				}
 				@Override
 				public void generateWithSubExps(Expression[] subExps,Vector<Expression> result) {
