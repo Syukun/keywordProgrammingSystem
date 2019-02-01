@@ -52,8 +52,8 @@ public class DataBase {
 	}
 
 	private static void initStringLiterals() {
-//		allStringLiterals.add(new StringLiteral("a"));
-//		allStringLiterals.add(new StringLiteral("b"));
+		allStringLiterals.add(new StringLiteral("a"));
+		allStringLiterals.add(new StringLiteral("b"));
 
 	}
 

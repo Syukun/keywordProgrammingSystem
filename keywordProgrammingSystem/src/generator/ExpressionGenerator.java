@@ -159,8 +159,8 @@ public class ExpressionGenerator implements Generator {
 			String possibleParaType_arity = this.getParameterTypes()[arity - 1];
 			// need add code about parameter generator name
 			Vector<Expression> candidates = isBitOn(exactFlags, arity - 1)
-					? getPossibleExpressionsUnderDepth(d - 1, possibleParaType_arity)
-					: getPossibleExpressionInDepth(d - 2, possibleParaType_arity);
+					? getPossibleExpressionsInDepth(d - 1, possibleParaType_arity)
+					: getPossibleExpressionsUnderDepth(d - 2, possibleParaType_arity);
 			if(candidates.size()>0) {
 				for (Expression e : candidates) {
 					subExps[arity - 1] = e;
@@ -175,7 +175,7 @@ public class ExpressionGenerator implements Generator {
 	
 	
 
-	private Vector<Expression> getPossibleExpressionInDepth(int d, String possibleParaType_arity) {
+	private Vector<Expression> getPossibleExpressionsInDepth(int d, String possibleParaType_arity) {
 		Vector<Expression> result = new Vector<Expression>();
 		for(String t_s : Type.getSubType(possibleParaType_arity)) {
 			result.addAll(expsAtExactDepth_Table.root_table.get(t_s).get(d));

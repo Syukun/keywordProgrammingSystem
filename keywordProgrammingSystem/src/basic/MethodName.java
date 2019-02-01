@@ -24,7 +24,11 @@ public class MethodName {
 	}
 	
 	public String[] getParameterTypes() {
-		return this.typeNames;
+		String[] res = new String[typeNames.length-1];
+		for(int i = 0 ; i < typeNames.length-1 ; i++) {
+			res[i] = typeNames[i+1];
+		}
+		return res;
 	}
 
 	public String toString() {

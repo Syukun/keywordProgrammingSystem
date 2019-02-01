@@ -23,7 +23,7 @@ class ExpressionGeneratorTest {
 	@Test
 	void test() {
 		String keywords = "add line";
-		Vector<Expression> exps = ExpressionGenerator.generateExpression(2, keywords);
+		Vector<Expression> exps = ExpressionGenerator.generateExpression(4, keywords);
 		for (Expression exp : exps) {
 			System.out.println(exp.toString() + " : " +exp.getScore(keywords));
 		}
