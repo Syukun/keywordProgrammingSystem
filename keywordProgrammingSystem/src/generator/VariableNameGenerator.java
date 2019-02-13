@@ -9,38 +9,35 @@ import basic.Type;
 import basic.VariableName;
 import dataBase.DataBase;
 
-public class VariableNameGenerator extends ExpressionGenerator {
+public class VariableNameGenerator extends ExpressionGenerator implements GeneratorWithMultipleReturnType {
 
-	Vector<VariableName> varNames;
-	
+	VariableName varName;
+
+	public VariableNameGenerator() {
+
+	}
+
+	public VariableNameGenerator(VariableName varName) {
+		this.varName = varName;
+	}
+
 	@Override
-	public void changeProperty(String t) {
-		Vector<VariableName> result = new Vector<VariableName>();
-		for(VariableName varName : DataBase.allVariableName) {
-			// need to be modified later
-			if(varName.getType().toString().equals(t)) {
-				result.add(varName);
+	public Vector<ExpressionGenerator> getAllSubGeneratorWithTypeT(String t) {
+		Vector<ExpressionGenerator> result = new Vector<ExpressionGenerator>();
+		for (VariableName varName : DataBase.allVariableName) {
+			if (varName.getType().equals(t)) {
+				VariableNameGenerator vName = new VariableNameGenerator(varName) {
+					@Override
+					public void generateWithSubExps(Expression[] subExps, Vector<Expression> result) {
+						result.add(this.varName);
+					}
+				};
+				result.add(vName);
 			}
+
 		}
-		this.varNames = result;
-	}
-	
-	@Override
-	public Generator[] getParameterGenerators() {
-		// TODO Auto-generated method stub
-		return new Generator[] {};
+		return result;
 	}
 
-	@Override
-	public String[] getParameterTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void generateWithSubExps(Expression[] subExps, Vector<Expression> result) {
-		result.addAll(this.varNames);
-	}
-	
-	
+
 }

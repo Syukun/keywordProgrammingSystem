@@ -35,7 +35,7 @@ public class BinaryConditionalExpression extends Expression {
 	@Override
 	public String getType() {
 		// TODO Auto-generated method stub
-		return binaryOperator.isRelationalExpression() ? "boolean" : leftExpression.getType();
+		return binaryOperator.isRelationalExpression ? "boolean" : leftExpression.getType();
 	}
 
 }

@@ -36,8 +36,8 @@ public class JavaCompletionProposalComputer implements
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		// modify later
 		String keywords = this.getKeywords(context);
-//		String currentText = context.getDocument().get();
-//		ParsingContext(context.getDocument().get());
+		String currentText = context.getDocument().get();
+		ParsingContext(currentText);
 		Vector<Expression> exps = new ExpressionGenerator().generateExpression(10, keywords);
 		for(Expression exp : exps) {
 			result.add(new MyCompletionProposal(context,exp));

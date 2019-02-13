@@ -7,28 +7,32 @@ import dataBase.DataBase;
 
 public class MethodName {
 	String methodName;
-	String[] typeNames;
+	String returnType;
+	String[] parameterTypes;
 
-	public MethodName(String methodName, String[] typeNames) {
+	public MethodName(String methodName,String returnType,String[] parameterTypes) {
 		super();
 		this.methodName = methodName;
-		this.typeNames = typeNames;
+		this.returnType = returnType;
+		this.parameterTypes = parameterTypes;
+		
 	}
 
 	public String getReceiveType() {
-		return typeNames[0];
+		return this.parameterTypes[0];
 	}
 
 	public String getParameterType(int i) {
-		return typeNames[i];
+		return parameterTypes[i];
 	}
 	
 	public String[] getParameterTypes() {
-		String[] res = new String[typeNames.length-1];
-		for(int i = 0 ; i < typeNames.length-1 ; i++) {
-			res[i] = typeNames[i+1];
-		}
-		return res;
+//		String[] res = new String[parameterTypes.length];
+//		for(int i=1; i<parameterTypes.length ;i++) {
+//			res[i-1] = parameterTypes[i];
+//		}
+//		return res;
+		return this.parameterTypes;
 	}
 
 	public String toString() {
@@ -36,7 +40,11 @@ public class MethodName {
 	}
 	
 	public int getParaNumber() {
-		return this.typeNames.length-1;
+		return this.parameterTypes.length;
+	}
+	
+	public String getReturnType() {
+		return this.returnType;
 	}
 	
 	public BigDecimal getScore(String keywords) {

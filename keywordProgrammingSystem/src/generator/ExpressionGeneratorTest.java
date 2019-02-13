@@ -55,7 +55,7 @@ class ExpressionGeneratorTest {
 	void ScoreFunctionTest() {
 		// need more consideration in StringLiteral
 //		String keywords = "add line";
-		String keywords = "add line";
+		String keywords = "src read line";
 //		String sl1 = "\"a\"";
 //		StringLiteral sl_1 = new StringLiteral(sl1);
 //		float score = sl_1.getScore(keywords).floatValue();
@@ -68,8 +68,8 @@ class ExpressionGeneratorTest {
 //		System.out.println(score1.floatValue());
 //		System.out.println(score2.floatValue());
 		
-		MethodName mName_1 = new MethodName("readLine",
-				new String[] {"boolean","String","String"});
+		MethodName mName_1 = new MethodName("readLine","String",
+				new String[] {"BufferReader"});
 		BigDecimal score3 = mName_1.getScore(keywords);
 		MethodInvocation mi_1 = new MethodInvocation(varName_1,new Expression[] {},mName_1);
 		BigDecimal score4 = mi_1.getScore(keywords);

@@ -29,9 +29,9 @@ public class BinaryOperator {
 		return score;
 	}
 
-	public boolean isRelationalExpression() {
-		// TODO Auto-generated method stub
-		return this.isRelationalExpression;
+	
+	public String getReturnType() {
+		return this.isRelationalExpression?"boolean":this.typeName;
 	}
 
 }

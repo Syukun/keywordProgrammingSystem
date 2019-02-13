@@ -9,13 +9,19 @@ import basic.Type;
 
 public interface Generator {
 
-	public abstract Set<String> getAllPossibleReceiveTypes();
+//	public abstract Set<String> getAllPossibleReturnTypes();
 	
-	public abstract Generator[] getParameterGenerators();
+//	public abstract Generator[] getParameterGenerators();
+	
+	public String getReturnType();
+	
+	public String getReceiveType();
 
-	public abstract String[] getParameterTypes();
+	public String[] getParameterTypes();
 
 	public abstract void generateWithSubExps(Expression[] subExps, Vector<Expression> result);
+	
+
 
 
 }

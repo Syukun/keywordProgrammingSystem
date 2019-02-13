@@ -1,5 +1,7 @@
 package generator;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Vector;
 
 import basic.Expression;
@@ -8,58 +10,72 @@ import basic.MethodName;
 import basic.Type;
 import dataBase.DataBase;
 
-public class MethodInvocationGenerator extends ExpressionGenerator {
-	Vector<MethodName> methodNames;
-	
-	public Table expsLEQDepth_Table;
-	public Table expsAtExactDepth_Table;
+public class MethodInvocationGenerator extends ExpressionGenerator implements GeneratorWithMultipleReturnType {
+	MethodName methodName;
+
+
+	public MethodInvocationGenerator() {
+
+	}
 	
 	public MethodInvocationGenerator(Table expsLEQDepth_Table,Table expsAtExactDepth_Table) {
+		this.expsLEQDepth_Table = expsLEQDepth_Table;
 		this.expsAtExactDepth_Table = expsAtExactDepth_Table;
-		this.expsLEQDepth_Table = expsLEQDepth_Table ;
 	}
-	
+
+	public MethodInvocationGenerator(MethodName methodName,Table expsLEQDepth_Table,Table expsAtExactDepth_Table) {
+		this.methodName = methodName;
+		this.expsLEQDepth_Table = expsLEQDepth_Table;
+		this.expsAtExactDepth_Table = expsAtExactDepth_Table;
+
+	}
+
 	@Override
-	public void changeProperty(String t) {
-		Vector<MethodName> res = new Vector<MethodName>();
-		for(MethodName methodName : DataBase.allMethodNames) {
-			if(t.equals(methodName.getReceiveType().toString())) {
-				res.add(methodName);
+	public Vector<ExpressionGenerator> getAllSubGeneratorWithTypeT(String t) {
+		Vector<ExpressionGenerator> result = new Vector<ExpressionGenerator>();
+		for (MethodName mName : DataBase.allMethodNames) {
+			if (mName.getReturnType().equals(t)) {
+				Table table1 = this.expsLEQDepth_Table;
+				Table table2 = this.expsAtExactDepth_Table;
+				MethodInvocationGenerator methodInv = new MethodInvocationGenerator(mName,table1,table2) {
+					@Override
+					public String getReturnType() {
+						return mName.getReturnType();
+					}
+
+					@Override
+					public String[] getParameterTypes() {
+						return mName.getParameterTypes();
+					}
+
+					@Override
+					public Generator[] getParameterGenerators() {
+						int paraNum = mName.getParaNumber();
+						Generator[] res = new Generator[paraNum];
+						for (int i = 0; i < paraNum; i++) {
+							res[i] = new ExpressionGenerator();
+						}
+						return res;
+					}
+
+					@Override
+					public void generateWithSubExps(Expression[] subExps, Vector<Expression> result) {
+						Expression expFront;
+						Expression[] expsBack;
+						expFront = subExps[0];
+						int length = subExps.length;
+						expsBack = new Expression[length - 1];
+						for (int i = 0; i < length - 1; i++) {
+							expsBack[i] = subExps[i + 1];
+						}
+
+						result.add(new MethodInvocation(expFront, expsBack, mName));
+					}
+				};
+				result.add(methodInv);
 			}
 		}
-		this.methodNames = res;
+		return result;
 	}
-	
-	@Override
-	public void generateExpressionExact(int d, Vector<Expression> result) {
-		for(MethodName mname : this.methodNames) {
-			new ExpressionGenerator(expsLEQDepth_Table,expsAtExactDepth_Table) {
-				@Override
-				public Generator[] getParameterGenerators() {
-					int paraNum = mname.getParaNumber();
-					Generator[] res = new Generator[paraNum];
-					for(int i=0; i<paraNum ; i++) {
-						res[i] = new ExpressionGenerator();
-					}
-					return res;
-				}
-				
-				@Override
-				public String[] getParameterTypes() {
-					return mname.getParameterTypes();
-				}
-				
-				@Override
-				public void generateWithSubExps(Expression[] subExps,Vector<Expression> result) {
-					Expression expFront = subExps[0];
-					int length = subExps.length;
-					Expression[] expsBack = new Expression[length-1];
-					for(int i = 0 ; i < length-1 ; i++) {
-						expsBack[i] = subExps[i+1];
-					}
-					result.add(new MethodInvocation(expFront,expsBack,mname));
-				}
-			}.generateExpressionExact(d, result);
-		}
-	}
+
 }

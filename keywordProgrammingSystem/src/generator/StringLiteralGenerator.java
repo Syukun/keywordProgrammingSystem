@@ -23,7 +23,7 @@ public class StringLiteralGenerator extends ExpressionGenerator {
 		return null;
 	}
 	
-	public Set<String> getAllPossibleReceiveTypes(){
+	public Set<String> getAllPossibleReturnTypes(){
 		Set<String> allPossibleReceiveType = new HashSet<String>();
 		allPossibleReceiveType.add("String");
 		return allPossibleReceiveType;

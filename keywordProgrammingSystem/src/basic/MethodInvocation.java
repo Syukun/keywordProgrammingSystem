@@ -45,7 +45,7 @@ public class MethodInvocation extends Expression{
 	@Override
 	public String getType() {
 		// TODO Auto-generated method stub
-		return this.methodName.getReceiveType();
+		return this.methodName.getReturnType();
 	}
 	
 	
