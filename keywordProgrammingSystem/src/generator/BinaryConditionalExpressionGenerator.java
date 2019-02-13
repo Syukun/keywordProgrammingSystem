@@ -64,6 +64,11 @@ public class BinaryConditionalExpressionGenerator extends ExpressionGenerator
 		}
 		return result;
 	}
+	
+	public int getArity() {
+		// TODO Auto-generated method stub
+		return 2;
+	}
 
 
 }

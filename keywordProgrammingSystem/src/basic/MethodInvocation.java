@@ -24,7 +24,7 @@ public class MethodInvocation extends Expression{
 		result.append(methodName.toString()+"(");
 		String seperator = "";
 		for(Expression exp: expressionsBack) {
-			result.append(exp.toString()+seperator);
+			result.append(seperator+exp.toString());
 			seperator = ",";
 		}
 		result.append(")");
@@ -35,7 +35,12 @@ public class MethodInvocation extends Expression{
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		score = score.add(expressionFront.getScore(keywords)).add(methodName.getScore(keywords));
+		if(expressionFront!=null) {
+			score = score.add(expressionFront.getScore(keywords));
+		}
+		
+		score = score.add(methodName.getScore(keywords));
+		
 		for(Expression exp : expressionsBack) {
 			score = score.add(exp.getScore(keywords));
 		}

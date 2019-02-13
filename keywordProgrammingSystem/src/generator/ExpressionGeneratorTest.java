@@ -22,18 +22,20 @@ class ExpressionGeneratorTest {
 
 	@Test
 	void test() {
+		DataBase.initDataBase();
 		String keywords = "add line";
-		Vector<Expression> exps = new ExpressionGenerator().generateExpression(3, keywords);
+		Vector<Expression> exps = new ExpressionGenerator().generateExpression(5, keywords);
 		for (Expression exp : exps) {
 			System.out.println(exp.toString() + " : " +exp.getScore(keywords));
 		}
 		
 		System.out.println("**************************************");
-//		Vector<Expression> exps2 = new ExpressionGenerator().generateExpression(1, keywords);
+//		
+//		Vector<Expression> exps2 = new ExpressionGenerator().generateExpression(3, keywords);
 //		for (Expression exp : exps2) {
 //			System.out.println(exp.toString() + " : " +exp.getScore(keywords));
 //		}
-////		
+//		
 //		IntegerLiteral i1 = new IntegerLiteral(1);
 //		BigDecimal score = i1.getScore(keywords);
 //		System.out.println(score.floatValue());		
@@ -44,9 +46,9 @@ class ExpressionGeneratorTest {
 //	void testMethodInvocation() {
 //		IntegerLiteral i1 = new IntegerLiteral(1);
 //		IntegerLiteral i2 = new IntegerLiteral(2);
-//		MethodName mn1 = new MethodName("add", 
-//				new Type[] {DataBase.allTypes.get("boolean"),DataBase.allTypes.get("int"),DataBase.allTypes.get("int")});
-//		MethodInvocation mi = new MethodInvocation(i1,new Expression[] {i2},mn1);
+//		MethodName mn1 = new MethodName("add","boolean",
+//				new String[] {null,"Integer","Integer"});
+//		MethodInvocation mi = new MethodInvocation(null,new Expression[] {i1,i2},mn1);
 //		System.out.println(mi.toString());
 //	
 //	}
@@ -72,6 +74,7 @@ class ExpressionGeneratorTest {
 				new String[] {"BufferReader"});
 		BigDecimal score3 = mName_1.getScore(keywords);
 		MethodInvocation mi_1 = new MethodInvocation(varName_1,new Expression[] {},mName_1);
+		
 		BigDecimal score4 = mi_1.getScore(keywords);
 	}
 }

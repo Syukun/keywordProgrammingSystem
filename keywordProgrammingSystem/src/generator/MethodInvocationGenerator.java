@@ -45,6 +45,7 @@ public class MethodInvocationGenerator extends ExpressionGenerator implements Ge
 
 					@Override
 					public String[] getParameterTypes() {
+						
 						return mName.getParameterTypes();
 					}
 
@@ -57,17 +58,29 @@ public class MethodInvocationGenerator extends ExpressionGenerator implements Ge
 						}
 						return res;
 					}
+					
+					@Override
+					public int getArity() {
+						// TODO Auto-generated method stub
+						return mName.getParaNumber();
+					}
 
 					@Override
 					public void generateWithSubExps(Expression[] subExps, Vector<Expression> result) {
 						Expression expFront;
 						Expression[] expsBack;
-						expFront = subExps[0];
-						int length = subExps.length;
-						expsBack = new Expression[length - 1];
-						for (int i = 0; i < length - 1; i++) {
-							expsBack[i] = subExps[i + 1];
+						if(mName.getReceiveType()==null) {
+							expFront = null;
+							expsBack = subExps;
+						}else {
+							expFront = subExps[0];
+							int length = subExps.length;
+							expsBack = new Expression[length - 1];
+							for (int i = 0; i < length - 1; i++) {
+								expsBack[i] = subExps[i + 1];
+							}
 						}
+						
 
 						result.add(new MethodInvocation(expFront, expsBack, mName));
 					}

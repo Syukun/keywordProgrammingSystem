@@ -29,7 +29,7 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 
 
 	public Vector<Expression> generateExpression(int depth, String keywords) {
-		DataBase.initDataBase();
+//		DataBase.initDataBase();
 		
 		Vector<Expression> result = new Vector<Expression>();
 		Set<String> receiveTypes = this.getAllPossibleReturnTypes();
@@ -130,18 +130,21 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 	}
 
 	public Set<String> getAllPossibleReturnTypes(){
-		Set<String> allPossibleReceiveType = new HashSet<String>();
-		allPossibleReceiveType.add("boolean");
-		allPossibleReceiveType.add("Integer");
-		allPossibleReceiveType.add("String");
-		allPossibleReceiveType.add("BufferedReader");
-		allPossibleReceiveType.add("List<String>");
-		return allPossibleReceiveType;
+//		Set<String> allPossibleReceiveType = new HashSet<String>();
+//		allPossibleReceiveType.add("boolean");
+//		allPossibleReceiveType.add("Integer");
+//		allPossibleReceiveType.add("String");
+//		allPossibleReceiveType.add("BufferedReader");
+//		allPossibleReceiveType.add("List<String>");
+//		return allPossibleReceiveType;
+		
+		return DataBase.allTypes.keySet();
 	}
 
 	
 	public void generateExpressionExact(int d, Vector<Expression> result) {
-		int arity = this.getParameterGenerators().length;
+//		int arity = this.getParameterGenerators().length;
+		int arity = this.getArity();
 		if (arity == 0) {
 			if (d == 1) {
 				generateWithSubExps(new Expression[0], result);
@@ -150,6 +153,12 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 			generateWithArity(d, arity, result);
 		}
 	}
+
+	public int getArity() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 
 	private void generateWithArity(int d, int arity, Vector<Expression> result) {
 		for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
@@ -175,9 +184,9 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 					generateWithArityAuxi(d, arity - 1, exactFlags, result, subExps);
 				}
 			}
-			if(arity == 1 && this.getReceiveType()==null) {
-				subExps[0] = null;
-			}
+//			if(arity == 1 && this.getReceiveType()==null) {
+//				subExps[0] = null;
+//			}
 
 		}
 
@@ -186,7 +195,11 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 
 	private Vector<Expression> getPossibleExpressionsInDepth(int d, String possibleParaType_arity) {
 		Vector<Expression> result = new Vector<Expression>();
-		for(String t_s : Type.getSubType(possibleParaType_arity)) {
+		String[] subT = Type.getSubType(possibleParaType_arity);
+//		if(subT == null) {
+//			return result;
+//		}
+		for(String t_s : subT) {
 			// t_s : BufferReader
 			// d = 2
 			Table table2 = this.expsAtExactDepth_Table;
@@ -201,7 +214,11 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 
 	private Vector<Expression> getPossibleExpressionsUnderDepth(int d, String possibleParaType_arity) {
 		Vector<Expression> result = new Vector<Expression>();
-		for(String t_s : Type.getSubType(possibleParaType_arity)) {
+		String[] subT = Type.getSubType(possibleParaType_arity);
+//		if(subT == null) {
+//			return result;
+//		}
+		for(String t_s : subT) {
 			result.addAll(this.expsLEQDepth_Table.root_table.get(t_s).get(d));
 		}
 		return result;

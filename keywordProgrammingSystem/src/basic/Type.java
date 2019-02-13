@@ -24,7 +24,9 @@ public class Type{
 		return this.subTypes;
 	}
 	public static String[] getSubType(String possibleParaType_arity) {
-		// TODO Auto-generated method stub
+		if(possibleParaType_arity == null) {
+			return null;
+		}
 		return possibleParaType_arity.split(",");
 	}
 	

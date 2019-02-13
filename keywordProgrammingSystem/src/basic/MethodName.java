@@ -27,12 +27,17 @@ public class MethodName {
 	}
 	
 	public String[] getParameterTypes() {
-//		String[] res = new String[parameterTypes.length];
-//		for(int i=1; i<parameterTypes.length ;i++) {
-//			res[i-1] = parameterTypes[i];
-//		}
-//		return res;
-		return this.parameterTypes;
+
+		if(this.getReceiveType()!=null) {
+			return this.parameterTypes;	
+		}else {
+			String[] res = new String[parameterTypes.length];
+			for(int i=1; i<parameterTypes.length ;i++) {
+				res[i-1] = parameterTypes[i];
+			}
+			return res;
+		}
+		
 	}
 
 	public String toString() {
@@ -40,6 +45,10 @@ public class MethodName {
 	}
 	
 	public int getParaNumber() {
+		
+		if(this.getReceiveType() == null) {
+			return this.parameterTypes.length - 1;
+		}
 		return this.parameterTypes.length;
 	}
 	

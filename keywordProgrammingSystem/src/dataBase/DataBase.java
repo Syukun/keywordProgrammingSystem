@@ -47,10 +47,10 @@ public class DataBase {
 	}
 
 	private static void initAllBinaryOperators() {
-		allBinaryOperators.add(new BinaryOperator(">","Integer",true));
-		allBinaryOperators.add(new BinaryOperator("<","Integer",true));
-		allBinaryOperators.add(new BinaryOperator("+","Integer", false));
-		allBinaryOperators.add(new BinaryOperator("-","Integer", false));
+//		allBinaryOperators.add(new BinaryOperator(">","Integer",true));
+//		allBinaryOperators.add(new BinaryOperator("<","Integer",true));
+//		allBinaryOperators.add(new BinaryOperator("+","Integer", false));
+//		allBinaryOperators.add(new BinaryOperator("-","Integer", false));
 	}
 
 	private static void initStringLiterals() {
@@ -74,6 +74,12 @@ public class DataBase {
 		
 		allMethodNames.add(new MethodName("concat","String",
 				new String[] {"String","String"}));
+		
+		allMethodNames.add(new MethodName("add","boolean",
+				new String[] {null,"Integer","Integer"}));
+		
+		allMethodNames.add(new MethodName("add_Int","Integer",
+				new String[] {"Integer","Integer"}));
 	}
 
 }
