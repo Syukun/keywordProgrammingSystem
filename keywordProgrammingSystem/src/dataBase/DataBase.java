@@ -33,8 +33,8 @@ public class DataBase {
 	}
 
 	private static void initVariableName() {
-		allVariableName.add(new VariableName("src","BufferedReader"));
-		allVariableName.add(new VariableName("array","List<String>"));
+//		allVariableName.add(new VariableName("src","BufferedReader"));
+//		allVariableName.add(new VariableName("array","List<String>"));
 	}
 
 	private static void initAllTypes() {
@@ -54,14 +54,14 @@ public class DataBase {
 	}
 
 	private static void initStringLiterals() {
-		allStringLiterals.add(new StringLiteral("a"));
-		allStringLiterals.add(new StringLiteral("b"));
+//		allStringLiterals.add(new StringLiteral("a"));
+//		allStringLiterals.add(new StringLiteral("b"));
 
 	}
 
 	private static void initIntegerLiterals() {
-		allIntegerLiterals.add(new IntegerLiteral(0));		
-		allIntegerLiterals.add(new IntegerLiteral(1));
+//		allIntegerLiterals.add(new IntegerLiteral(0));		
+//		allIntegerLiterals.add(new IntegerLiteral(1));
 	}
 	
 	private static void initMethodNames() {
@@ -72,8 +72,8 @@ public class DataBase {
 		allMethodNames.add(new MethodName("readLine","String",
 				new String[] {"BufferedReader"}));
 		
-		allMethodNames.add(new MethodName("concat","String",
-				new String[] {"String","String"}));
+//		allMethodNames.add(new MethodName("concat","String",
+//				new String[] {"String","String"}));
 		
 		allMethodNames.add(new MethodName("add","boolean",
 				new String[] {null,"Integer","Integer"}));

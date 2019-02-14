@@ -5,19 +5,19 @@ import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 
+import basic.Type;
+import basic.VariableName;
 import basic.Expression;
+import basic.MethodName;
 import dataBase.DataBase;
 import generator.ExpressionGenerator;
 
@@ -36,8 +36,28 @@ public class JavaCompletionProposalComputer implements
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		// modify later
 		String keywords = this.getKeywords(context);
+		
+		// get context without keyword query
 		String currentText = context.getDocument().get();
-		ParsingContext(currentText);
+		Document document = (Document) context.getDocument(); 
+		
+		StringBuffer textWithoutKeyword = new StringBuffer("");
+		int cursorPosition = context.getViewer().getSelectedRange().x;
+		int line;
+		try {
+			line = document.getLineOfOffset(cursorPosition);
+			int firstPosition = document.getLineOffset(line);
+			int lastPosition = document.getLineOffset(line+1);
+			textWithoutKeyword.append(currentText.substring(0, firstPosition));
+			textWithoutKeyword.append(currentText.substring(lastPosition));
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+		
+		DataBase.initDataBase();
+		parsingContext(textWithoutKeyword.toString(),cursorPosition);
 		Vector<Expression> exps = new ExpressionGenerator().generateExpression(10, keywords);
 		for(Expression exp : exps) {
 			result.add(new MyCompletionProposal(context,exp));
@@ -47,11 +67,149 @@ public class JavaCompletionProposalComputer implements
 		return result;
 	}
 
-	private void ParsingContext(String currentText) {
+	private void parsingContext(String currentText,int cursorPosition) {
+//		System.out.println("Line 71 cursor position is : "+ cursorPosition);
+		
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
 		parser.setSource(currentText.toCharArray());
 		CompilationUnit cu = (CompilationUnit)parser.createAST(null);
-		cu.accept(new MyVisitor());
+		cu.accept(new ASTVisitor() {
+			public boolean visit(TypeDeclaration node) {
+				// class name and receiver type
+				String className = node.getName().toString();
+				DataBase.allTypes.put(className, new Type(className));
+				
+				FieldDeclaration[] fields = node.getFields();
+				MethodDeclaration[] methods = node.getMethods();
+				
+				for(FieldDeclaration field : fields) {
+					String fieldType = field.getType().toString();
+					if(fieldType == "int") {
+						fieldType = "Integer";
+					}
+					DataBase.allTypes.put(fieldType, new Type(fieldType));
+					
+					List<VariableDeclarationFragment> vdfs = field.fragments();
+					for(VariableDeclarationFragment vdf : vdfs) {
+						String vName = vdf.getName().toString();
+						DataBase.allVariableName.add(new VariableName(vName,fieldType));
+					}
+				}
+				int methodNumber = methods.length;
+				
+				for(int i = 0; i < methodNumber-1 ; i++) {
+					MethodDeclaration method = methods[i];
+					
+					String methodName = method.getName().toString();
+					String returnType = method.getReturnType2().toString();
+					DataBase.allTypes.put(returnType, new Type(returnType));
+					
+					String receiveType;
+					if(method.getReceiverType()!=null) {
+						receiveType = method.getReceiverType().toString();
+					}else {
+						receiveType = className;
+					}
+					DataBase.allTypes.put(receiveType, new Type(receiveType));
+					
+					List<SingleVariableDeclaration> svds = method.parameters();
+					int paraNum = svds.size();
+					
+					String[] paraTypes = new String[paraNum+1];
+					paraTypes[0] = receiveType;
+					for(int j = 1; j <= paraNum ; j++) {
+						String parameterType = svds.get(j-1).getType().toString();
+						DataBase.allTypes.put(parameterType, new Type(parameterType));
+						paraTypes[j] = parameterType;
+						
+						String parameterName = svds.get(j-1).getName().toString();
+						DataBase.allVariableName.add(new VariableName(parameterName,parameterType));
+					}
+					DataBase.allMethodNames.add(new MethodName(methodName,returnType,paraTypes));
+					
+					int startPosition = method.getStartPosition();
+					int endPosition = methods[i+1].getStartPosition();
+//					System.out.println("Name " + methods[i+1].getName().toString());
+//					System.out.println("Num" + i+1 + " Start position is : " + startPosition);
+//					System.out.println("Num" + i+1 + " End position is : " + endPosition);
+					if(cursorPosition >= startPosition && cursorPosition < endPosition) {
+						Block  body = method.getBody();
+						// need modify later by change the position of panduan cursor position
+						List<Statement> statements = body.statements();
+						for(Statement statement : statements) {
+							if(statement instanceof VariableDeclarationStatement) {
+								String fieldType = ((VariableDeclarationStatement) statement).getType().toString();
+								DataBase.allTypes.put(fieldType, new Type(fieldType));
+								
+								List<VariableDeclarationFragment> vdfs = ((VariableDeclarationStatement) statement).fragments();
+								for(VariableDeclarationFragment vdf : vdfs) {
+									String vName = vdf.getName().toString();
+									DataBase.allVariableName.add(new VariableName(vName,fieldType));
+								}
+							}
+						}
+					}
+				}
+				
+				
+				if(methodNumber > 0) {
+					// could refractor this as a method
+					MethodDeclaration method = methods[methodNumber-1];					
+					
+					String methodName = method.getName().toString();
+					String returnType = method.getReturnType2().toString();
+					DataBase.allTypes.put(returnType, new Type(returnType));
+					
+					String receiveType;
+					if(method.getReceiverType()!=null) {
+						receiveType = method.getReceiverType().toString();
+					}else {
+						receiveType = className;
+					}
+					DataBase.allTypes.put(receiveType, new Type(receiveType));
+					
+					List<SingleVariableDeclaration> svds = method.parameters();
+					int paraNum = svds.size();
+					
+					String[] paraTypes = new String[paraNum+1];
+					paraTypes[0] = receiveType;
+					for(int j = 1; j <= paraNum ; j++) {
+						String parameterType = svds.get(j-1).getType().toString();
+						DataBase.allTypes.put(parameterType, new Type(parameterType));
+						paraTypes[j] = parameterType;
+						
+						String parameterName = svds.get(j-1).getName().toString();
+//						System.out.println("Parameter Type : " + paraTypes[1]+ "Parameter Name : " + parameterName);
+					
+						DataBase.allVariableName.add(new VariableName(parameterName,parameterType));
+					}
+					DataBase.allMethodNames.add(new MethodName(methodName,returnType,paraTypes));
+					
+					int startPosition = method.getStartPosition();
+					if(cursorPosition >= startPosition) {
+						// could refractor later
+						Block  body = method.getBody();
+						// need modify later by change the position of panduan cursor position
+						List<Statement> statements = body.statements();
+						for(Statement statement : statements) {
+							if(statement instanceof VariableDeclarationStatement) {
+								String fieldType = ((VariableDeclarationStatement) statement).getType().toString();
+								DataBase.allTypes.put(fieldType, new Type(fieldType));
+								
+								List<VariableDeclarationFragment> vdfs = ((VariableDeclarationStatement) statement).fragments();
+								for(VariableDeclarationFragment vdf : vdfs) {
+									String vName = vdf.getName().toString();
+									DataBase.allVariableName.add(new VariableName(vName,fieldType));
+								}
+							}
+						}
+					}
+					
+				}
+				
+				return false;
+			}
+		});
 		
 	}
 
