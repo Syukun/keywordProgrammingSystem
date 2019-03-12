@@ -33,8 +33,8 @@ public class DataBase {
 	}
 
 	private static void initVariableName() {
-//		allVariableName.add(new VariableName("src","BufferedReader"));
-//		allVariableName.add(new VariableName("array","List<String>"));
+		allVariableName.add(new VariableName("src","BufferedReader"));
+		allVariableName.add(new VariableName("array","List<String>"));
 	}
 
 	private static void initAllTypes() {
@@ -72,8 +72,8 @@ public class DataBase {
 		allMethodNames.add(new MethodName("readLine","String",
 				new String[] {"BufferedReader"}));
 		
-//		allMethodNames.add(new MethodName("concat","String",
-//				new String[] {"String","String"}));
+		allMethodNames.add(new MethodName("concat","String",
+				new String[] {"String","String"}));
 		
 		allMethodNames.add(new MethodName("add","boolean",
 				new String[] {null,"Integer","Integer"}));

@@ -19,7 +19,9 @@ public class ParsingTest {
 //		JavaCore.setComplianceOptions(JavaCore.VERSION_9, options);
 //		parser.setCompilerOptions(options);
 		CompilationUnit cu = (CompilationUnit)parser.createAST(null);
-		cu.accept(new TVisitor());
+		AST ast = cu.getAST();
+		System.out.println(ast);
+//		cu.accept(new TVisitor());
 	}
 	
 	public static void main(String[] args) {
