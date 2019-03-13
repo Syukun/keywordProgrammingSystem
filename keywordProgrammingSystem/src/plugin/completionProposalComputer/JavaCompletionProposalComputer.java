@@ -42,8 +42,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		
 		ICompilationUnit cu = ((JavaContentAssistInvocationContext)context).getCompilationUnit();				
-		CompilationUnit cu_ast = (CompilationUnit)cu;
-		
+		CompilationUnit cu_ast = (CompilationUnit) cu;
 		String keywords = "add line";
 		try {
 			IType[] types = cu.getAllTypes();
