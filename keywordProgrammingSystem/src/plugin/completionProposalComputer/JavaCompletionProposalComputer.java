@@ -37,28 +37,34 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context,
 			IProgressMonitor monitor) {
-
+		
+		
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-		
-		// get 
-		ICompilationUnit cu = ((JavaContentAssistInvocationContext)context).getCompilationUnit();
-
-		
-		try {
-			t = (IType)(cu.getChildren()[1]);
-		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		
 		// get cursor location
 		int cursorPos = context.getViewer().getSelectedRange().x;
 
-		
+		// get
+		ICompilationUnit cu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
+
+		try {
+			IJavaElement[] types = cu.getChildren();
+			for(IJavaElement type : types) {
+				if(type instanceof IType) {
+					String typeName = type.getElementName();
+					// get start position and length 
+					
+				}
+			}
+			
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		// test whether the keyword query have any influence on ast
 		String keywords = "add line";
-		
+
 		Vector<Expression> exps = new ExpressionGenerator().generateExpression(10, keywords);
 		for (Expression exp : exps) {
 			result.add(new MyCompletionProposal(context, exp));
@@ -66,8 +72,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 		return result;
 	}
-
-
 
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context,
@@ -86,8 +90,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 	public void sessionEnded() {
 		// TODO Auto-generated method stub
 	}
-	
-	
 
 	private String getKeywords(ContentAssistInvocationContext context) {
 		String res = "";
