@@ -43,23 +43,24 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		
 		// get cursor location
 		int cursorPos = context.getViewer().getSelectedRange().x;
-
-		// get
-		ICompilationUnit cu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
-
-		try {
-			IJavaElement[] types = cu.getChildren();
-			for(IJavaElement type : types) {
-				if(type instanceof IType) {
-					String typeName = type.getElementName();
-					// get start position and length 
-					
-				}
-			}
-			
-		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		// get current Compilation Unit
+		// currently parsing the whole source file, looking whether I can get AST directly from context later
+//		char[] source = context.getDocument().get().toCharArray();
+		ASTParser parser = ASTParser.newParser(AST.JLS11);
+		parser.setSource(((JavaContentAssistInvocationContext)context).getCompilationUnit());
+		
+		ASTNode cu = parser.createAST(null);
+		
+		// get the innerest ASTNode
+		NodeFinder nodeFinder = new NodeFinder(cu,cursorPos,0);
+		ASTNode innerestNode = nodeFinder.getCoveringNode();
+		ASTNode parsedNode =  innerestNode;
+		
+		// get elements
+		while(parsedNode!=null) {
+			parsedNode.accept(new MyVisitor(cursorPos));
+			parsedNode = parsedNode.getParent();
 		}
 
 		// test whether the keyword query have any influence on ast

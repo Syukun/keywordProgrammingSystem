@@ -20,8 +20,8 @@ public class ParsingTest {
 //		parser.setCompilerOptions(options);
 		CompilationUnit cu = (CompilationUnit)parser.createAST(null);
 		AST ast = cu.getAST();
-		System.out.println(ast);
-//		cu.accept(new TVisitor());
+//		System.out.println(ast);
+		cu.accept(new TVisitor());
 	}
 	
 	public static void main(String[] args) {
@@ -39,9 +39,10 @@ public class ParsingTest {
 				"		return array;\n" + 
 				"	}\n" + 
 				"	\n" + 
-				"	public static void main(String[] args) {\n" + 
+				"	public static void main(String[] args) {\n" +
+				"   { int i;}\n" +
 				"		\n" + 
-				"	}\n" + 
+				"	}\n" +
 				"	\n" + 
 				"}";
 		parsingContext(context);
@@ -51,65 +52,8 @@ public class ParsingTest {
 class TVisitor extends ASTVisitor{
 	
 	@SuppressWarnings("unchecked")
-	public boolean visit(TypeDeclaration node) {
-		String className = node.getName().toString();
-		System.out.println("Class Name is : " + className);
-		
-		FieldDeclaration[] fields = node.getFields();
-		MethodDeclaration[] methods = node.getMethods();
-		for(FieldDeclaration field : fields) {
-			String fieldType = field.getType().toString();
-			if(fieldType == "int") {
-				fieldType = "Integer";
-			}
-			List<VariableDeclarationFragment> vdfs = field.fragments();
-			for(VariableDeclarationFragment vdf : vdfs) {
-				String vName = vdf.getName().toString();
-				System.out.println("varaible name is : " + vName + "  Type is : " + fieldType);
-		
-			}
-		}
-		
-		for(MethodDeclaration method : methods) {
-			String methodName = method.getName().toString();
-			System.out.println("Method Name is : " + methodName);
-			List<SingleVariableDeclaration> svds = method.parameters();
-			int parameterSize = svds.size();
-			for(SingleVariableDeclaration svd : svds) {
-				System.out.println("Parameter Type is : " + svd.getType().toString()
-						+ "  Parameter Name is : " + svd.getName().toString());
-			}
-			
-			String returnType = method.getReturnType2().toString();
-			System.out.println("Return Type is : " + returnType);
-			
-			String receiveType;
-			if(method.getReceiverType() == null) {
-				receiveType = "null";
-			}else {
-				receiveType = method.getReceiverType().toString();
-			}
-			System.out.println("Receive Type is : " + receiveType);
-			
-			Block body = method.getBody();
-			List<Statement> statements = body.statements();
-			for(Statement statement : statements) {
-				if(statement instanceof VariableDeclarationStatement) {
-					String fieldType = ((VariableDeclarationStatement) statement).getType().toString();
-					System.out.println("Field Type in method is : " + fieldType);
-					List<VariableDeclarationFragment> vdfs = ((VariableDeclarationStatement) statement).fragments();
-					for(VariableDeclarationFragment vdf : vdfs) {
-						String vName = vdf.getName().toString();
-						System.out.println("varaible name is : " + vName + "  Type is : " + fieldType);
-				
-					}
-				}
-			}
-			System.out.println();
-//			System.out.println(method.getStartPosition());
-			
-		}
-		
+	public boolean visit(AnonymousClassDeclaration node) {
+		System.out.println("have");
 		return false;
 	}
 
