@@ -33,7 +33,7 @@ public class MyVisitor extends ASTVisitor {
 		PackageDeclaration packageDeclaration = node.getPackage();
 		if (packageDeclaration != null) {
 			String packageName = packageDeclaration.getName().toString();
-			data_tmp.add("Package Name : " + packageName);
+			data_tmp.add("Package Name : " + packageName + "\n");
 		}
 
 		// get import declaration
@@ -42,7 +42,7 @@ public class MyVisitor extends ASTVisitor {
 		if (importDeclarations != null) {
 			for (ImportDeclaration importDeclaration : importDeclarations) {
 				String importName = importDeclaration.getName().toString();
-				data_tmp.add("Import Package Name : " + importName);
+				data_tmp.add("Import Package Name : " + importName + "\n");
 			}
 		}
 
@@ -55,7 +55,7 @@ public class MyVisitor extends ASTVisitor {
 				int len = typeDeclaration.getLength();
 
 				String typeName = typeDeclaration.getName().toString();
-				data_tmp.add("Class Name : " + typeName);
+				data_tmp.add("Class Name : " + typeName + "\n");
 				if (!(cursorPos >= startPos && cursorPos <= startPos + len)) {
 					this.visitOtherClass(typeDeclaration);
 				}
@@ -79,7 +79,7 @@ public class MyVisitor extends ASTVisitor {
 			for (BodyDeclaration bodyDeclaration : bodyDeclarations) {
 				if (bodyDeclaration instanceof AbstractTypeDeclaration) {
 					String typeName = ((AbstractTypeDeclaration) bodyDeclaration).getName().toString();
-					data_tmp.add("Class in inside class : " + typeName);
+					data_tmp.add("Class in inside class : " + typeName + "\n");
 					this.visit((AbstractTypeDeclaration) bodyDeclaration);
 				}
 
@@ -89,7 +89,7 @@ public class MyVisitor extends ASTVisitor {
 							.fragments();
 					for (VariableDeclarationFragment variableDeclarationFragment : variableDeclarationFragments) {
 						data_tmp.add("Member Field Name : \n\tType Name is : " + typeName + ", name is : "
-								+ variableDeclarationFragment.getName().toString());
+								+ variableDeclarationFragment.getName().toString() + "\n");
 					}
 				}
 
@@ -109,12 +109,12 @@ public class MyVisitor extends ASTVisitor {
 
 					data_tmp.add("Inner Class Method : " + "Return Type Name : " + returnTypeName + "\n"
 							+ "Reveiver Type Name : " + receiveTypeName + "\n" + "Method Name : " + methodName + "\n"
-							+ "Parameter Types Names : " + parameterTypeNames);
+							+ "Parameter Types Names : " + parameterTypeNames + "\n");
 				}
 
 			}
 		}
-		return false;
+		return true;
 	}
 
 	// the class which the cursor not in
@@ -130,7 +130,7 @@ public class MyVisitor extends ASTVisitor {
 				// need to check whether it is correct??
 				if (bodyDeclaration instanceof AbstractTypeDeclaration) {
 					String typeName = ((AbstractTypeDeclaration) bodyDeclaration).getName().toString();
-					data_tmp.add("Class in outside class : " + typeName);
+					data_tmp.add("Class in outside class : " + typeName + "\n");
 					this.visitOtherClass((AbstractTypeDeclaration) bodyDeclaration);
 				}
 
@@ -151,7 +151,7 @@ public class MyVisitor extends ASTVisitor {
 							.fragments();
 					for (VariableDeclarationFragment variableDeclarationFragment : variableDeclarationFragments) {
 						data_tmp.add("Other Class Field Name : Type Name is : " + typeName + ", name is : "
-								+ variableDeclarationFragment.getName().toString());
+								+ variableDeclarationFragment.getName().toString() + "\n");
 					}
 				}
 
@@ -175,7 +175,7 @@ public class MyVisitor extends ASTVisitor {
 
 					data_tmp.add("Other Class Method : " + "Return Type Name : " + returnTypeName + "\n"
 							+ "Reveiver Type Name : " + receiveTypeName + "\n" + "Method Name : " + methodName + "\n"
-							+ "Parameter Types Names : " + parameterTypeNames);
+							+ "Parameter Types Names : " + parameterTypeNames + "\n");
 				}
 
 			}
@@ -213,7 +213,7 @@ public class MyVisitor extends ASTVisitor {
 
 			}
 		}
-		return false;
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -297,7 +297,7 @@ public class MyVisitor extends ASTVisitor {
 			String typeName = ((VariableDeclarationStatement) statement).getType().toString();
 			List<VariableDeclarationFragment> localVariables = (List<VariableDeclarationFragment>)((VariableDeclarationStatement) statement).fragments();
 			for(VariableDeclarationFragment localVariable : localVariables) {
-				data_tmp.add("Local Varible is : (" + typeName + ", " + localVariable.getName().toString() + ")");
+				data_tmp.add("Local Varible is : (" + typeName + ", " + localVariable.getName().toString() + ")" + "\n");
 				// did not consider the expression part
 			}
 		}

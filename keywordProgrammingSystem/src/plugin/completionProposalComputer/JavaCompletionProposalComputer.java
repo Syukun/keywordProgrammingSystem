@@ -15,9 +15,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 
-import org.eclipse.jdt.internal.core.CompilationUnit;
-import org.eclipse.jdt.internal.core.SourceType;
-
 import basic.Type;
 import basic.VariableName;
 import basic.Expression;
@@ -59,7 +56,9 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		
 		// get elements
 		while(parsedNode!=null) {
-			parsedNode.accept(new MyVisitor(cursorPos));
+//			parsedNode.accept(new MyVisitor(cursorPos));
+			
+//			getElement(parsedNode);
 			parsedNode = parsedNode.getParent();
 		}
 
@@ -74,6 +73,16 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		return result;
 	}
 
+	List<String> outcome = new ArrayList<String>();
+	
+	private void getElement(CompilationUnit node) {
+		PackageDeclaration packageDeclaration = node.getPackage();
+		if (packageDeclaration != null) {
+			String packageName = packageDeclaration.getName().toString();
+			outcome.add("Package Name : " + packageName + "\n");
+		}
+	}
+	
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context,
 			IProgressMonitor monitor) {
@@ -111,4 +120,5 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		return res;
 	}
 
+	
 }
