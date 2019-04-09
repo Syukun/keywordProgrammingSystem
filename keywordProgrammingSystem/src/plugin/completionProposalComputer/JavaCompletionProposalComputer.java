@@ -23,6 +23,9 @@ import dataBase.DataBase;
 import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
+	public static String TD = "org.eclipse.jdt.core.dom.TypeDeclaration";
+	public static String BLOCK = "org.eclipse.jdt.core.dom.Block";
+	public static String VDS = "org.eclipse.jdt.core.dom.VariableDeclarationStatement";
 
 	@Override
 	public void sessionStarted() {
@@ -34,33 +37,31 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 	@Override
 	public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context,
 			IProgressMonitor monitor) {
-		
-		
+
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-		
+
 		// get cursor location
 		int cursorPos = context.getViewer().getSelectedRange().x;
-		
-		// get current Compilation Unit
-		// currently parsing the whole source file, looking whether I can get AST directly from context later
-//		char[] source = context.getDocument().get().toCharArray();
+
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
-		parser.setSource(((JavaContentAssistInvocationContext)context).getCompilationUnit());
-		
+		parser.setSource(((JavaContentAssistInvocationContext) context).getCompilationUnit());
+
 		ASTNode cu = parser.createAST(null);
-		
+
 		// get the innerest ASTNode
-		NodeFinder nodeFinder = new NodeFinder(cu,cursorPos,0);
+		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
 		ASTNode innerestNode = nodeFinder.getCoveringNode();
-		ASTNode parsedNode =  innerestNode;
-		
-		// get elements
-		while(parsedNode!=null) {
-//			parsedNode.accept(new MyVisitor(cursorPos));
-			
-//			getElement(parsedNode);
-			parsedNode = parsedNode.getParent();
+		ASTNode parsedNode = innerestNode;
+		int startPos = cursorPos;
+
+		try {
+			getAllLocalVariable(parsedNode, startPos);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
+
 
 		// test whether the keyword query have any influence on ast
 		String keywords = "add line";
@@ -73,16 +74,54 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		return result;
 	}
 
-	List<String> outcome = new ArrayList<String>();
-	
-	private void getElement(CompilationUnit node) {
-		PackageDeclaration packageDeclaration = node.getPackage();
-		if (packageDeclaration != null) {
-			String packageName = packageDeclaration.getName().toString();
-			outcome.add("Package Name : " + packageName + "\n");
+//	List<String> outcome = new ArrayList<String>();
+
+	public void getAllLocalVariable(ASTNode node, int startPos) throws Exception {
+		List<String> outcome = new ArrayList<String>();
+		
+		String nodeName = node.getClass().getName();
+		while(nodeName != TD) {
+			if(nodeName == BLOCK) {
+				getLocalVariable((Block)node,startPos);
+				startPos = node.getStartPosition();
+			}
+			
+			node = node.getParent();
+			if(node == null) break;
 		}
+		
+	}
+/*
+ * test ==============================
+ */
+	class A {
+		int a;
+		int z = 2;
 	}
 	
+/*
+ * test	===============================
+ */
+
+	private void getLocalVariable(Block node, int startPos) throws Exception {
+		try{
+			List<Statement> statements = node.statements();
+			for(Statement statement : statements) {
+				int startPos_statement = statement.getStartPosition();
+				if(startPos_statement > startPos) {
+					break;
+				}else {
+					if(statement.getClass().getName() == VDS) {
+						
+					}
+				}
+			}
+		}catch(Exception e) {
+			throw new Exception("node is not statement in Class JavaCompletionProposalComputer of method getLocalVariable");
+		}
+		
+	}
+
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context,
 			IProgressMonitor monitor) {
@@ -120,5 +159,4 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		return res;
 	}
 
-	
 }
