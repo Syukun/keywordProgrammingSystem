@@ -25,36 +25,31 @@ public class ParsingTest {
 	}
 	
 	public static void main(String[] args) {
-		String context ="package test;\n" + 
-				"\n" + 
-				"public class Test {\n" + 
-				"	\n" + 
-				"int[]  i = new int[2];" +
-				"	public List<String> getLines(BufferedReader src) throws Exception{\n" + 
-				"		List<String> array = new ArrayList<String>();\n" + 
-				"		while(src.ready()) {\n" + 
-				"			\n" + 
-				"		}\n" + 
-				"		\n" + 
-				"		return array;\n" + 
-				"	}\n" + 
-				"	\n" + 
-				"	public static void main(String[] args) {\n" +
-				"   { int i;}\n" +
-				"		\n" + 
-				"	}\n" +
-				"	\n" + 
-				"}";
+		String context ="class A{"
+				+ "int a;"
+				+ "void m(int b){"
+				+ "}"
+				+ "}";
 		parsingContext(context);
 	}
 }
 
 class TVisitor extends ASTVisitor{
 	
-	@SuppressWarnings("unchecked")
-	public boolean visit(AnonymousClassDeclaration node) {
-		System.out.println("have");
+	public boolean visit(SingleVariableDeclaration node) {
+		System.out.println(node.getName());
+		return false;
+	}
+	
+	public boolean visit(VariableDeclarationStatement node) {
 		return false;
 	}
 
+	public boolean visit(VariableDeclarationExpression node) {
+		return false;
+	}
+	
+	public boolean visit(VariableDeclarationFragment node) {
+		return false;
+	}
 }

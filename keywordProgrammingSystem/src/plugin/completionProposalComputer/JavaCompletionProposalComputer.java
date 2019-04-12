@@ -2,6 +2,7 @@ package plugin.completionProposalComputer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,10 +24,8 @@ import dataBase.DataBase;
 import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
-	public static String TD = "org.eclipse.jdt.core.dom.TypeDeclaration";
-	public static String BLOCK = "org.eclipse.jdt.core.dom.Block";
-	public static String VDS = "org.eclipse.jdt.core.dom.VariableDeclarationStatement";
 
+	public static Stack<String> localVariables;
 	@Override
 	public void sessionStarted() {
 		// TODO Auto-generated method stub
@@ -47,19 +46,14 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		parser.setSource(((JavaContentAssistInvocationContext) context).getCompilationUnit());
 
 		ASTNode cu = parser.createAST(null);
+		
+		cu.accept(new MyVisitor(cursorPos));
 
-		// get the innerest ASTNode
-		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
-		ASTNode innerestNode = nodeFinder.getCoveringNode();
-		ASTNode parsedNode = innerestNode;
-		int startPos = cursorPos;
-
-		try {
-			getAllLocalVariable(parsedNode, startPos);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		// get the innerest ASTNode
+//		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
+//		ASTNode innerestNode = nodeFinder.getCoveringNode();
+//		ASTNode parsedNode = innerestNode;
+//		int startPos = cursorPos;
 
 
 
@@ -74,53 +68,30 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		return result;
 	}
 
-//	List<String> outcome = new ArrayList<String>();
-
-	public void getAllLocalVariable(ASTNode node, int startPos) throws Exception {
-		List<String> outcome = new ArrayList<String>();
-		
-		String nodeName = node.getClass().getName();
-		while(nodeName != TD) {
-			if(nodeName == BLOCK) {
-				getLocalVariable((Block)node,startPos);
-				startPos = node.getStartPosition();
-			}
-			
-			node = node.getParent();
-			if(node == null) break;
-		}
-		
-	}
 /*
  * test ==============================
  */
 	class A {
-		int a;
-		int z = 2;
+		int a = 1;
+		class B{
+			int b = a;
+			{
+				float b =3;
+				
+			}
+		}
+		int z = 2;{
+			for(int i = 2; i<5;i++) {
+				
+			}	
+		}
+		
 	}
 	
 /*
  * test	===============================
  */
 
-	private void getLocalVariable(Block node, int startPos) throws Exception {
-		try{
-			List<Statement> statements = node.statements();
-			for(Statement statement : statements) {
-				int startPos_statement = statement.getStartPosition();
-				if(startPos_statement > startPos) {
-					break;
-				}else {
-					if(statement.getClass().getName() == VDS) {
-						
-					}
-				}
-			}
-		}catch(Exception e) {
-			throw new Exception("node is not statement in Class JavaCompletionProposalComputer of method getLocalVariable");
-		}
-		
-	}
 
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context,
