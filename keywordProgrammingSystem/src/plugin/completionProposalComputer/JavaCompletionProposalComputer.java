@@ -27,6 +27,7 @@ import generator.ExpressionGenerator;
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
 
 	public static Stack<String> localVariables;
+
 	@Override
 	public void sessionStarted() {
 		// TODO Auto-generated method stub
@@ -44,20 +45,69 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		int cursorPos = context.getViewer().getSelectedRange().x;
 
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
-		parser.setSource(((JavaContentAssistInvocationContext) context).getCompilationUnit());
+		ICompilationUnit cu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 
-		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		parser.setSource(cu);
+		IJavaProject javaproject = cu.getJavaProject();
+
+		String projectName = javaproject.getElementName();
+
+		// package level
+		IPackageFragment[] packages;
+		try {
+			packages = javaproject.getPackageFragments();
+
+			for (IPackageFragment mypackage : packages) {
+				String packageName = mypackage.getElementName();
+
+				for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
+					String cuName = unit.getElementName();
+
+					for (IType type : unit.getAllTypes()) {
+						String typeName = type.getElementName();
+
+						IMethod[] methods = type.getMethods();
+						IField[] fields = type.getFields();
+
+						// method part
+						for (IMethod method : methods) {
+							String methodName = method.getElementName();
+							String returnType = method.getReturnType();
+							String[] parameterTypes = method.getParameterTypes();
+						}
+
+						// field part
+						for (IField field : fields) {
+							String fieldTypeName = field.getTypeSignature();
+							String fieldName = field.getElementName();
+						}
+
+					}
+				}
+
+			}
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		List<String> classNames = new ArrayList<String>();
+		List<String> methods = new ArrayList<String>();
+		List<String> fields = new ArrayList<String>();
+
+		// get ClassName and fields&methods in that class
+
+		// get local variables
+		CompilationUnit cu_ast = (CompilationUnit) parser.createAST(null);
 		Stack<LocalVariable> localVars = new Stack<LocalVariable>();
-		MyVisitor mv = new MyVisitor(cursorPos,localVars);
-		cu.accept(mv);
+		MyVisitor mv = new MyVisitor(cursorPos, localVars);
+		cu_ast.accept(mv);
 
 //		// get the innerest ASTNode
 //		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
 //		ASTNode innerestNode = nodeFinder.getCoveringNode();
 //		ASTNode parsedNode = innerestNode;
 //		int startPos = cursorPos;
-
-
 
 		// test whether the keyword query have any influence on ast
 		String keywords = "add line";
@@ -69,31 +119,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 		return result;
 	}
-
-/*
- * test ==============================
- */
-	class A {
-		int a = 1;
-		class B{
-			int b = a;
-			{
-				float b =3;
-				
-			}
-		}
-		int z = 2;{
-			for(int i = 2; i<5;i++) {
-				
-			}	
-		}
-		
-	}
-	
-/*
- * test	===============================
- */
-
 
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context,

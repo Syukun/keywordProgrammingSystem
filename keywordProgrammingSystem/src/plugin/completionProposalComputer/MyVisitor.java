@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.*;
 
 import basic.LocalVariable;
@@ -37,7 +38,7 @@ public class MyVisitor extends ASTVisitor {
 			for (VariableDeclarationFragment localVariable : localVariables) {
 				
 				String varName = localVariable.getName().toString();
-				LocalVariable lv = new LocalVariable(typeName,varName);
+				LocalVariable lv = new LocalVariable(varName,typeName);
 				localVars.push(lv);
 			}
 
@@ -52,7 +53,7 @@ public class MyVisitor extends ASTVisitor {
 		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
 			String typeName = node.getType().toString();
 			String varName = node.getName().toString();
-			LocalVariable lv = new LocalVariable(typeName,varName);
+			LocalVariable lv = new LocalVariable(varName,typeName);
 			localVars.push(lv);
 		}
 		
@@ -67,7 +68,7 @@ public class MyVisitor extends ASTVisitor {
 			List<VariableDeclarationFragment> localVariables = node.fragments();
 			for (VariableDeclarationFragment localVariable : localVariables) {
 				String varName = localVariable.getName().toString();
-				LocalVariable lv = new LocalVariable(typeName,varName);
+				LocalVariable lv = new LocalVariable(varName,typeName);
 				localVars.push(lv);
 			}
 		}
@@ -100,9 +101,5 @@ public class MyVisitor extends ASTVisitor {
 		return (cursorPos >= startPos && cursorPos <= endPos);
 	}
 
-	public boolean visit(CompilationUnit node) {
-		// change node from AST to JavaModel
-		return false;
-	}
 
 }
