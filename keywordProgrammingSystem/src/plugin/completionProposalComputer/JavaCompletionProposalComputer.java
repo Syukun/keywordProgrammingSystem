@@ -45,9 +45,10 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
 		parser.setSource(((JavaContentAssistInvocationContext) context).getCompilationUnit());
 
-		ASTNode cu = parser.createAST(null);
-		
-		cu.accept(new MyVisitor(cursorPos));
+		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
+		MyVisitor mv = new MyVisitor(cursorPos);
+		cu.accept(mv);
+		Stack<String> localVars = mv.localVars;
 
 //		// get the innerest ASTNode
 //		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);

@@ -11,83 +11,95 @@ import org.eclipse.jdt.core.dom.*;
 
 public class MyVisitor extends ASTVisitor {
 	int cursorPos = -1;
+	Stack<String> localVars = new Stack<String>();
 
 	public MyVisitor(int cursorPos) {
 		this.cursorPos = cursorPos;
 	}
 
-	// this is wrong
-	public static List<String> data_tmp = new ArrayList<String>();
-
 	// visit the class-level node and get local variable
-	public boolean visit(VariableDeclarationExpression node) {
-
-		// get Variable Element if cursor position in its nearest block
-		// also field of outtest class do not count as local variable
-		int startPos = node.getStartPosition();
-//		Stack<String> localVariables = new Stack<String>();
-		ASTNode parentBlock = getParentBlock(node);
-//		JavaCompletionProposalComputer.localVariables = new Stack<String>();
-		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
-			// process with field
-			if (getParentBlock(parentBlock) != null) {
-				// add the type and name of the local variable
-				String typeName = node.getType().toString();
-				List<VariableDeclarationFragment> localVars = new ArrayList<VariableDeclarationFragment>();
-				for(VariableDeclarationFragment localVar : localVars) {
-					String varName = localVar.getName().toString();
-					System.out.println("Type " + typeName + "  Name : " + varName);
-				}
-				
-			}
-
-		}
-
-		return false;
-	}
+//	public boolean visit(VariableDeclarationExpression node) {
+//
+//		// get Variable Element if cursor position in its nearest block
+//		// also field of outtest class do not count as local variable
+//		int startPos = node.getStartPosition();
+////		Stack<String> localVariables = new Stack<String>();
+//		ASTNode parentBlock = getParentBlock(node);
+////		JavaCompletionProposalComputer.localVariables = new Stack<String>();
+//		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
+//			// process with field
+//			// add the type and name of the local variable
+//			String typeName = node.getType().toString();
+//			List<VariableDeclarationFragment> localVars = new ArrayList<VariableDeclarationFragment>();
+//			for (VariableDeclarationFragment localVar : localVars) {
+//				String varName = localVar.getName().toString();
+//				System.out.println("Type " + typeName + "  Name : " + varName + "    VariableDeclarationExpression");
+//			}
+//
+//		}
+//
+//		return false;
+//	}
 
 	public boolean visit(SingleVariableDeclaration node) {
 		// maybe could refract this as a method to fit all those AST
 		int startPos = node.getStartPosition();
+		ASTNode parentBlock = getParentBlock(node);
+		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
+			String typeName = node.getType().toString();
+			String varName = node.getName().toString();
+			System.out.println("Type " + typeName + "  Name : " + varName + "   SingleVariableDeclaration");
+		}
+		
+//		String typeName = node.getType().toString();
+//		String nodeName  = node.getName().toString();
+//		System.out.println("Type : " + typeName + "\n" + "Name : " + nodeName +"\nSingle Variable");
+//		ASTNode parentBlock = getParentBlock(node);
+//		
+//		
+//		System.out.println("======================================================================");
 		return false;
 	}
-	
-	public boolean visit(VariableDeclarationFragment node) {
-		return false;
-	}
-	
-	public boolean visit(VariableDeclarationStatement node) {
-		return false;
-	}
+
+//	public boolean visit(VariableDeclarationStatement node) {
+//		int startPos = node.getStartPosition();
+//		ASTNode parentBlock = getParentBlock(node);
+//		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
+//			String typeName = node.getType().toString();
+//			List<VariableDeclarationFragment> localVars = new ArrayList<VariableDeclarationFragment>();
+//			for (VariableDeclarationFragment localVar : localVars) {
+//				String varName = localVar.getName().toString();
+//				System.out.println("Type " + typeName + "  Name : " + varName + "    VariableDeclarationExpression");
+//			}
+//		}
+//
+//		return false;
+//	}
+
 	private ASTNode getParentBlock(ASTNode node) {
 		String TD = "org.eclipse.jdt.core.dom.TypeDeclaration";
 		String BLOCK = "org.eclipse.jdt.core.dom.Block";
-		String nodeName = node.getParent().getClass().getName();
-		while (nodeName != TD || nodeName != BLOCK) {
-			if(node.getParent()!=null) {
-				node = node.getParent();	
-			}else {
+		while (getNodeName(node) != TD && getNodeName(node)  != BLOCK) {
+			if (node.getParent() != null) {
+				node = node.getParent();
+			} else {
 				return null;
 			}
 		}
-		return  node;
+		return node;
+	}
+	
+	private String getNodeName(ASTNode node){
+		return node.getClass().getName();
 	}
 
-	private boolean isInNode(ASTNode node,int cursorPos) {
+	private boolean isInNode(ASTNode node, int cursorPos) {
+		if(node == null) return true;
 		int startPos = node.getStartPosition();
 		int length = node.getLength();
 		int endPos = startPos + length;
-		return (cursorPos>=startPos&&cursorPos<=endPos);
+		return (cursorPos >= startPos && cursorPos <= endPos);
 	}
-	// get all methodName and field by visit the CompilationUnit node
-	public boolean visit(CompilationUnit node) {
-		// change node from AST to Java Model
 
-		// get all possible Method Element
-
-		// get all possible Field Element
-
-		return false;
-	}
 
 }
