@@ -9,11 +9,13 @@ import java.util.Stack;
 
 import org.eclipse.jdt.core.dom.*;
 
+import basic.LocalVariable;
+
 public class MyVisitor extends ASTVisitor {
 	int cursorPos = -1;
-	Stack<String> localVars;
+	Stack<LocalVariable> localVars;
 
-	public MyVisitor(int cursorPos,Stack<String> localVars) {
+	public MyVisitor(int cursorPos,Stack<LocalVariable> localVars) {
 		this.cursorPos = cursorPos;
 		this.localVars = localVars;
 	}
@@ -31,10 +33,12 @@ public class MyVisitor extends ASTVisitor {
 			// process with field
 			// add the type and name of the local variable
 			String typeName = node.getType().toString();
-			List<VariableDeclarationFragment> localVars = node.fragments();
-			for (VariableDeclarationFragment localVar : localVars) {
-				String varName = localVar.getName().toString();
-				System.out.println("Type " + typeName + "  Name : " + varName + "    VariableDeclarationExpression");
+			List<VariableDeclarationFragment> localVariables = node.fragments();
+			for (VariableDeclarationFragment localVariable : localVariables) {
+				
+				String varName = localVariable.getName().toString();
+				LocalVariable lv = new LocalVariable(typeName,varName);
+				localVars.push(lv);
 			}
 
 		}
@@ -48,7 +52,8 @@ public class MyVisitor extends ASTVisitor {
 		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
 			String typeName = node.getType().toString();
 			String varName = node.getName().toString();
-			System.out.println("Type " + typeName + "  Name : " + varName + "   SingleVariableDeclaration");
+			LocalVariable lv = new LocalVariable(typeName,varName);
+			localVars.push(lv);
 		}
 		
 		return false;
@@ -59,10 +64,11 @@ public class MyVisitor extends ASTVisitor {
 		ASTNode parentBlock = getParentBlock(node);
 		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
 			String typeName = node.getType().toString();
-			List<VariableDeclarationFragment> localVars = node.fragments();
-			for (VariableDeclarationFragment localVar : localVars) {
-				String varName = localVar.getName().toString();
-				System.out.println("Type " + typeName + "  Name : " + varName + "    VariableDeclarationExpression");
+			List<VariableDeclarationFragment> localVariables = node.fragments();
+			for (VariableDeclarationFragment localVariable : localVariables) {
+				String varName = localVariable.getName().toString();
+				LocalVariable lv = new LocalVariable(typeName,varName);
+				localVars.push(lv);
 			}
 		}
 
@@ -94,5 +100,9 @@ public class MyVisitor extends ASTVisitor {
 		return (cursorPos >= startPos && cursorPos <= endPos);
 	}
 
+	public boolean visit(CompilationUnit node) {
+		// change node from AST to JavaModel
+		return false;
+	}
 
 }

@@ -19,6 +19,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import basic.Type;
 import basic.VariableName;
 import basic.Expression;
+import basic.LocalVariable;
 import basic.MethodName;
 import dataBase.DataBase;
 import generator.ExpressionGenerator;
@@ -46,7 +47,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		parser.setSource(((JavaContentAssistInvocationContext) context).getCompilationUnit());
 
 		CompilationUnit cu = (CompilationUnit) parser.createAST(null);
-		Stack<String> localVars = new Stack<String>();
+		Stack<LocalVariable> localVars = new Stack<LocalVariable>();
 		MyVisitor mv = new MyVisitor(cursorPos,localVars);
 		cu.accept(mv);
 
