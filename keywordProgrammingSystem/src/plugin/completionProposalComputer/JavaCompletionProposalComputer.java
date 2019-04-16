@@ -17,11 +17,15 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 
 import basic.Type;
+import basic.TypeName;
 import basic.VariableName;
 import basic.Expression;
+import basic.FieldName;
 import basic.LocalVariable;
 import basic.MethodName;
+import basic.PackageName;
 import dataBase.DataBase;
+import dataBase.DataFromSourceFile;
 import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
@@ -41,6 +45,9 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
+		// initialize database
+		DataFromSourceFile dataInfos = new DataFromSourceFile();
+		
 		// get cursor location
 		int cursorPos = context.getViewer().getSelectedRange().x;
 
@@ -51,6 +58,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		IJavaProject javaproject = cu.getJavaProject();
 
 		String projectName = javaproject.getElementName();
+		dataInfos.projectName = projectName;
 
 		// package level
 		IPackageFragment[] packages;
@@ -58,14 +66,18 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			packages = javaproject.getPackageFragments();
 
 			for (IPackageFragment mypackage : packages) {
-				String packageName = mypackage.getElementName();
+				PackageName packageName = new PackageName(mypackage.getElementName());
+				dataInfos.packages.add(packageName);
 
 				for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
-					String cuName = unit.getElementName();
+					// might be used when use the modifiers (public, protect ,etc.)
+//					String cuName = unit.getElementName();
 
 					for (IType type : unit.getAllTypes()) {
+						
 						String typeName = type.getElementName();
-
+						TypeName tname = new TypeName(typeName,packageName);
+						dataInfos.types.add(tname);
 						IMethod[] methods = type.getMethods();
 						IField[] fields = type.getFields();
 
@@ -74,12 +86,17 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 							String methodName = method.getElementName();
 							String returnType = method.getReturnType();
 							String[] parameterTypes = method.getParameterTypes();
+							MethodName mname = new MethodName(methodName,returnType,parameterTypes,tname);
+							dataInfos.methods.add(mname);
 						}
 
 						// field part
 						for (IField field : fields) {
+							// not sure this is right or not??
 							String fieldTypeName = field.getTypeSignature();
 							String fieldName = field.getElementName();
+							FieldName fname = new FieldName(fieldName,fieldTypeName,tname);
+							dataInfos.fields.add(fname);
 						}
 
 					}
@@ -91,17 +108,19 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			e.printStackTrace();
 		}
 
-		List<String> classNames = new ArrayList<String>();
-		List<String> methods = new ArrayList<String>();
-		List<String> fields = new ArrayList<String>();
-
-		// get ClassName and fields&methods in that class
-
 		// get local variables
 		CompilationUnit cu_ast = (CompilationUnit) parser.createAST(null);
 		Stack<LocalVariable> localVars = new Stack<LocalVariable>();
 		MyVisitor mv = new MyVisitor(cursorPos, localVars);
 		cu_ast.accept(mv);
+		
+		// imports local variables from stack to set
+		while(!localVars.empty()) {
+			LocalVariable  lv = localVars.pop();
+			if(!dataInfos.localVariables.contains(lv)) {
+				dataInfos.localVariables.add(lv);
+			}
+		}
 
 //		// get the innerest ASTNode
 //		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);

@@ -9,12 +9,14 @@ public class MethodName {
 	String methodName;
 	String returnType;
 	String[] parameterTypes;
+	TypeName typeName;
 
-	public MethodName(String methodName,String returnType,String[] parameterTypes) {
+	public MethodName(String methodName,String returnType,String[] parameterTypes,TypeName typeName) {
 		super();
 		this.methodName = methodName;
 		this.returnType = returnType;
 		this.parameterTypes = parameterTypes;
+		this.typeName = typeName;
 		
 	}
 
