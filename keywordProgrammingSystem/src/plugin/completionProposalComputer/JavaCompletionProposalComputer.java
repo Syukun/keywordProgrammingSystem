@@ -60,6 +60,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		String projectName = javaproject.getElementName();
 		dataInfos.projectName = projectName;
 
+
 		// package level
 		IPackageFragment[] packages;
 		try {
@@ -74,6 +75,13 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 //					String cuName = unit.getElementName();
 
 					for (IType type : unit.getAllTypes()) {
+						// get the hierarchy information
+						ITypeHierarchy th = type.newTypeHierarchy(monitor);
+						// get sub class and super class
+						IType[] allClasses = th.getAllClasses();
+						IType[] subTypes = th.getAllSubtypes(type);
+						IType[] superTypes = th.getAllSupertypes(type);
+
 						
 						String typeName = type.getElementName();
 						TypeName tname = new TypeName(typeName,packageName);
@@ -106,6 +114,8 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		
+		
 		}
 
 		// get local variables
