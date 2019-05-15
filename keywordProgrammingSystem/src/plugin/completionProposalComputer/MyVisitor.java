@@ -1,13 +1,9 @@
 package plugin.completionProposalComputer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
-import org.eclipse.jdt.core.IJavaElement;
+
 import org.eclipse.jdt.core.dom.*;
 
 import basic.LocalVariable;
@@ -15,7 +11,8 @@ import basic.LocalVariable;
 public class MyVisitor extends ASTVisitor {
 	int cursorPos = -1;
 	Stack<LocalVariable> localVars;
-
+	
+	
 	public MyVisitor(int cursorPos,Stack<LocalVariable> localVars) {
 		this.cursorPos = cursorPos;
 		this.localVars = localVars;
@@ -33,12 +30,13 @@ public class MyVisitor extends ASTVisitor {
 		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
 			// process with field
 			// add the type and name of the local variable
-			String typeName = node.getType().toString();
+			// also should consider the hierarchy!!
+			Type type = node.getType();
 			List<VariableDeclarationFragment> localVariables = node.fragments();
 			for (VariableDeclarationFragment localVariable : localVariables) {
 				
 				String varName = localVariable.getName().toString();
-				LocalVariable lv = new LocalVariable(varName,typeName);
+				LocalVariable lv = new LocalVariable(varName,type);
 				localVars.push(lv);
 			}
 
@@ -51,24 +49,25 @@ public class MyVisitor extends ASTVisitor {
 		int startPos = node.getStartPosition();
 		ASTNode parentBlock = getParentBlock(node);
 		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
-			String typeName = node.getType().toString();
+			Type type = node.getType();
 			String varName = node.getName().toString();
-			LocalVariable lv = new LocalVariable(varName,typeName);
+			LocalVariable lv = new LocalVariable(varName,type);
 			localVars.push(lv);
 		}
 		
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationStatement node) {
 		int startPos = node.getStartPosition();
 		ASTNode parentBlock = getParentBlock(node);
 		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
-			String typeName = node.getType().toString();
+			Type type = node.getType();
 			List<VariableDeclarationFragment> localVariables = node.fragments();
 			for (VariableDeclarationFragment localVariable : localVariables) {
 				String varName = localVariable.getName().toString();
-				LocalVariable lv = new LocalVariable(varName,typeName);
+				LocalVariable lv = new LocalVariable(varName,type);
 				localVars.push(lv);
 			}
 		}
@@ -99,6 +98,16 @@ public class MyVisitor extends ASTVisitor {
 		int length = node.getLength();
 		int endPos = startPos + length;
 		return (cursorPos >= startPos && cursorPos <= endPos);
+	}
+	
+	// get the class which the current cursor in.
+	public boolean visit(TypeDeclaration node) {
+		int startPos = node.getStartPosition();
+		int nodeLength = node.getLength();
+		if((startPos < cursorPos) && (cursorPos < startPos + nodeLength)) {
+			// TODO get member methods
+		}
+		return false;
 	}
 
 
