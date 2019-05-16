@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.*;
 import org.eclipse.jdt.core.dom.*;
@@ -15,9 +14,6 @@ import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
-import org.eclipse.jdt.core.search.TypeNameMatch;
-import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
-import org.eclipse.jdt.core.search.TypeNameRequestor;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
@@ -26,16 +22,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 
-import basic.TypeName;
-import basic.VariableName;
 import basic.Expression;
-import basic.FieldName;
 import basic.LocalVariable;
-import basic.MethodName;
-import basic.PackageName;
-import dataBase.DataBase;
 import dataBase.DataFromSourceFile;
-import dataBase.Method;
 import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
@@ -77,52 +66,75 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			Type typeOfLv = lv.getType();
 			String nameOfLv = lv.getName();
 			if (!dataInfos.localVariables.containsKey(nameOfLv)) {
-				dataInfos.localVariables.put(nameOfLv, typeOfLv);				
+				dataInfos.localVariables.put(nameOfLv, typeOfLv);
 			}
 		}
-		
+
 		try {
 			IPackageDeclaration[] packageDeclarations = cu.getPackageDeclarations();
 			IImportDeclaration[] importDeclarations = cu.getImports();
-			
+
 			// this could be solved by just using Java Model
-			Map<IPackageDeclaration,List<IType>> currentPackageToTypes = new HashMap<IPackageDeclaration,List<IType>>();
-			Map<IImportDeclaration,List<IType>> importPackageToTypes = new HashMap<IImportDeclaration,List<IType>>();
+			Map<IPackageDeclaration, List<IType>> currentPackageToTypes = new HashMap<IPackageDeclaration, List<IType>>();
+			Map<IImportDeclaration, List<IType>> importPackageToTypes = new HashMap<IImportDeclaration, List<IType>>();
 
 			SearchEngine se = new SearchEngine();
 			// using search engine
 			// set Scope
-			IJavaSearchScope scope = SearchEngine.createJavaSearchScope(packageDeclarations);
-			
-		
-			for(IPackageDeclaration pd : packageDeclarations) {
+			IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+
+			for (IPackageDeclaration pd : packageDeclarations) {
 				char[] pdName = pd.getElementName().toCharArray();
 				List<IType> types = new ArrayList<IType>();
-	
-				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(pd,types);
-				se.searchAllTypeNames(pdName, SearchPattern.R_PREFIX_MATCH, null, 0,
-						IJavaSearchConstants.TYPE, scope, nameRequestor, 0, monitor);
-				
+
+				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(pd, types);
+				se.searchAllTypeNames(pdName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE, scope,
+						nameRequestor, 0, monitor);
+
 				currentPackageToTypes.put(pd, types);
 				
+
 			}
 			
-			for(IImportDeclaration id : importDeclarations) {
-				char[] idName = id.getElementName().toCharArray();
+			
+			
+			// TODO do something to process import declaration informations.
+			for (IImportDeclaration id : importDeclarations) {
+
+				String idName = id.getElementName().trim();
+				String packageName;
 				List<IType> types = new ArrayList<IType>();
+				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(id, types);
 				
-				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(id,types);
-				se.searchAllTypeNames(idName, SearchPattern.R_PREFIX_MATCH, null, 0,
-						IJavaSearchConstants.TYPE, scope, nameRequestor, 0, monitor);
+				int id_len = idName.length();
+				if (idName.endsWith(".*")) {
+					packageName = idName.substring(0, id_len - 2);
+					char[] pName = packageName.toCharArray();
+					se.searchAllTypeNames(pName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE, scope,
+							nameRequestor, 0, monitor);
+				} else {
+					int lastDotPos = idName.lastIndexOf('.');
+					packageName = idName.substring(0, lastDotPos);
+					String typeName = idName.substring(lastDotPos+1);
+					// TODO should figure out the exact way to use Search Pattern
+					se.searchAllTypeNames(packageName.toCharArray(), SearchPattern.R_PREFIX_MATCH, typeName.toCharArray(), SearchPattern.R_SUBSTRING_MATCH, IJavaSearchConstants.TYPE, scope,
+							nameRequestor, 0, monitor);
+					
+				}
+				
 				importPackageToTypes.put(id, types);
+				// TODO 将下面的代码放到MyTypeNameMatchRequestor中
+				for(IType type : types) {
+					IMethod[] methods = type.getMethods();
+					IField[] fields = type.getFields();
+				}
 			}
-			
+
 		} catch (JavaModelException jme) {
 			// TODO Auto-generated catch block
 			jme.printStackTrace();
 		}
-		
-		
+
 		// get packageName
 		IJavaProject javaproject = cu.getJavaProject();
 
@@ -131,61 +143,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 		// package level
 		IPackageFragment[] packages;
-
-		// search for types
-
-		try {
-			packages = javaproject.getPackageFragments();
-
-			for (IPackageFragment mypackage : packages) {
-
-				PackageName packageName = new PackageName(mypackage.getElementName());
-//				dataInfos.packages.add(packageName);
-
-				for (ICompilationUnit unit : mypackage.getCompilationUnits()) {
-					// might be used when use the modifiers (public, protect ,etc.)
-//					String cuName = unit.getElementName();
-
-					for (IType type : unit.getAllTypes()) {
-						// get the hierarchy information
-						ITypeHierarchy th = type.newTypeHierarchy(monitor);
-						// get sub class and super class
-						IType[] allClasses = th.getAllClasses();
-						IType[] subTypes = th.getAllSubtypes(type);
-						IType[] superTypes = th.getAllSupertypes(type);
-
-						String typeName = type.getElementName();
-						TypeName tname = new TypeName(typeName, packageName);
-//						dataInfos.types.add(tname);
-						IMethod[] methods = type.getMethods();
-						IField[] fields = type.getFields();
-
-						// method part
-						for (IMethod method : methods) {
-							String methodName = method.getElementName();
-							String returnType = method.getReturnType();
-							String[] parameterTypes = method.getParameterTypes();
-							MethodName mname = new MethodName(methodName, returnType, parameterTypes, tname);
-//							dataInfos.methods.add(mname);
-						}
-
-						// field part
-						for (IField field : fields) {
-							// not sure this is right or not??
-							String fieldTypeName = field.getTypeSignature();
-							String fieldName = field.getElementName();
-							FieldName fname = new FieldName(fieldName, fieldTypeName, tname);
-						}
-
-					}
-				}
-
-			}
-		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-
-		}
 
 //		// get the innerest ASTNode
 //		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
@@ -203,7 +160,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 		return result;
 	}
-
 
 	@Override
 	public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context,
