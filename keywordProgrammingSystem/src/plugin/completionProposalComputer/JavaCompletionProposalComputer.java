@@ -2,8 +2,10 @@ package plugin.completionProposalComputer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -92,12 +94,10 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 						nameRequestor, 0, monitor);
 
 				currentPackageToTypes.put(pd, types);
-				
 
 			}
-			
-			
-			
+
+			Set<String> importInfos = new HashSet<String>();
 			// TODO do something to process import declaration informations.
 			for (IImportDeclaration id : importDeclarations) {
 
@@ -105,28 +105,36 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 				String packageName;
 				List<IType> types = new ArrayList<IType>();
 				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(id, types);
-				
+
 				int id_len = idName.length();
-				if (idName.endsWith(".*")) {
-					packageName = idName.substring(0, id_len - 2);
-					char[] pName = packageName.toCharArray();
-					se.searchAllTypeNames(pName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE, scope,
-							nameRequestor, 0, monitor);
-				} else {
-					int lastDotPos = idName.lastIndexOf('.');
-					packageName = idName.substring(0, lastDotPos);
-					String typeName = idName.substring(lastDotPos+1);
-					// TODO should figure out the exact way to use Search Pattern
-					se.searchAllTypeNames(packageName.toCharArray(), SearchPattern.R_PREFIX_MATCH, typeName.toCharArray(), SearchPattern.R_SUBSTRING_MATCH, IJavaSearchConstants.TYPE, scope,
-							nameRequestor, 0, monitor);
+				int lastDotPos = idName.lastIndexOf('.');
+				packageName = idName.substring(0, lastDotPos);
+
+				if (!importInfos.contains(packageName)) {
 					
-				}
-				
-				importPackageToTypes.put(id, types);
-				// TODO 将下面的代码放到MyTypeNameMatchRequestor中
-				for(IType type : types) {
-					IMethod[] methods = type.getMethods();
-					IField[] fields = type.getFields();
+					importInfos.add(packageName);
+
+					if (idName.endsWith(".*")) {
+						char[] pName = packageName.toCharArray();
+						se.searchAllTypeNames(pName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE,
+								scope, nameRequestor, 0, monitor);
+					} else {
+
+						String typeName = idName.substring(lastDotPos + 1);
+						// TODO should figure out the exact way to use Search Pattern
+						se.searchAllTypeNames(packageName.toCharArray(), SearchPattern.R_PREFIX_MATCH,
+								typeName.toCharArray(), SearchPattern.R_SUBSTRING_MATCH, IJavaSearchConstants.TYPE,
+								scope, nameRequestor, 0, monitor);
+
+					}
+
+					importPackageToTypes.put(id, types);
+					// TODO 将下面的代码放到MyTypeNameMatchRequestor中
+					for (IType type : types) {
+						IMethod[] methods = type.getMethods();
+						IField[] fields = type.getFields();
+						System.out.println();
+					}
 				}
 			}
 
