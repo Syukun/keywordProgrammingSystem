@@ -47,31 +47,46 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 
-		// initialize database
-		DataFromSourceFile dataInfos = new DataFromSourceFile();
+		// Step-1 : get the Local Variable and "this" information from ASTParser
+		ICompilationUnit cu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
-		ICompilationUnit cu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 		parser.setSource(cu);
 
 		// get local variables
 		CompilationUnit cu_ast = (CompilationUnit) parser.createAST(null);
-		// TODO modify the code of Local Variable
-		Stack<LocalVariable> localVars = new Stack<LocalVariable>();
 		// get cursor location
 		int cursorPos = context.getViewer().getSelectedRange().x;
-		MyVisitor mv = new MyVisitor(cursorPos, localVars);
+
+		MyVisitor mv = new MyVisitor(cursorPos);
+
+		// TODO modify local variable to fit member fields
 		cu_ast.accept(mv);
+
+		// TODO modify the code of Local Variable
+		Stack<LocalVariable> localVars = mv.localVars;
+		String nameOfThis = mv.nameOfThis;
 		// imports local variables from stack to set
 		while (!localVars.empty()) {
 			LocalVariable lv = localVars.pop();
 			Type typeOfLv = lv.getType();
 			String nameOfLv = lv.getName();
-			if (!dataInfos.localVariables.containsKey(nameOfLv)) {
-				dataInfos.localVariables.put(nameOfLv, typeOfLv);
-			}
+			// TODO use HashMap to add local variables.
+//	*		if (!dataInfos.localVariables.containsKey(nameOfLv)) {
+//				dataInfos.localVariables.put(nameOfLv, typeOfLv);
+//			}
 		}
-
+		
+		//TODO maybe need to be modified
+		IType thisIType;
+		// get information of "this"
+		try {
+			thisIType = cu.getType(nameOfThis);
+		} catch (NullPointerException npe) {
+			// TODO need to specify this code
+			System.out.println("Cursor is not in any Class");
+		}
+		
 		try {
 			IPackageDeclaration[] packageDeclarations = cu.getPackageDeclarations();
 			IImportDeclaration[] importDeclarations = cu.getImports();
@@ -111,7 +126,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 				packageName = idName.substring(0, lastDotPos);
 
 				if (!importInfos.contains(packageName)) {
-					
+
 					importInfos.add(packageName);
 
 					if (idName.endsWith(".*")) {
@@ -147,7 +162,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		IJavaProject javaproject = cu.getJavaProject();
 
 		String projectName = javaproject.getElementName();
-		dataInfos.projectName = projectName;
+//	*	dataInfos.projectName = projectName;
 
 		// package level
 		IPackageFragment[] packages;

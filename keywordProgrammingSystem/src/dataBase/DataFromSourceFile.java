@@ -1,32 +1,30 @@
 package dataBase;
 
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.Type;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import basic.FieldName;
-//import basic.LocalVariable;
-import basic.MethodName;
-import basic.PackageName;
-import basic.TypeName;
-
 public class DataFromSourceFile {
-	public String projectName;
-	// local variables from editing source file 
-	public Map<String,Type> localVariables;
-	// member methods from editing source file
-	public Set<Method> memberMethods;
-	// local field from editing source file
-//	public Map<String,Type> localFields;
-	
-	public Set<InfoFromOutterClass> infos;
+	// local variables from editing source file
+	// <Name : String, Type : jdt.core.dom.Type>
+	public Map<String, Type> localVariables;
 
-	public DataFromSourceFile() {
-		this.localVariables = new HashMap<String,Type>();
+	// represent the information of "this"
+	public IType thisIType;
+
+	// save the type informations of outer packages, such as imports
+	public Set<IType> typesFromOuterPackage;
+
+	String a;
+	public DataFromSourceFile(Map<String, Type> localVariables, IType thisIType, Set<IType> typesFromOuterPackage) {
+		super();
+		this.localVariables = localVariables;
+		this.thisIType = thisIType;
+		this.typesFromOuterPackage = typesFromOuterPackage;
 	}
+
 	
 
 }

@@ -10,12 +10,13 @@ import basic.LocalVariable;
 
 public class MyVisitor extends ASTVisitor {
 	int cursorPos = -1;
-	Stack<LocalVariable> localVars;
+	public Stack<LocalVariable> localVars;
+	public String nameOfThis;
 	
 	
-	public MyVisitor(int cursorPos,Stack<LocalVariable> localVars) {
+	public MyVisitor(int cursorPos) {
 		this.cursorPos = cursorPos;
-		this.localVars = localVars;
+		this.localVars = new Stack<LocalVariable>();
 	}
 
 	// visit the class-level node and get local variable
@@ -101,13 +102,15 @@ public class MyVisitor extends ASTVisitor {
 	}
 	
 	// get the class which the current cursor in.
+	//TODO change this to previsit?
 	public boolean visit(TypeDeclaration node) {
 		int startPos = node.getStartPosition();
 		int nodeLength = node.getLength();
 		if((startPos < cursorPos) && (cursorPos < startPos + nodeLength)) {
-			// TODO get member methods
+			// TODO get type name of "This"
+			nameOfThis = node.getName().toString();
 		}
-		return false;
+		return true;
 	}
 
 
