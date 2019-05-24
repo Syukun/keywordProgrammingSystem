@@ -50,6 +50,7 @@ public class MyVisitor extends ASTVisitor {
 		int startPos = node.getStartPosition();
 		ASTNode parentBlock = getParentBlock(node);
 		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
+			
 			Type type = node.getType();
 			String varName = node.getName().toString();
 			LocalVariable lv = new LocalVariable(varName,type);
@@ -79,7 +80,8 @@ public class MyVisitor extends ASTVisitor {
 	private ASTNode getParentBlock(ASTNode node) {
 		String TD = "org.eclipse.jdt.core.dom.TypeDeclaration";
 		String BLOCK = "org.eclipse.jdt.core.dom.Block";
-		while (getNodeName(node) != TD && getNodeName(node)  != BLOCK) {
+		String MD = "org.eclipse.jdt.core.dom.MethodDeclaration";
+		while (getNodeName(node) != TD && getNodeName(node)  != BLOCK && getNodeName(node)!=MD) {
 			if (node.getParent() != null) {
 				node = node.getParent();
 			} else {

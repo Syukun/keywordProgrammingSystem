@@ -17,7 +17,6 @@ public class DataFromSourceFile {
 	// save the type informations of outer packages, such as imports
 	public Set<IType> typesFromOuterPackage;
 
-	String a;
 	public DataFromSourceFile(Map<String, Type> localVariables, IType thisIType, Set<IType> typesFromOuterPackage) {
 		super();
 		this.localVariables = localVariables;

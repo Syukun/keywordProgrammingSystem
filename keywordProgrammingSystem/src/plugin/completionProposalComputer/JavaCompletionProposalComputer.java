@@ -66,19 +66,21 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		// TODO modify the code of Local Variable
 		Stack<LocalVariable> localVars = mv.localVars;
 		String nameOfThis = mv.nameOfThis;
-		// imports local variables from stack to set
-		while (!localVars.empty()) {
-			LocalVariable lv = localVars.pop();
-			Type typeOfLv = lv.getType();
-			String nameOfLv = lv.getName();
-			// TODO use HashMap to add local variables.
-//	*		if (!dataInfos.localVariables.containsKey(nameOfLv)) {
-//				dataInfos.localVariables.put(nameOfLv, typeOfLv);
-//			}
-		}
-		
-		//TODO maybe need to be modified
-		IType thisIType;
+//		// imports local variables from stack to set
+//		while (!localVars.empty()) {
+//			LocalVariable lv = localVars.pop();
+//			Type typeOfLv = lv.getType();
+//			String nameOfLv = lv.getName();
+//			// TODO use HashMap to add local variables.
+////	*		if (!dataInfos.localVariables.containsKey(nameOfLv)) {
+////				dataInfos.localVariables.put(nameOfLv, typeOfLv);
+////			}
+//		}
+//		
+		/**
+		 * get IType of "this"
+		 */
+		IType thisIType = null;
 		// get information of "this"
 		try {
 			thisIType = cu.getType(nameOfThis);
@@ -87,6 +89,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			System.out.println("Cursor is not in any Class");
 		}
 		
+		Set<IType> typesFromOuterPackage = new HashSet<IType>();
 		try {
 			IPackageDeclaration[] packageDeclarations = cu.getPackageDeclarations();
 			IImportDeclaration[] importDeclarations = cu.getImports();
@@ -108,6 +111,10 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 				se.searchAllTypeNames(pdName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE, scope,
 						nameRequestor, 0, monitor);
 
+				for(IType type : types) {
+					typesFromOuterPackage.add(type);
+				}
+				// TODO this is not necessary
 				currentPackageToTypes.put(pd, types);
 
 			}
@@ -146,9 +153,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 					importPackageToTypes.put(id, types);
 					// TODO 将下面的代码放到MyTypeNameMatchRequestor中
 					for (IType type : types) {
-						IMethod[] methods = type.getMethods();
-						IField[] fields = type.getFields();
-						System.out.println();
+						typesFromOuterPackage.add(type);
 					}
 				}
 			}
@@ -157,6 +162,8 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			// TODO Auto-generated catch block
 			jme.printStackTrace();
 		}
+		
+		DataFromSourceFile data = new DataFromSourceFile(null,thisIType,typesFromOuterPackage);
 
 		// get packageName
 		IJavaProject javaproject = cu.getJavaProject();
