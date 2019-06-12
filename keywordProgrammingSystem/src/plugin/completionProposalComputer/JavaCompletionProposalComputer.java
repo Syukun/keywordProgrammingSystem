@@ -59,24 +59,11 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		int cursorPos = context.getViewer().getSelectedRange().x;
 
 		MyVisitor mv = new MyVisitor(cursorPos);
-
-		// TODO modify local variable to fit member fields
 		cu_ast.accept(mv);
 
-		// TODO modify the code of Local Variable
-		Stack<LocalVariable> localVars = mv.localVars;
-		String nameOfThis = mv.nameOfThis;
-//		// imports local variables from stack to set
-//		while (!localVars.empty()) {
-//			LocalVariable lv = localVars.pop();
-//			Type typeOfLv = lv.getType();
-//			String nameOfLv = lv.getName();
-//			// TODO use HashMap to add local variables.
-////	*		if (!dataInfos.localVariables.containsKey(nameOfLv)) {
-////				dataInfos.localVariables.put(nameOfLv, typeOfLv);
-////			}
-//		}
-//		
+		Map<String,Type> localVars = mv.getLocalVariables();
+		String nameOfThis = mv.getNameOfThis();
+	
 		/**
 		 * get IType of "this"
 		 */
@@ -94,10 +81,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			IPackageDeclaration[] packageDeclarations = cu.getPackageDeclarations();
 			IImportDeclaration[] importDeclarations = cu.getImports();
 
-			// this could be solved by just using Java Model
-			Map<IPackageDeclaration, List<IType>> currentPackageToTypes = new HashMap<IPackageDeclaration, List<IType>>();
-			Map<IImportDeclaration, List<IType>> importPackageToTypes = new HashMap<IImportDeclaration, List<IType>>();
-
 			SearchEngine se = new SearchEngine();
 			// using search engine
 			// set Scope
@@ -114,8 +97,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 				for(IType type : types) {
 					typesFromOuterPackage.add(type);
 				}
-				// TODO this is not necessary
-				currentPackageToTypes.put(pd, types);
 
 			}
 
@@ -150,7 +131,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 					}
 
-					importPackageToTypes.put(id, types);
 					// TODO 将下面的代码放到MyTypeNameMatchRequestor中
 					for (IType type : types) {
 						typesFromOuterPackage.add(type);
@@ -163,16 +143,8 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			jme.printStackTrace();
 		}
 		
-		DataFromSourceFile data = new DataFromSourceFile(null,thisIType,typesFromOuterPackage);
+		DataFromSourceFile data = new DataFromSourceFile(localVars,thisIType,typesFromOuterPackage);
 
-		// get packageName
-		IJavaProject javaproject = cu.getJavaProject();
-
-		String projectName = javaproject.getElementName();
-//	*	dataInfos.projectName = projectName;
-
-		// package level
-		IPackageFragment[] packages;
 
 //		// get the innerest ASTNode
 //		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
