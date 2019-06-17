@@ -17,6 +17,13 @@ public class MyVisitor extends ASTVisitor {
 	private Stack<LocalVariable> localVars_tmp;
 	private String nameOfThis;
 
+	private final String BLOCK = "org.eclipse.jdt.core.dom.Block";
+	private final String FS = "org.eclipse.jdt.core.dom.ForStatement";
+
+	private final String EFS = "org.eclipse.jdt.core.dom.EnhancedForStatement";
+	private final String CATCHCLAUSE = "org.eclipse.jdt.core.dom.CatchClause";
+	
+
 	public MyVisitor(int cursorPos) {
 		this.cursorPos = cursorPos;
 		this.localVars_tmp = new Stack<LocalVariable>();
@@ -25,65 +32,150 @@ public class MyVisitor extends ASTVisitor {
 	// visit the class-level node and get local variable
 	public boolean visit(VariableDeclarationExpression node) {
 
-		// get Variable Element if cursor position in its nearest block
-		// also field of outtest class do not count as local variable
-		int startPos = node.getStartPosition();
-//		Stack<String> localVariables = new Stack<String>();
-		ASTNode parentBlock = getParentBlock(node);
-//		JavaCompletionProposalComputer.localVariables = new Stack<String>();
-		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
-			// process with field
-			// add the type and name of the local variable
-			// also should consider the hierarchy!!
-			Type type = node.getType();
-			List<VariableDeclarationFragment> localVariables = node.fragments();
-			for (VariableDeclarationFragment localVariable : localVariables) {
+		boolean isProperParent = false;
+		ASTNode nodeParent = node.getParent();
 
-				String varName = localVariable.getName().toString();
-				LocalVariable lv = new LocalVariable(varName, type);
-				localVars_tmp.push(lv);
+		int startPos_node = node.getStartPosition();
+		int length_node = node.getLength();
+		int endPos_node = startPos_node + length_node;
+
+		while (!isProperParent) {
+
+			String nodeParentClassName = nodeParent.getClass().getName().toString();
+			switch (nodeParentClassName) {
+			case BLOCK:
+				isProperParent = true;
+
+				boolean isLocalVariable = isLocalVariable(endPos_node, nodeParent);
+
+				if (isLocalVariable) {
+					addToStackForVariableDeclarationExpression(node);
+				}
+
+				break;
+			case FS:
+				isProperParent = true;
+				// TODO check what is statement
+				Statement innerStatement = ((ForStatement) nodeParent).getBody();
+				isLocalVariable = isLocalVariable(endPos_node, innerStatement);
+
+				if (isLocalVariable) {
+					addToStackForVariableDeclarationExpression(node);
+				}
+
+				break;
+
+			default:
+				nodeParent = nodeParent.getParent();
+				break;
 			}
-
 		}
 
 		return false;
 	}
 
-	public boolean visit(SingleVariableDeclaration node) {
-		int startPos = node.getStartPosition();
-		ASTNode parentBlock = getParentBlock(node);
-		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
+	private boolean isLocalVariable(int endPos_node, ASTNode node) {
+		int startPos_Scope = node.getStartPosition();
+		int length_Scope = node.getLength();
+		int endPos_Scope = startPos_Scope + length_Scope;
+		
+		return (endPos_node < cursorPos) && (startPos_Scope < cursorPos) && (cursorPos < endPos_Scope);
+	}
 
-			Type type = node.getType();
-			String varName = node.getName().toString();
+	private void addToStackForVariableDeclarationExpression(VariableDeclarationExpression node) {
+		Type type = node.getType();
+		@SuppressWarnings("unchecked")
+		List<VariableDeclarationFragment> localVariables = node.fragments();
+		for (VariableDeclarationFragment localVariable : localVariables) {
+
+			String varName = localVariable.getName().toString();
 			LocalVariable lv = new LocalVariable(varName, type);
 			localVars_tmp.push(lv);
 		}
-
-		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	public boolean visit(VariableDeclarationStatement node) {
-		int startPos = node.getStartPosition();
-		ASTNode parentBlock = getParentBlock(node);
-		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
-			Type type = node.getType();
-			List<VariableDeclarationFragment> localVariables = node.fragments();
-			for (VariableDeclarationFragment localVariable : localVariables) {
-				String varName = localVariable.getName().toString();
-				LocalVariable lv = new LocalVariable(varName, type);
-				localVars_tmp.push(lv);
+	public boolean visit(SingleVariableDeclaration node) {
+
+		boolean isProperParent = false;
+		ASTNode nodeParent = node.getParent();
+
+		int startPos_node = node.getStartPosition();
+		int length_node = node.getLength();
+		int endPos_node = startPos_node + length_node;
+
+		while (!isProperParent) {
+			String nodeParentClassName = nodeParent.getClass().getName().toString();
+			switch (nodeParentClassName) {
+			// Block:
+			case BLOCK:
+				isProperParent = true;
+
+				boolean isLocalVariable = isLocalVariable(endPos_node, nodeParent);
+
+				if (isLocalVariable) {
+					addToStackSingleVariableDeclaration(node);
+				}
+				
+				break;
+			// Enhanced For Statement ----------- OK
+			case EFS:
+				isProperParent = true;
+				Statement innerStatement= ((EnhancedForStatement)nodeParent).getBody();
+				
+				isLocalVariable = isLocalVariable(endPos_node, innerStatement);
+				if (isLocalVariable) {
+					addToStackSingleVariableDeclaration(node);
+				}
+				
+				break;
+			case CATCHCLAUSE:
+				isProperParent = true;
+				innerStatement= ((CatchClause)nodeParent).getBody();
+				
+				isLocalVariable = isLocalVariable(endPos_node, innerStatement);
+				if (isLocalVariable) {
+					addToStackSingleVariableDeclaration(node);
+				}
+				
+				break;
+			default:
+				nodeParent = nodeParent.getParent();
+				break;
+				
 			}
 		}
 
 		return false;
+	}
+//
+//	@SuppressWarnings("unchecked")
+//	public boolean visit(VariableDeclarationStatement node) {
+//		int startPos = node.getStartPosition();
+//		ASTNode parentBlock = getParentBlock(node);
+//		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
+//			Type type = node.getType();
+//			List<VariableDeclarationFragment> localVariables = node.fragments();
+//			for (VariableDeclarationFragment localVariable : localVariables) {
+//				String varName = localVariable.getName().toString();
+//				LocalVariable lv = new LocalVariable(varName, type);
+//				localVars_tmp.push(lv);
+//			}
+//		}
+//
+//		return false;
+//	}
+
+	private void addToStackSingleVariableDeclaration(SingleVariableDeclaration node) {
+
+		Type type = node.getType();
+		String varName = node.getName().toString();
+		LocalVariable lv = new LocalVariable(varName, type);
+		localVars_tmp.push(lv);
 	}
 
 	private ASTNode getParentBlock(ASTNode node) {
 		Set<String> nodeNames = new HashSet<String>();
 		String TD = "org.eclipse.jdt.core.dom.TypeDeclaration";
-		String BLOCK = "org.eclipse.jdt.core.dom.Block";
 		String MD = "org.eclipse.jdt.core.dom.MethodDeclaration";
 		String IS = "org.eclipse.jdt.core.dom.IfStatement";
 		String WS = "org.eclipse.jdt.core.dom.WhileStatement";

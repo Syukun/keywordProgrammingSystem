@@ -61,6 +61,14 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		MyVisitor mv = new MyVisitor(cursorPos);
 		cu_ast.accept(mv);
 
+//		/**
+//		 * Test
+//		 */
+//		NodeFinder nf = new NodeFinder(cu_ast,cursorPos,0);
+//		nf.getCoveredNode();
+//		nf.getCoveringNode();
+		
+		
 		Map<String,Type> localVars = mv.getLocalVariables();
 		String nameOfThis = mv.getNameOfThis();
 	
