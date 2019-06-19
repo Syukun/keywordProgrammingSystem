@@ -2,14 +2,16 @@ package basic;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Type;
 
 public class LocalVariable {
 
-	private Type typeName;
+	private ITypeBinding typeName;
 	private String varName;
 
-	public LocalVariable(String vName, Type typeName) {
+	public LocalVariable(String vName, ITypeBinding typeName) {
 		this.varName = vName;
 		this.typeName = typeName;
 	}
@@ -28,7 +30,7 @@ public class LocalVariable {
 		return varName;
 	}
 
-	public Type getType() {
+	public ITypeBinding getTypeBinding() {
 		// TODO Auto-generated method stub
 
 		return this.typeName;

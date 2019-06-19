@@ -41,7 +41,7 @@ public class MyVisitor extends ASTVisitor {
 
 		while (!isProperParent) {
 
-			String nodeParentClassName = nodeParent.getClass().getName().toString();
+			String nodeParentClassName = getNodeName(nodeParent);
 			switch (nodeParentClassName) {
 			case BLOCK:
 				isProperParent = true;
@@ -82,18 +82,6 @@ public class MyVisitor extends ASTVisitor {
 		return (endPos_node < cursorPos) && (startPos_Scope < cursorPos) && (cursorPos < endPos_Scope);
 	}
 
-	private void addToStackForVariableDeclarationExpression(VariableDeclarationExpression node) {
-		Type type = node.getType();
-		@SuppressWarnings("unchecked")
-		List<VariableDeclarationFragment> localVariables = node.fragments();
-		for (VariableDeclarationFragment localVariable : localVariables) {
-
-			String varName = localVariable.getName().toString();
-			LocalVariable lv = new LocalVariable(varName, type);
-			localVars_tmp.push(lv);
-		}
-	}
-
 	public boolean visit(SingleVariableDeclaration node) {
 
 		boolean isProperParent = false;
@@ -103,8 +91,9 @@ public class MyVisitor extends ASTVisitor {
 		int length_node = node.getLength();
 		int endPos_node = startPos_node + length_node;
 
+
 		while (!isProperParent) {
-			String nodeParentClassName = nodeParent.getClass().getName().toString();
+			String nodeParentClassName = getNodeName(nodeParent);
 			switch (nodeParentClassName) {
 			// Block:
 			case BLOCK:
@@ -138,6 +127,8 @@ public class MyVisitor extends ASTVisitor {
 				}
 				
 				break;
+				
+			// TODO find other stuff 
 			default:
 				nodeParent = nodeParent.getParent();
 				break;
@@ -147,69 +138,78 @@ public class MyVisitor extends ASTVisitor {
 
 		return false;
 	}
-//
-//	@SuppressWarnings("unchecked")
-//	public boolean visit(VariableDeclarationStatement node) {
-//		int startPos = node.getStartPosition();
-//		ASTNode parentBlock = getParentBlock(node);
-//		if ((startPos < cursorPos) && (isInNode(parentBlock, cursorPos))) {
-//			Type type = node.getType();
-//			List<VariableDeclarationFragment> localVariables = node.fragments();
-//			for (VariableDeclarationFragment localVariable : localVariables) {
-//				String varName = localVariable.getName().toString();
-//				LocalVariable lv = new LocalVariable(varName, type);
-//				localVars_tmp.push(lv);
-//			}
-//		}
-//
-//		return false;
-//	}
+	
+	public boolean visit(VariableDeclarationStatement node) {
+		
+		boolean isProperParent = false;
+		ASTNode nodeParent = node.getParent();
+
+		int startPos_node = node.getStartPosition();
+		int length_node = node.getLength();
+		int endPos_node = startPos_node + length_node;
+		
+		while(!isProperParent) {
+			String nodeParentClassName = getNodeName(nodeParent);
+			switch(nodeParentClassName) {
+			case BLOCK:
+				isProperParent = true;
+
+				boolean isLocalVariable = isLocalVariable(endPos_node, nodeParent);
+
+				if (isLocalVariable) {
+					addToStackVariableDeclarationStatement(node);
+				}
+				
+				break;
+			default:
+				nodeParent = nodeParent.getParent();
+				break;
+			}
+		}
+		
+		return false;
+	}
+	
+	private void addToStackForVariableDeclarationExpression(VariableDeclarationExpression node) {
+		Type type = node.getType();
+		ITypeBinding typeBind= type.resolveBinding();
+		@SuppressWarnings("unchecked")
+		List<VariableDeclarationFragment> localVariables = node.fragments();
+		for (VariableDeclarationFragment localVariable : localVariables) {
+
+			String varName = localVariable.getName().toString();
+			LocalVariable lv = new LocalVariable(varName, typeBind);
+			localVars_tmp.push(lv);
+		}
+	}
+
+	private void addToStackVariableDeclarationStatement(VariableDeclarationStatement node) {
+		Type type = node.getType();
+		ITypeBinding typeBind= type.resolveBinding();
+		@SuppressWarnings("unchecked")
+		List<VariableDeclarationFragment> localVariables = node.fragments();
+		for (VariableDeclarationFragment localVariable : localVariables) {
+
+			String varName = localVariable.getName().toString();
+			LocalVariable lv = new LocalVariable(varName, typeBind);
+			localVars_tmp.push(lv);
+		}
+		
+	}
 
 	private void addToStackSingleVariableDeclaration(SingleVariableDeclaration node) {
 
 		Type type = node.getType();
+		ITypeBinding typeBind= type.resolveBinding();
 		String varName = node.getName().toString();
-		LocalVariable lv = new LocalVariable(varName, type);
+		LocalVariable lv = new LocalVariable(varName, typeBind);
 		localVars_tmp.push(lv);
+	
 	}
 
-	private ASTNode getParentBlock(ASTNode node) {
-		Set<String> nodeNames = new HashSet<String>();
-		String TD = "org.eclipse.jdt.core.dom.TypeDeclaration";
-		String MD = "org.eclipse.jdt.core.dom.MethodDeclaration";
-		String IS = "org.eclipse.jdt.core.dom.IfStatement";
-		String WS = "org.eclipse.jdt.core.dom.WhileStatement";
-		String FS = "org.eclipse.jdt.core.dom.ForStatement";
-		// TODO consider do while is correct or not
-
-		nodeNames.add(TD);
-		nodeNames.add(BLOCK);
-		nodeNames.add(MD);
-		nodeNames.add(IS);
-		nodeNames.add(WS);
-		nodeNames.add(FS);
-
-		while (!nodeNames.contains(getNodeName(node))) {
-			if (node.getParent() != null) {
-				node = node.getParent();
-			} else {
-				return null;
-			}
-		}
-		return node;
-	}
 
 	private String getNodeName(ASTNode node) {
 		return node.getClass().getName();
-	}
-
-	private boolean isInNode(ASTNode node, int cursorPos) {
-		if (node == null)
-			return true;
-		int startPos = node.getStartPosition();
-		int length = node.getLength();
-		int endPos = startPos + length;
-		return (cursorPos >= startPos && cursorPos <= endPos);
 	}
 
 	// get the class which the current cursor in.
@@ -227,16 +227,16 @@ public class MyVisitor extends ASTVisitor {
 		return this.nameOfThis;
 	}
 
-	public Map<String, Type> getLocalVariables() {
-		Map<String, Type> localVariables = new HashMap<String, Type>();
+	public Map<String, ITypeBinding> getLocalVariables() {
+		Map<String, ITypeBinding> localVariables = new HashMap<String, ITypeBinding>();
 
 		while (!localVars_tmp.empty()) {
 			LocalVariable lv = localVars_tmp.pop();
 			String nameOfLv = lv.getName();
-			Type typeOfLv = lv.getType();
+			ITypeBinding typeOfLv_bind = lv.getTypeBinding();
 
 			if (!localVariables.containsKey(nameOfLv)) {
-				localVariables.put(nameOfLv, typeOfLv);
+				localVariables.put(nameOfLv, typeOfLv_bind);
 			}
 		}
 
