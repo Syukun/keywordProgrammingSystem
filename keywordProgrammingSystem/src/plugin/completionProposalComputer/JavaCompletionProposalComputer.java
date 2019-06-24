@@ -163,7 +163,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		// test whether the keyword query have any influence on ast
 		String keywords = "add line";
 
-		Vector<Expression> exps = new ExpressionGenerator().generateExpression(10, keywords);
+		Vector<Expression> exps = new ExpressionGenerator(data).generateExpression(10, keywords);
 		for (Expression exp : exps) {
 			result.add(new MyCompletionProposal(context, exp));
 		}
