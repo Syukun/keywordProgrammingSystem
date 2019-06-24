@@ -22,7 +22,8 @@ public class MyVisitor extends ASTVisitor {
 
 	private final String EFS = "org.eclipse.jdt.core.dom.EnhancedForStatement";
 	private final String CATCHCLAUSE = "org.eclipse.jdt.core.dom.CatchClause";
-	
+	private final String MD = "org.eclipse.jdt.core.dom.MethodDeclaration";
+	private final String CD = "org.eclipse.jdt.core.dom.ConstructorDeclaration";
 
 	public MyVisitor(int cursorPos) {
 		this.cursorPos = cursorPos;
@@ -122,6 +123,29 @@ public class MyVisitor extends ASTVisitor {
 				innerStatement= ((CatchClause)nodeParent).getBody();
 				
 				isLocalVariable = isLocalVariable(endPos_node, innerStatement);
+				if (isLocalVariable) {
+					addToStackSingleVariableDeclaration(node);
+				}
+				
+				break;
+			// Method Declaration 
+			case MD:
+				isProperParent = true;
+				Block innerBlock = ((MethodDeclaration)nodeParent).getBody();
+				
+				isLocalVariable = isLocalVariable(endPos_node, innerBlock);
+				if (isLocalVariable) {
+					addToStackSingleVariableDeclaration(node);
+				}
+				
+				break;
+				
+			// Constructor Declaration
+			case CD:
+				isProperParent = true;
+				innerBlock = ((MethodDeclaration)nodeParent).getBody();
+				
+				isLocalVariable = isLocalVariable(endPos_node, innerBlock);
 				if (isLocalVariable) {
 					addToStackSingleVariableDeclaration(node);
 				}
