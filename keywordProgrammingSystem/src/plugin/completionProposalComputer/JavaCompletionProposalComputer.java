@@ -69,7 +69,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 //		nf.getCoveringNode();
 		
 		
-		Map<String,ITypeBinding> localVars = mv.getLocalVariables();
+		Map<String,Type> localVars = mv.getLocalVariables();
 		String nameOfThis = mv.getNameOfThis();
 	
 		/**

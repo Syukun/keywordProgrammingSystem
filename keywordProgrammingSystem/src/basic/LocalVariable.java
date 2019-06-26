@@ -8,10 +8,10 @@ import org.eclipse.jdt.core.dom.Type;
 
 public class LocalVariable {
 
-	private ITypeBinding typeName;
+	private Type typeName;
 	private String varName;
 
-	public LocalVariable(String vName, ITypeBinding typeName) {
+	public LocalVariable(String vName, Type typeName) {
 		this.varName = vName;
 		this.typeName = typeName;
 	}
@@ -30,7 +30,7 @@ public class LocalVariable {
 		return varName;
 	}
 
-	public ITypeBinding getTypeBinding() {
+	public Type getType() {
 		// TODO Auto-generated method stub
 
 		return this.typeName;

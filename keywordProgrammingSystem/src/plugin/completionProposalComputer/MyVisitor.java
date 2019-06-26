@@ -196,26 +196,24 @@ public class MyVisitor extends ASTVisitor {
 	
 	private void addToStackForVariableDeclarationExpression(VariableDeclarationExpression node) {
 		Type type = node.getType();
-		ITypeBinding typeBind= type.resolveBinding();
 		@SuppressWarnings("unchecked")
 		List<VariableDeclarationFragment> localVariables = node.fragments();
 		for (VariableDeclarationFragment localVariable : localVariables) {
 
 			String varName = localVariable.getName().toString();
-			LocalVariable lv = new LocalVariable(varName, typeBind);
+			LocalVariable lv = new LocalVariable(varName, type);
 			localVars_tmp.push(lv);
 		}
 	}
 
 	private void addToStackVariableDeclarationStatement(VariableDeclarationStatement node) {
 		Type type = node.getType();
-		ITypeBinding typeBind= type.resolveBinding();
 		@SuppressWarnings("unchecked")
 		List<VariableDeclarationFragment> localVariables = node.fragments();
 		for (VariableDeclarationFragment localVariable : localVariables) {
 
 			String varName = localVariable.getName().toString();
-			LocalVariable lv = new LocalVariable(varName, typeBind);
+			LocalVariable lv = new LocalVariable(varName, type);
 			localVars_tmp.push(lv);
 		}
 		
@@ -224,9 +222,8 @@ public class MyVisitor extends ASTVisitor {
 	private void addToStackSingleVariableDeclaration(SingleVariableDeclaration node) {
 
 		Type type = node.getType();
-		ITypeBinding typeBind= type.resolveBinding();
 		String varName = node.getName().toString();
-		LocalVariable lv = new LocalVariable(varName, typeBind);
+		LocalVariable lv = new LocalVariable(varName, type);
 		localVars_tmp.push(lv);
 	
 	}
@@ -251,16 +248,16 @@ public class MyVisitor extends ASTVisitor {
 		return this.nameOfThis;
 	}
 
-	public Map<String, ITypeBinding> getLocalVariables() {
-		Map<String, ITypeBinding> localVariables = new HashMap<String, ITypeBinding>();
+	public Map<String, Type> getLocalVariables() {
+		Map<String, Type> localVariables = new HashMap<String, Type>();
 
 		while (!localVars_tmp.empty()) {
 			LocalVariable lv = localVars_tmp.pop();
 			String nameOfLv = lv.getName();
-			ITypeBinding typeOfLv_bind = lv.getTypeBinding();
+			Type typeOfLv = lv.getType();
 
 			if (!localVariables.containsKey(nameOfLv)) {
-				localVariables.put(nameOfLv, typeOfLv_bind);
+				localVariables.put(nameOfLv, typeOfLv);
 			}
 		}
 

@@ -35,7 +35,7 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 
 	public Vector<Expression> generateExpression(int depth, String keywords) {
 //		DataBase.initDataBase();
-		
+
 		Vector<Expression> result = new Vector<Expression>();
 		Set<String> receiveTypes = this.getAllPossibleReturnTypes();
 		
