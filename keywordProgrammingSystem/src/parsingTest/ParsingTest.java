@@ -15,6 +15,7 @@ public class ParsingTest {
 	public static void parsingContext(String context) {
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
 		parser.setSource(context.toCharArray());
+		parser.setResolveBindings(true);
 //		Map options = JavaCore.getOptions();
 //		JavaCore.setComplianceOptions(JavaCore.VERSION_9, options);
 //		parser.setCompilerOptions(options);
@@ -25,23 +26,21 @@ public class ParsingTest {
 	}
 	
 	public static void main(String[] args) {
-		String context ="public class Test {\n" + 
-				"	String field_a;\n" + 
-				"	String field_b1, field_b2;\n" + 
+		String context ="public class A{\n" + 
+				"    B field_a;\n" + 
+				"    \n" + 
+				"    public A(A.B constructor_a){\n" + 
+				"    }\n" + 
+				"    \n" + 
+				"    public void fun_a(B b){\n" + 
+				"        for(int i = 1; i < 5; i++){\n" + 
+				"        }\n" + 
+				"    }\n" + 
+				"}\n" + 
 				"\n" + 
-				"	void m(int para_m1, int para_m2) {\n" + 
-				"		List<Integer> loi = new ArrayList<Integer>();\n" + 
-				"		for (int for_i = 0,for_i2 = 1; for_i < 3; for_i++) {\n" + 
-				"			try {\n" + 
-				"				int try_i = 0;\n" + 
-				"			} catch (Exception e) {\n" + 
-				"			}\n" + 
-				"		}\n" + 
-				"\n" + 
-				"		for (Integer enhance_for_i : loi) {\n" + 
-				"		}\n" + 
-				"	}\n" + 
-				"}\n";
+				"class B extends A{\n" + 
+				"    String field_b;\n" + 
+				"}";
 		parsingContext(context);
 	}
 }
@@ -50,7 +49,12 @@ class TVisitor extends ASTVisitor{
 	
 	public boolean visit(SingleVariableDeclaration node) {
 		System.out.println(node.getType()+"  " + node.getName() + "   SingleVariableDeclaration");
-		
+		Type nodeType = node.getType();
+		String nodeName = nodeType.toString();
+		ITypeBinding tb = nodeType.resolveBinding();
+		if(tb!=null) {
+			
+		}
 		return false;
 	}
 	

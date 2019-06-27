@@ -8,3 +8,15 @@ public class PatternMatchTest {
 		
 	}
 }
+
+class A{
+	public void funA() {
+		
+	}
+}
+
+class B extends A{
+	public void funB(){
+		funA();
+	}
+}

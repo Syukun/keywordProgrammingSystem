@@ -19,6 +19,7 @@ public class TypeWithSubTyping {
 		
 	}
 	
+	// TODO find a way to get hierarchy from ASTParser
 	public TypeWithSubTyping(Type type) {
 		// if is not resolvable
 		ITypeBinding tb = type.resolveBinding();
