@@ -61,6 +61,8 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		MyVisitor mv = new MyVisitor(cursorPos);
 		cu_ast.accept(mv);
 
+
+		
 //		/**
 //		 * Test
 //		 */
@@ -79,15 +81,25 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		// get information of "this"
 		try {
 			thisIType = cu.getType(nameOfThis);
+			
+//			/**
+//			 * Test
+//			 */
+//			ITypeHierarchy ith = thisIType.newTypeHierarchy(monitor);
+//			IType[] ts = ith.getAllClasses();
+//			IType[] subs = ith.getAllSubtypes(thisIType);
+			
 		} catch (NullPointerException npe) {
 			// TODO need to specify this code
 			System.out.println("Cursor is not in any Class");
-		}
+		} 
 		
 		Set<IType> typesFromOuterPackage = new HashSet<IType>();
 		try {
 			IPackageDeclaration[] packageDeclarations = cu.getPackageDeclarations();
 			IImportDeclaration[] importDeclarations = cu.getImports();
+			
+			IType[] currentTypes = cu.getAllTypes();
 
 			SearchEngine se = new SearchEngine();
 			// using search engine
@@ -151,7 +163,8 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			jme.printStackTrace();
 		}
 		
-		DataFromSourceFile data = new DataFromSourceFile(localVars,thisIType,typesFromOuterPackage);
+		//TODO refactor 
+		DataFromSourceFile data = new DataFromSourceFile(localVars,thisIType,typesFromOuterPackage,monitor);
 
 
 //		// get the innerest ASTNode

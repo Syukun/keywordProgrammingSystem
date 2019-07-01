@@ -20,3 +20,4 @@ class B extends A{
 		funA();
 	}
 }
+
