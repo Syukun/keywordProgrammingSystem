@@ -63,7 +63,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 
 		// test
-		DataFromSourceFile dataFromS = new DataFromSourceFile(cu,monitor);
+		DataFromSourceFile dataFromS = new DataFromSourceFile(context,monitor);
 		try {
 			Set<IType> res = dataFromS.getAllTypes();
 		} catch (JavaModelException e) {

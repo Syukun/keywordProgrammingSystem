@@ -9,13 +9,19 @@ import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
+import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 
 import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
+import plugin.completionProposalComputer.MyVisitor;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +46,7 @@ public class DataFromSourceFile {
 	 * Step - 1 : icu : current Compilation unit from Java Model monitor : current
 	 * monitor
 	 */
+	ContentAssistInvocationContext context;
 	ICompilationUnit icu;
 	public IProgressMonitor monitor;
 
@@ -62,8 +69,9 @@ public class DataFromSourceFile {
 	 * @param monitor
 	 * @date 2019/07/01
 	 */
-	public DataFromSourceFile(ICompilationUnit icu, IProgressMonitor monitor) {
-		this.icu = icu;
+	public DataFromSourceFile(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+		this.context = context;
+		this.icu =  ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 		this.monitor = monitor;
 	}
 
@@ -148,6 +156,39 @@ public class DataFromSourceFile {
 		return importDeclarationName.substring(lastDotPos+1);
 	}
 
+
+
+	/**
+	 * 
+	 * @return map of < Name of Type : IType in Java Model of that type >
+	 * @date 2019/07/03
+	 */
+	public Map<String, IType> getLocalVariables() {
+		Map<String, IType> res = new HashMap<String, IType>();
+		
+		// Step-1 : create a parser for this
+		ASTParser parser = ASTParser.newParser(AST.JLS11);
+		parser.setSource(icu);
+		
+		CompilationUnit cu = (CompilationUnit)parser.createAST(monitor);
+		// get the position of cursor
+		int cursorPos = context.getViewer().getSelectedRange().x;
+		
+		// ASTVisitor to get local variables
+		MyVisitor mv = new MyVisitor(cursorPos);
+		
+		// TODO finish all possible situations of local variable
+		Map<String,Type> localVariable_AST = mv.getLocalVariables();
+		// TODO translate to Map<String,IType>,  maybe could use stream
+		// TODO END of TODAY=======================================================
+		for (String s : localVariables.keySet()) {
+			Type type = localVariables.get(s);
+			
+		}
+
+		return res;
+	}
+
 	public Map<String, IType> getMemberFields() throws JavaModelException {
 		Map<String, IType> res = new HashMap<String, IType>();
 		// deal with this type
@@ -159,23 +200,6 @@ public class DataFromSourceFile {
 
 		return res;
 	}
-
-	public Map<String, TypeWithSuperTyping> getLocalVariables() {
-		Map<String, TypeWithSuperTyping> res = new HashMap<String, TypeWithSuperTyping>();
-		// TODO maybe could use stream
-		for (String s : localVariables.keySet()) {
-			Type type = localVariables.get(s);
-			TypeWithSuperTyping type_s = resolveTypeBinding(type);
-
-		}
-
-		return res;
-	}
-
-	private TypeWithSuperTyping resolveTypeBinding(Type type) {
-		return new TypeWithSuperTyping(type);
-	}
-
 	public Map<String, IType> getOutterFields() throws JavaModelException {
 		Map<String, IType> res = new HashMap<String, IType>();
 
