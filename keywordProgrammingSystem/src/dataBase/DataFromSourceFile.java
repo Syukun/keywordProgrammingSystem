@@ -10,8 +10,12 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchPattern;
+
+import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,7 +80,6 @@ public class DataFromSourceFile {
 		// check the range of package Declaration whether it contains this TYpe?
 		// answer is yes
 
-		// TODO check when present package is not available
 		// Deal with package:
 		try {
 			IPackageFragment ipf = (IPackageFragment) icu.getParent();
@@ -95,28 +98,55 @@ public class DataFromSourceFile {
 
 		// Search Engine : search types and interfaces in workspace
 		IImportDeclaration[] importDeclarations = icu.getImports();
-		
+
 		SearchEngine se = new SearchEngine();
+
+		// TODO check packageMatchRule
+		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
 		
+		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
+		// searchFor : right now just classes and interfaces
+		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
+		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+		// TODO waitingPolicy??
+		int waitingPolicy = 0;
+
+		/**
+		 * @current Need to write down full name of package when importing one.
+		 */
+		for (IImportDeclaration iimd : importDeclarations) {
+			// get name of type ( in Import Declarations)
+			String imdName = iimd.getElementName();
+
+			// get packageName and typeName
+			char[] packageName = getPackageName(imdName).toCharArray();
+			
+			char[] typeName = getTypeName(imdName).toCharArray();
+
+			MyTypeNameMatchRequestor nameMatchRequestor = new MyTypeNameMatchRequestor();
+
+			// TODO test whether could gain excepted Types
+
+			se.searchAllTypeNames(packageName, packageMatchRule, typeName, typeMatchRule, searchFor, scope,
+					nameMatchRequestor, waitingPolicy, monitor);
+
+			res.add(nameMatchRequestor.getIType());
+
+		}
+
 		return res;
 	}
 
-//	/**
-//	 * @date 2019/7/1
-//	 * @return
-//	 * @throws JavaModelException 
-//	 */
-//	public Set<TypeWithSuperTyping> getAllTypes() throws JavaModelException{
-//		Set<TypeWithSuperTyping> res = new HashSet<TypeWithSuperTyping>();
-//		// outer IType ==> Type with SubTyping
-//		for(IType outerType : typesFromOuterPackage ) {
-//			TypeWithSuperTyping type = new TypeWithSuperTyping(outerType,monitor);
-//			res.add(type);
-//		}
-//		// this IType ==> Type with SubTyping
-//		
-//		return res;
-//	}
+	
+	private String getPackageName(String importDeclarationName) {
+		int lastDotPos = importDeclarationName.lastIndexOf('.');
+		return importDeclarationName.substring(0, lastDotPos);
+	}
+
+	private String getTypeName(String importDeclarationName) {
+		int lastDotPos = importDeclarationName.lastIndexOf('.');
+		return importDeclarationName.substring(lastDotPos+1);
+	}
 
 	public Map<String, IType> getMemberFields() throws JavaModelException {
 		Map<String, IType> res = new HashMap<String, IType>();

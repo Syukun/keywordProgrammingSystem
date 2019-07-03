@@ -62,6 +62,15 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		cu_ast.accept(mv);
 
 
+		// test
+		DataFromSourceFile dataFromS = new DataFromSourceFile(cu,monitor);
+		try {
+			Set<IType> res = dataFromS.getAllTypes();
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 //		/**
 //		 * Test
@@ -95,76 +104,11 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		} 
 		
 		Set<IType> typesFromOuterPackage = new HashSet<IType>();
-		try {
-			IPackageDeclaration[] packageDeclarations = cu.getPackageDeclarations();
-			IImportDeclaration[] importDeclarations = cu.getImports();
-			
-			IType[] currentTypes = cu.getAllTypes();
 
-			SearchEngine se = new SearchEngine();
-			// using search engine
-			// set Scope
-			IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-
-			for (IPackageDeclaration pd : packageDeclarations) {
-				char[] pdName = pd.getElementName().toCharArray();
-				List<IType> types = new ArrayList<IType>();
-
-				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(pd, types);
-				se.searchAllTypeNames(pdName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE, scope,
-						nameRequestor, 0, monitor);
-
-				for(IType type : types) {
-					typesFromOuterPackage.add(type);
-				}
-
-			}
-
-			Set<String> importInfos = new HashSet<String>();
-			// TODO do something to process import declaration informations.
-			for (IImportDeclaration id : importDeclarations) {
-
-				String idName = id.getElementName().trim();
-				String packageName;
-				List<IType> types = new ArrayList<IType>();
-				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(id, types);
-
-				int id_len = idName.length();
-				int lastDotPos = idName.lastIndexOf('.');
-				packageName = idName.substring(0, lastDotPos);
-
-				if (!importInfos.contains(packageName)) {
-
-					importInfos.add(packageName);
-
-					if (idName.endsWith(".*")) {
-						char[] pName = packageName.toCharArray();
-						se.searchAllTypeNames(pName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE,
-								scope, nameRequestor, 0, monitor);
-					} else {
-
-						String typeName = idName.substring(lastDotPos + 1);
-						// TODO should figure out the exact way to use Search Pattern
-						se.searchAllTypeNames(packageName.toCharArray(), SearchPattern.R_PREFIX_MATCH,
-								typeName.toCharArray(), SearchPattern.R_SUBSTRING_MATCH, IJavaSearchConstants.TYPE,
-								scope, nameRequestor, 0, monitor);
-
-					}
-
-					// TODO 将下面的代码放到MyTypeNameMatchRequestor中
-					for (IType type : types) {
-						typesFromOuterPackage.add(type);
-					}
-				}
-			}
-
-		} catch (JavaModelException jme) {
-			// TODO Auto-generated catch block
-			jme.printStackTrace();
-		}
 		
 		//TODO refactor 
 		DataFromSourceFile data = new DataFromSourceFile(localVars,thisIType,typesFromOuterPackage,monitor);
+		
 
 
 //		// get the innerest ASTNode

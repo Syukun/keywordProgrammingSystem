@@ -1,35 +1,29 @@
 package plugin.completionProposalComputer;
 
-import java.util.List;
-
-import org.eclipse.jdt.core.IImportDeclaration;
-import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 
 public class MyTypeNameMatchRequestor extends TypeNameMatchRequestor {
-	IImportDeclaration importDeclaration;
-	IPackageDeclaration packageDeclaration;
-	List<IType> types;
+	IType type;
 	
 	
-	public MyTypeNameMatchRequestor(IPackageDeclaration packageDeclaration, List<IType> types) {
-		super();
-		this.packageDeclaration = packageDeclaration;
-		this.types = types;
+	/**
+	 * @date 2019/07/03
+	 */
+	public MyTypeNameMatchRequestor() {
+		
 	}
 
-	public MyTypeNameMatchRequestor(IImportDeclaration importDeclaration, List<IType> types) {
-		super();
-		this.importDeclaration = importDeclaration;
-		this.types = types;
-	}
 
 	@Override
 	public void acceptTypeNameMatch(TypeNameMatch match) {
-		IType t = match.getType();
-		this.types.add(t);
+		// TODO Auto-generated method stub
+		this.type = match.getType();
+	}
+	
+	public IType getIType() {
+		return this.type;
 	}
 
 }
