@@ -80,3 +80,13 @@ class TVisitor extends ASTVisitor{
 		return res;
 	}
 }
+
+class AA{
+	int fieldA;
+}
+
+class BB extends AA{
+	public void foo() {
+		int i = new BB().fieldA;
+	}
+}

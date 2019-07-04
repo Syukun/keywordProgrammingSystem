@@ -5,9 +5,9 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -30,17 +30,11 @@ import java.util.Set;
 import java.util.Vector;
 
 public class DataFromSourceFile {
-	// local variables from editing source file
-	// <Name : String, Type : jdt.core.dom.Type>
-	public Map<String, Type> localVariables;
-
 	// represent the information of "this"
 	public IType thisIType;
 
 	// save the type informations of outer packages, such as imports
 	public Set<IType> typesFromOuterPackage;
-
-	public Set<TypeWithSuperTyping> allTypes;
 
 	/**
 	 * Step - 1 : icu : current Compilation unit from Java Model monitor : current
@@ -49,18 +43,12 @@ public class DataFromSourceFile {
 	ContentAssistInvocationContext context;
 	ICompilationUnit icu;
 	public IProgressMonitor monitor;
-
-	// not useful
-	public DataFromSourceFile(Map<String, Type> localVariables, IType thisIType, Set<IType> typesFromOuterPackage,
-			IProgressMonitor monitor) {
-		super();
-		this.localVariables = localVariables;
-		this.thisIType = thisIType;
-		this.typesFromOuterPackage = typesFromOuterPackage;
-		this.allTypes = new HashSet<TypeWithSuperTyping>();
-		this.monitor = monitor;
-	}
-
+	
+	Vector<IType> allTypes;
+	Map<String, IType> allLocalVariables;
+	Set<Field> allFields;
+	Set<Method> allMethods;
+	
 	/**
 	 * Get compilationUnit (Java Model) and monitor from Class
 	 * JavaCompletionProposalComputer
@@ -73,17 +61,19 @@ public class DataFromSourceFile {
 		this.context = context;
 		this.icu =  ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 		this.monitor = monitor;
+		this.allTypes = new Vector<IType>();
+		this.allLocalVariables = new HashMap<String, IType>();
+		this.allFields = new HashSet<Field>();
 	}
 
 	// Step - 2 : get all Types
 	// TODO for right now NOT consider two classes with duplicated name
 	/**
-	 * 
-	 * @return Set of IType(Java Model)
+	 * extract all Type
+	 * @return 
 	 * @date 2019/07/01
 	 */
-	public Set<IType> getAllTypes() throws JavaModelException {
-		Set<IType> res = new HashSet<IType>();
+	public void extractAllTypes() throws JavaModelException {
 
 		// check the range of package Declaration whether it contains this TYpe?
 		// answer is yes
@@ -96,7 +86,7 @@ public class DataFromSourceFile {
 			for (ICompilationUnit icu_inner : icus) {
 				IType[] itypes = icu_inner.getAllTypes();
 				for (IType itype : itypes) {
-					res.add(itype);
+					allTypes.add(itype);
 				}
 			}
 
@@ -138,11 +128,13 @@ public class DataFromSourceFile {
 			se.searchAllTypeNames(packageName, packageMatchRule, typeName, typeMatchRule, searchFor, scope,
 					nameMatchRequestor, waitingPolicy, monitor);
 
-			res.add(nameMatchRequestor.getIType());
+			allTypes.add(nameMatchRequestor.getIType());
 
 		}
+		/**
+		 *  TODO right now not consider primitive type: which means we need to write down import informations when we use a type even for primitive type such as String
+		 */
 
-		return res;
 	}
 
 	
@@ -159,13 +151,12 @@ public class DataFromSourceFile {
 
 
 	/**
-	 * 
-	 * @return map of < Name of Type : IType in Java Model of that type >
+	 * Step - 3 : get all local variables
+	 * @return map of < Name of Type , IType in Java Model of that type >
+	 * @throws JavaModelException 
 	 * @date 2019/07/03
 	 */
-	public Map<String, IType> getLocalVariables() {
-		Map<String, IType> res = new HashMap<String, IType>();
-		
+	public void extractLocalVariables() throws JavaModelException {		
 		// Step-1 : create a parser for this
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
 		parser.setSource(icu);
@@ -178,61 +169,120 @@ public class DataFromSourceFile {
 		MyVisitor mv = new MyVisitor(cursorPos);
 		
 		// TODO finish all possible situations of local variable
-		Map<String,Type> localVariable_AST = mv.getLocalVariables();
-		// TODO translate to Map<String,IType>,  maybe could use stream
+		Map<String,Type> localVariables_AST = mv.getLocalVariables();
 		// TODO END of TODAY=======================================================
-		for (String s : localVariables.keySet()) {
-			Type type = localVariables.get(s);
+		/**
+		 * @since 2019/07/04
+		 * translate Map<X,Y> to Map<X,Z>
+		 * TODO translate to functional programming to make it more concise
+		 */
+		
+		for(String localVarName : localVariables_AST.keySet()) {
+			Type localVarType = localVariables_AST.get(localVarName);
+			try {
+				IType localVarIType = findIType(localVarType);
+				allLocalVariables.put(localVarName, localVarIType);
+			}catch(NullPointerException e) {
+				e.getStackTrace();
+			}
 			
 		}
-
-		return res;
 	}
 
-	public Map<String, IType> getMemberFields() throws JavaModelException {
-		Map<String, IType> res = new HashMap<String, IType>();
-		// deal with this type
-		IField[] fieldsOfThis = thisIType.getFields();
-		for (IField field_this : fieldsOfThis) {
-			String field_this_name = field_this.getElementName();
-			res.put(field_this_name, thisIType);
-		}
-
-		return res;
+	/**
+	 * translate Type from AST to IType from Java Model
+	 * @param t
+	 * @param allTypes
+	 * @return 
+	 * @since 2019/07/04
+	 */
+	private IType findIType(Type t){
+		String typeName = t.toString();
+		return this.findIType(typeName);
+		
 	}
-	public Map<String, IType> getOutterFields() throws JavaModelException {
-		Map<String, IType> res = new HashMap<String, IType>();
-
-		for (IType type : typesFromOuterPackage) {
-			IField[] fieldsOfOutter = type.getFields();
-			for (IField field_outter : fieldsOfOutter) {
-				String field_outter_name = field_outter.getElementName();
-				res.put(field_outter_name, type);
+	
+	/**
+	 * return all field information extracted from source file
+	 * @return set of Field
+	 * @throws JavaModelException
+	 * @since 2019/07/04
+	 */
+	public void extractFields() throws JavaModelException {
+		for(IType t : allTypes) {
+			// add field from itself
+			IField[] selfFields = t.getFields();
+			for(IField selfField : selfFields) {
+				String selfFieldName = selfField.getElementName();
+				Field selfF = new Field(selfFieldName,t);
+				allFields.add(selfF);
+			}
+			// get super classes and interfaces
+			ITypeHierarchy ith = t.newTypeHierarchy(monitor);
+			// 1. get all super classes
+			IType[] superClasses = ith.getAllSuperclasses(t);
+			// get field info from those super classes
+			for(IType superClass : superClasses) {
+				IField[] superClassFields = superClass.getFields();
+				for(IField superClassField : superClassFields) {
+					String superClassFieldName = superClassField.getElementName();
+					Field superClassF = new Field(superClassFieldName, superClass);
+					allFields.add(superClassF);
+				}
+			}
+			
+			// 2. get all interfaces
+			// TODO check difference between getAllSuperClasses and getAllSuperClasses(Type t)
+			IType[] superInterfaces = ith.getAllSuperInterfaces(t);
+			// get field info from those super interfaces
+			for(IType superInterface : superInterfaces) {
+				IField[] superInterfaceFields = superInterface.getFields();
+				for(IField superInterfaceField : superInterfaceFields) {
+					String superInterfaceFieldName = superInterfaceField.getElementName();
+					Field superInterfaceF = new Field(superInterfaceFieldName,superInterface);
+					allFields.add(superInterfaceF);
+				}
 			}
 		}
-
-		return res;
 	}
 
-	public Vector<Method> getMemberMethod() throws JavaModelException {
-		Vector<Method> res = new Vector<Method>();
-		IMethod[] memberMethods = thisIType.getMethods();
-		for (IMethod memberMethod : memberMethods) {
-			res.add(new Method(memberMethod));
+	/**
+	 * return all methods
+	 * @return
+	 * @throws JavaModelException
+	 * @since 2019/07/04
+	 */
+	public void extractMethods() throws JavaModelException{
+		for(IType iType : allTypes) {
+			// get methods from self class
+			IMethod[] selfMethods = iType.getMethods();
+			for(IMethod selfMethod : selfMethods) {
+				/**
+				 * TODO check three things:
+				 * 	1. when return Type is void what happened
+				 *  2. when receive Type is null what happened
+				 *  3. Does super class has methods in subClass when use getMethods()
+				 */
+				
+			}
+			
 		}
-		return res;
 	}
-
-	public Vector<Method> getOutterMethod() throws JavaModelException {
-		Vector<Method> res = new Vector<Method>();
-
-		for (IType type : typesFromOuterPackage) {
-			IMethod[] outerMethods = type.getMethods();
-			for (IMethod outerMethod : outerMethods) {
-				res.add(new Method(outerMethod));
+	
+	/**
+	 * find proper IType (Java Model) from allTypes by checking the name(String)
+	 * @param typeName
+	 * @return
+	 */
+	private IType findIType(String typeName) {
+		for(IType iType : this.allTypes) {
+			String iTypeName = iType.getElementName();
+			if(iTypeName.equals(typeName)) {
+				return iType;
 			}
 		}
-		return res;
+		return null;
 	}
+
 
 }

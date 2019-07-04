@@ -65,7 +65,10 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		// test
 		DataFromSourceFile dataFromS = new DataFromSourceFile(context,monitor);
 		try {
-			Set<IType> res = dataFromS.getAllTypes();
+			dataFromS.extractAllTypes();
+			dataFromS.extractLocalVariables();
+			dataFromS.extractFields();
+
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -105,10 +108,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		
 		Set<IType> typesFromOuterPackage = new HashSet<IType>();
 
-		
-		//TODO refactor 
-		DataFromSourceFile data = new DataFromSourceFile(localVars,thisIType,typesFromOuterPackage,monitor);
-		
+			
 
 
 //		// get the innerest ASTNode
@@ -120,7 +120,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		// test whether the keyword query have any influence on ast
 		String keywords = "add line";
 
-		Vector<Expression> exps = new ExpressionGenerator(data).generateExpression(10, keywords);
+		Vector<Expression> exps = new ExpressionGenerator().generateExpression(10, keywords);
 		for (Expression exp : exps) {
 			result.add(new MyCompletionProposal(context, exp));
 		}

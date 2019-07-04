@@ -25,9 +25,7 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 	public Table expsLEQDepth_Table;
 	public Table expsAtExactDepth_Table;
 	
-	public ExpressionGenerator(DataFromSourceFile data) {
-		this.data = data;
-	}
+
 	public ExpressionGenerator() {
 		
 	}
