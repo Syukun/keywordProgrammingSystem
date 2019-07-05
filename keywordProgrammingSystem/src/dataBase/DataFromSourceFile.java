@@ -167,6 +167,7 @@ public class DataFromSourceFile {
 		
 		// ASTVisitor to get local variables
 		MyVisitor mv = new MyVisitor(cursorPos);
+		cu.accept(mv);
 		
 		// TODO finish all possible situations of local variable
 		Map<String,Type> localVariables_AST = mv.getLocalVariables();
@@ -187,19 +188,6 @@ public class DataFromSourceFile {
 			}
 			
 		}
-	}
-
-	/**
-	 * translate Type from AST to IType from Java Model
-	 * @param t
-	 * @param allTypes
-	 * @return 
-	 * @since 2019/07/04
-	 */
-	private IType findIType(Type t){
-		String typeName = t.toString();
-		return this.findIType(typeName);
-		
 	}
 	
 	/**
@@ -250,7 +238,7 @@ public class DataFromSourceFile {
 	 * return all methods
 	 * @return
 	 * @throws JavaModelException
-	 * @since 2019/07/04
+	 * @since 2019/07/04,2019/07/05
 	 */
 	public void extractMethods() throws JavaModelException{
 		for(IType iType : allTypes) {
@@ -259,20 +247,43 @@ public class DataFromSourceFile {
 			for(IMethod selfMethod : selfMethods) {
 				/**
 				 * TODO check three things:
-				 * 	1. when return Type is void what happened
-				 *  2. when receive Type is null what happened
-				 *  3. Does super class has methods in subClass when use getMethods()
+				 * 	1. What will happen when Return Type is void
+				 *  2. What will happen when Receive Type is null
+				 *  3. Does subclass has methods in super Class when use get Methods(); --- ok
+				 *  4. Translate String to IType by analyze the signature
 				 */
+				// find return Type of self method
+				
+				Method selfM = new Method(selfMethod, iType, allTypes);
+//				IType returnType_selfMethod = findReturnType(selfMethod);
+//				IType[] parameterTypes_selfMethod = findParameterTypes(selfMethod);
+//				IType[] exceptionTypes_selfMethod = findExceptionTypes(selfMethod);
+				
 				
 			}
 			
 		}
 	}
 	
+	
+	/**
+	 * translate Type from AST to IType from Java Model
+	 * @param t
+	 * @param allTypes
+	 * @return 
+	 * @since 2019/07/04
+	 */
+	private IType findIType(Type t){
+		String typeName = t.toString();
+		return this.findIType(typeName);
+		
+	}
+	
 	/**
 	 * find proper IType (Java Model) from allTypes by checking the name(String)
 	 * @param typeName
 	 * @return
+	 * @since 2019/07/04
 	 */
 	private IType findIType(String typeName) {
 		for(IType iType : this.allTypes) {

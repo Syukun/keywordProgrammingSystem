@@ -68,6 +68,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			dataFromS.extractAllTypes();
 			dataFromS.extractLocalVariables();
 			dataFromS.extractFields();
+			dataFromS.extractMethods();
 
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block
