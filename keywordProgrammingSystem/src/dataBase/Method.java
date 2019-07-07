@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.Type;
 
 public class Method {
@@ -19,15 +20,15 @@ public class Method {
 	private IType[] parameterTypes;
 	private IType[] exceptionTypes;
 	
-//	private static final String B = "java.lang.Byte";
-//	private static final String C = "java.lang.Character";
-//	private static final String D = "java.lang.Double";
-//	private static final String F = "java.lang.Float";
-//	private static final String I = "java.lang.Integer";
-//	private static final String J = "java.lang.Long";
-//	private static final String S = "java.lang.Short";
-//	private static final String V = "void";
-//	private static final String Z = "java.lang.Boolean";
+	private static final String B = "java.lang.Byte";
+	private static final String C = "java.lang.Character";
+	private static final String D = "java.lang.Double";
+	private static final String F = "java.lang.Float";
+	private static final String I = "java.lang.Integer";
+	private static final String J = "java.lang.Long";
+	private static final String S = "java.lang.Short";
+	private static final String V = "void";
+	private static final String Z = "java.lang.Boolean";
 	
 
 	public Method(IMethod iMethod, IType iType, Vector<IType> allTypes) throws JavaModelException {
@@ -81,25 +82,38 @@ public class Method {
 	
 	// TODO signature : String ==> t : IType
 	private IType findITypeFromSign(String signature) {
-		switch(signature) {
-//		case "B" -> this.findIType(B);
+		//TODO deal with array
+		int arrayCount = Signature.getArrayCount(signature);
+		String elementType = signature;
+		if(arrayCount!=0) {
+			elementType = Signature.getElementType(signature);
 		}
+		
+		String signSimpleName = Signature.getSignatureSimpleName(elementType);
+		
+		switch(signSimpleName) {
+		//TODO could modified after update to java 12
+			case "V" : return null;
+			case "byte":
+			case "char":
+			case "double":
+			case "float":
+			case "int":
+			case "long":
+			case "short":
+			case "boolean":
+				return findPrimitiveIType(Signature.getSignatureSimpleName(signSimpleName));
+			default :
+				return findIType(Signature.getSignatureSimpleName(signSimpleName));
+		}
+	}
+	
+	
+	private IType findPrimitiveIType(String signatureSimpleName) {
+		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	/**
-	 * translate Type from AST to IType from Java Model
-	 * @param t
-	 * @param allTypes
-	 * @return 
-	 * @since 2019/07/04
-	 */
-	private IType findIType(Type t){
-		String typeName = t.toString();
-		return this.findIType(typeName);
-		
-	}
-	
+
 	/**
 	 * find proper IType (Java Model) from allTypes by checking the name(String)
 	 * @param typeName

@@ -8,11 +8,14 @@ import org.eclipse.jdt.core.Signature;
 */
 public class SignatureTest {
 	public static void main(String[] args){
-		String str = "Byte";
+		String str = "String";
 		
 		String sig = Signature.createTypeSignature(str, false);
-		String res = Signature.getSignatureSimpleName("B");
-		System.out.println(res);
-//		System.out.println(sig);
+		sig = "Z";
+		String res = Signature.getSignatureSimpleName(sig);
+		String res2 = Signature.getSignatureQualifier(sig);
+		System.out.println("Type signature is : " + sig);
+		System.out.println("Simple Name is : " + res);
+		System.out.println("Qualifier is : " + res2);
 	}
 }
