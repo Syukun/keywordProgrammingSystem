@@ -42,7 +42,7 @@ public class DataFromSourceFile {
 	 */
 	ContentAssistInvocationContext context;
 	ICompilationUnit icu;
-	public IProgressMonitor monitor;
+	IProgressMonitor monitor;
 
 	/**
 	 * name : String ==> t : TypeF
@@ -54,9 +54,17 @@ public class DataFromSourceFile {
 	 * name : String ==> t : TypeF
 	 * e.g. "String" ==> new TypeF("java.lang.String")
 	 */
-//	Map<String, TypeF> defaultTypesF;
+	Map<String, TypeF> defaultTypesF;
 	
-	Map<String,Map<String, TypeF>> DictionaryFindFinalTypeFromTypeName;
+	/**
+	 * Package Name : String ==> IType Name : String ==> Simple Type Name : String ==> TypeF
+	 */
+	Map<String,Map<String,Map<String, TypeF>>> DictionaryFindFinalTypeFromTypeName;
+	
+	/**
+	 * Vector of all IType which could be extracted from current classes, 
+	 * usage : extract all Fields and Methods
+	 */
 	Vector<IType> allTypes;
 	Map<String, IType> allLocalVariables;
 	Set<Field> allFields;
@@ -76,7 +84,8 @@ public class DataFromSourceFile {
 		this.monitor = monitor;
 		this.primitiveTypesF = new HashMap<String, TypeF>();
 //		TODO complete this
-//		this.defaultTypesF = new HashMap<String, TypeF>();
+		this.defaultTypesF = new HashMap<String, TypeF>();
+		this.DictionaryFindFinalTypeFromTypeName = new HashMap<String,Map<String,Map<String, TypeF>>>();
 		this.allTypes = new Vector<IType>();
 		this.allLocalVariables = new HashMap<String, IType>();
 		this.allFields = new HashSet<Field>();
@@ -93,8 +102,15 @@ public class DataFromSourceFile {
 		for(String priType : priTypes) {
 			this.primitiveTypesF.put(priType, new TypeF(priType));
 		}
-		
 
+	}
+	
+	/**
+	 * initialize Default types, basically deal with  
+	 * @throws JavaModelException
+	 */
+	public void initialDefaultType() throws JavaModelException{
+		this.defaultTypesF.put("String", new TypeF("java.lang.String"));
 	}
 
 	// Step - 2 : get all Types
@@ -137,7 +153,7 @@ public class DataFromSourceFile {
 		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
 		// searchFor : right now just classes and interfaces
 		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
-		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+		IJavaSearchScope scope = (IJavaSearchScope) icu.getJavaProject();
 		// TODO waitingPolicy??
 		int waitingPolicy = 0;
 
@@ -183,17 +199,67 @@ public class DataFromSourceFile {
 	/**
 	 * TODO next mission --- finish this method
 	 * Map(IType ==> String, Map( String, TypeF))
+	 * @throws JavaModelException 
 	 */
-	public void initialDictionary() {
+	public void initialDictionary() throws JavaModelException {
 		for(IType iType : allTypes) {
 			String iTypeName = iType.getFullyQualifiedName();
 			Map<String,TypeF> strToTypeF = getStrToTypeF(iType);
+			
+			
 		}
 	}
 
-	private Map<String, TypeF> getStrToTypeF(IType iType) {
-		// TODO Auto-generated method stub
-		return null;
+	private Map<String, TypeF> getStrToTypeF(IType iType) throws JavaModelException{
+		Map<String, TypeF> res = new HashMap<String, TypeF>();
+		res.putAll(primitiveTypesF);
+		res.putAll(defaultTypesF);
+		/**
+		 * for each types in package
+		 * TODO consider modifier when it is not "public"
+		 * TODO task2 : refract code : <packageName,<String,<String,TypeF>>>
+		 */
+		IPackageFragment ipf = (IPackageFragment) icu.getParent();
+		ICompilationUnit[] icus = ipf.getCompilationUnits();
+
+		for (ICompilationUnit icu_inner : icus) {
+			IType[] itypes = icu_inner.getAllTypes();
+			for (IType itype : itypes) {
+				String iTypeName = itype.getElementName();
+				TypeF typeF = new TypeF(itype, monitor);
+				res.put(iTypeName, typeF);
+			}
+		}
+		
+		IImportDeclaration[] importDeclarations = icu.getImports();
+		SearchEngine se = new SearchEngine();
+		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
+
+		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
+		// searchFor : right now just classes and interfaces
+		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
+		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+		// TODO waitingPolicy??
+		int waitingPolicy = 0;
+		
+		for(IImportDeclaration iimd : importDeclarations) {
+			String imdName = iimd.getElementName();
+			char[] packageName = getPackageName(imdName).toCharArray();
+
+			char[] typeName = getTypeName(imdName).toCharArray();
+
+			MyTypeNameMatchRequestor nameMatchRequestor = new MyTypeNameMatchRequestor();
+
+			// TODO test whether could gain excepted Types
+
+			se.searchAllTypeNames(packageName, packageMatchRule, typeName, typeMatchRule, searchFor, scope,
+					nameMatchRequestor, waitingPolicy, monitor);
+			IType imdIType = nameMatchRequestor.getIType();
+			res.put(imdName, new TypeF(imdIType,monitor));
+			
+		}
+		
+		return res;
 	}
 
 	/**
