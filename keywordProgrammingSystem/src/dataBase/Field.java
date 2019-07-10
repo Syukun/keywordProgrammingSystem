@@ -9,18 +9,13 @@ import org.eclipse.jdt.core.IType;
 public class Field {
 
 	String name;
-	IType type;
+	TypeF fieldType;
+	TypeF classType;
 	
-	public Field(String name, IType type) {
+	public Field(String name, TypeF fieldType, TypeF classType) {
 		this.name = name;
-		this.type = type;
+		this.fieldType = fieldType;
+		this.classType = classType;
 	}
 	
-	public String getTypeName() {
-		return type.getElementName();
-	}
-	
-	public String getFullQulifiedName() {
-		return type.getFullyQualifiedName();
-	}
 }

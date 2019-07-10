@@ -45,28 +45,28 @@ public class DataFromSourceFile {
 	IProgressMonitor monitor;
 
 	/**
-	 * name : String ==> t : TypeF
-	 * e.g. "byte" ==> new TypeF("byte")
+	 * Vector of all IType which could be extracted from current classes, usage :
+	 * extract all Fields and Methods
+	 */
+	Vector<IType> allTypes;
+
+	/**
+	 * name : String ==> t : TypeF e.g. "byte" ==> new TypeF("byte")
 	 */
 	Map<String, TypeF> primitiveTypesF;
 	/**
-	 * TODO complete this
-	 * name : String ==> t : TypeF
-	 * e.g. "String" ==> new TypeF("java.lang.String")
+	 * TODO complete this name : String ==> t : TypeF e.g. "String" ==> new
+	 * TypeF("java.lang.String")
 	 */
 	Map<String, TypeF> defaultTypesF;
-	
+
 	/**
-	 * Package Name : String ==> IType Name : String ==> Simple Type Name : String ==> TypeF
+	 * Package Name : String ==> IType Name : String ==> Simple Type Name : String
+	 * ==> TypeF
 	 */
-	Map<String,Map<String,Map<String, TypeF>>> DictionaryFindFinalTypeFromTypeName;
-	
-	/**
-	 * Vector of all IType which could be extracted from current classes, 
-	 * usage : extract all Fields and Methods
-	 */
-	Vector<IType> allTypes;
-	Map<String, IType> allLocalVariables;
+	Map<String, Map<String, Map<String, TypeF>>> DictionaryFindFinalTypeFromTypeName;
+
+	Map<String, TypeF> allLocalVariables;
 	Set<Field> allFields;
 	Set<Method> allMethods;
 
@@ -76,18 +76,22 @@ public class DataFromSourceFile {
 	 * 
 	 * @param icu
 	 * @param monitor
+	 * @throws JavaModelException 
 	 * @date 2019/07/01
 	 */
-	public DataFromSourceFile(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+	public DataFromSourceFile(ContentAssistInvocationContext context, IProgressMonitor monitor) throws JavaModelException {
 		this.context = context;
 		this.icu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 		this.monitor = monitor;
+		
 		this.primitiveTypesF = new HashMap<String, TypeF>();
-//		TODO complete this
 		this.defaultTypesF = new HashMap<String, TypeF>();
-		this.DictionaryFindFinalTypeFromTypeName = new HashMap<String,Map<String,Map<String, TypeF>>>();
+		initialPrimitiveType();
+		initialDefaultType();
+		
+		this.DictionaryFindFinalTypeFromTypeName = new HashMap<String, Map<String, Map<String, TypeF>>>();
 		this.allTypes = new Vector<IType>();
-		this.allLocalVariables = new HashMap<String, IType>();
+		this.allLocalVariables = new HashMap<String, TypeF>();
 		this.allFields = new HashSet<Field>();
 	}
 
@@ -97,20 +101,44 @@ public class DataFromSourceFile {
 	 * @throws JavaModelException
 	 * @since 2019/07/07
 	 */
-	public void initialPrimitiveType() throws JavaModelException {
-		String[] priTypes = {"byte","short","int","long","float","double","boolean","char"};
-		for(String priType : priTypes) {
+	private void initialPrimitiveType() throws JavaModelException {
+		String[] priTypes = { "byte", "short", "int", "long", "float", "double", "boolean", "char" };
+		for (String priType : priTypes) {
 			this.primitiveTypesF.put(priType, new TypeF(priType));
 		}
 
 	}
-	
+
 	/**
-	 * initialize Default types, basically deal with  
+	 * initialize Default types, basically deal with
+	 * 
 	 * @throws JavaModelException
 	 */
-	public void initialDefaultType() throws JavaModelException{
-		this.defaultTypesF.put("String", new TypeF("java.lang.String"));
+	private void initialDefaultType() throws JavaModelException {
+//		this.defaultTypesF.put("String", new TypeF("java.lang.String"));
+		SearchEngine se = new SearchEngine();
+		String javaLang = "java.lang";
+		char[] packageName = javaLang.toCharArray();
+		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
+		char[] typeName = null;
+		int typeMatchRule = 0;
+		
+		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
+		IJavaSearchScope scope = (IJavaSearchScope) icu.getJavaProject();
+		
+		MyTypeNameMatchRequestor nameMatchRequestor = new MyTypeNameMatchRequestor();	
+		int waitingPolicy = 0;
+		
+		se.searchAllTypeNames(packageName, packageMatchRule, typeName, typeMatchRule, searchFor, scope,
+				nameMatchRequestor, waitingPolicy, monitor);
+		// TODO write as a field to extract methods and fields in java.lang.*;
+		Vector<IType> iTypesInJavaLang = nameMatchRequestor.getITypes();
+		
+		for(IType iType : iTypesInJavaLang) {
+			String iTypeName = iType.getElementName();
+			TypeF iTypeF = new TypeF(iType,monitor);
+			this.defaultTypesF.put(iTypeName, iTypeF);
+		}
 	}
 
 	// Step - 2 : get all Types
@@ -195,29 +223,28 @@ public class DataFromSourceFile {
 		int lastDotPos = importDeclarationName.lastIndexOf('.');
 		return importDeclarationName.substring(lastDotPos + 1);
 	}
-	
+
 	/**
-	 * TODO next mission --- finish this method
-	 * Map(IType ==> String, Map( String, TypeF))
-	 * @throws JavaModelException 
+	 * TODO next mission --- finish this method Map(IType ==> String, Map( String,
+	 * TypeF))
+	 * 
+	 * @throws JavaModelException
 	 */
 	public void initialDictionary() throws JavaModelException {
-		for(IType iType : allTypes) {
+		for (IType iType : allTypes) {
 			String iTypeName = iType.getFullyQualifiedName();
-			Map<String,TypeF> strToTypeF = getStrToTypeF(iType);
-			
-			
+			Map<String, TypeF> strToTypeF = getStrToTypeF(iType);
+
 		}
 	}
 
-	private Map<String, TypeF> getStrToTypeF(IType iType) throws JavaModelException{
+	private Map<String, TypeF> getStrToTypeF(IType iType) throws JavaModelException {
 		Map<String, TypeF> res = new HashMap<String, TypeF>();
 		res.putAll(primitiveTypesF);
 		res.putAll(defaultTypesF);
 		/**
-		 * for each types in package
-		 * TODO consider modifier when it is not "public"
-		 * TODO task2 : refract code : <packageName,<String,<String,TypeF>>>
+		 * for each types in package TODO consider modifier when it is not "public" TODO
+		 * task2 : refract code : <packageName,<String,<String,TypeF>>>
 		 */
 		IPackageFragment ipf = (IPackageFragment) icu.getParent();
 		ICompilationUnit[] icus = ipf.getCompilationUnits();
@@ -230,7 +257,7 @@ public class DataFromSourceFile {
 				res.put(iTypeName, typeF);
 			}
 		}
-		
+
 		IImportDeclaration[] importDeclarations = icu.getImports();
 		SearchEngine se = new SearchEngine();
 		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
@@ -241,8 +268,8 @@ public class DataFromSourceFile {
 		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
 		// TODO waitingPolicy??
 		int waitingPolicy = 0;
-		
-		for(IImportDeclaration iimd : importDeclarations) {
+
+		for (IImportDeclaration iimd : importDeclarations) {
 			String imdName = iimd.getElementName();
 			char[] packageName = getPackageName(imdName).toCharArray();
 
@@ -255,10 +282,10 @@ public class DataFromSourceFile {
 			se.searchAllTypeNames(packageName, packageMatchRule, typeName, typeMatchRule, searchFor, scope,
 					nameMatchRequestor, waitingPolicy, monitor);
 			IType imdIType = nameMatchRequestor.getIType();
-			res.put(imdName, new TypeF(imdIType,monitor));
-			
+			res.put(imdName, new TypeF(imdIType, monitor));
+
 		}
-		
+
 		return res;
 	}
 
@@ -294,7 +321,7 @@ public class DataFromSourceFile {
 			Type localVarType = localVariables_AST.get(localVarName);
 			try {
 				IType localVarIType = findIType(localVarType);
-				allLocalVariables.put(localVarName, localVarIType);
+//				allLocalVariables.put(localVarName, localVarIType);
 			} catch (NullPointerException e) {
 				e.getStackTrace();
 			}
@@ -315,8 +342,8 @@ public class DataFromSourceFile {
 			IField[] selfFields = t.getFields();
 			for (IField selfField : selfFields) {
 				String selfFieldName = selfField.getElementName();
-				Field selfF = new Field(selfFieldName, t);
-				allFields.add(selfF);
+//				Field selfF = new Field(selfFieldName, t);
+//				allFields.add(selfF);
 			}
 			// get super classes and interfaces
 			ITypeHierarchy ith = t.newTypeHierarchy(monitor);
@@ -327,8 +354,8 @@ public class DataFromSourceFile {
 				IField[] superClassFields = superClass.getFields();
 				for (IField superClassField : superClassFields) {
 					String superClassFieldName = superClassField.getElementName();
-					Field superClassF = new Field(superClassFieldName, superClass);
-					allFields.add(superClassF);
+//					Field superClassF = new Field(superClassFieldName, superClass);
+//					allFields.add(superClassF);
 				}
 			}
 
@@ -341,8 +368,8 @@ public class DataFromSourceFile {
 				IField[] superInterfaceFields = superInterface.getFields();
 				for (IField superInterfaceField : superInterfaceFields) {
 					String superInterfaceFieldName = superInterfaceField.getElementName();
-					Field superInterfaceF = new Field(superInterfaceFieldName, superInterface);
-					allFields.add(superInterfaceF);
+//					Field superInterfaceF = new Field(superInterfaceFieldName, superInterface);
+//					allFields.add(superInterfaceF);
 				}
 			}
 		}

@@ -62,9 +62,9 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		cu_ast.accept(mv);
 
 
-		// test
-		DataFromSourceFile dataFromS = new DataFromSourceFile(context,monitor);
 		try {
+			// test
+			DataFromSourceFile dataFromS = new DataFromSourceFile(context,monitor);
 			dataFromS.extractAllTypes();
 			dataFromS.extractLocalVariables();
 			dataFromS.extractFields();

@@ -1,11 +1,13 @@
 package plugin.completionProposalComputer;
 
+import java.util.Vector;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 
 public class MyTypeNameMatchRequestor extends TypeNameMatchRequestor {
-	IType type;
+	Vector<IType> types = new Vector<IType>();
 	
 	
 	/**
@@ -18,12 +20,17 @@ public class MyTypeNameMatchRequestor extends TypeNameMatchRequestor {
 
 	@Override
 	public void acceptTypeNameMatch(TypeNameMatch match) {
-		// TODO Auto-generated method stub
-		this.type = match.getType();
+
+		IType type = match.getType();
+		this.types.add(type);
 	}
 	
-	public IType getIType() {
-		return this.type;
+	public IType getIType() throws NullPointerException{
+		return this.types.get(0);
 	}
-
+	
+	public Vector<IType> getITypes(){
+		return this.types;
+	}
+ 
 }

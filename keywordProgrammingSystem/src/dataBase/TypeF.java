@@ -17,11 +17,12 @@ public class TypeF {
 	
 	public TypeF(String name) {
 		this.name = name;
-		if(name!="Object") {
-			superTypes.add(new TypeF("Object"));
-		}else {
-			superTypes = null;   
-		}
+		this.superTypes.add(getTopType());
+	}
+	
+	public TypeF(String name, Set<TypeF> superTypes) {
+		this.name = name;
+		this.superTypes = superTypes;
 	}
 	
 	public TypeF(IType iType, IProgressMonitor monitor) throws JavaModelException {
@@ -33,4 +34,8 @@ public class TypeF {
 		}
 	}
 	
+	
+	public TypeF getTopType() {
+		return new TypeF("java.lang.Object",null);
+	}
 }
