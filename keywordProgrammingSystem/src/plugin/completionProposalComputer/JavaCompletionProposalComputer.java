@@ -51,6 +51,14 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		 * Extract data from source codes
 		 */
 		DataFromSourceFile dataFromSourceFile = new DataFromSourceFile(context,monitor);
+		try {
+			dataFromSourceFile.setAllITypesFromSourceFile();
+			dataFromSourceFile.setLocalVariables();
+//			Vector<IType> allITypesFromSourceFile = dataFromSourceFile.getAllITypesFromSourceFile();
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 //		// get the innerest ASTNode
 //		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
