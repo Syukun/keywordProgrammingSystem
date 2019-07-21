@@ -16,8 +16,7 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 	// do not use right now might be used later
 	String className = "Expression";
 	int BW = RelateBeamSearch.BEAMWIDTH;
-	
-	DataFromSourceFile data;
+
 
 //	
 	// table1 : store expressions less than depth d
@@ -25,9 +24,7 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 	public Table expsLEQDepth_Table;
 	public Table expsAtExactDepth_Table;
 	
-	public ExpressionGenerator(DataFromSourceFile data) {
-		this.data = data;
-	}
+
 	public ExpressionGenerator() {
 		
 	}

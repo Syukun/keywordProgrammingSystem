@@ -1,97 +1,127 @@
 package dataBase;
 
-import org.eclipse.jdt.core.IField;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.Type;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Collection;
 import java.util.Vector;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IImportDeclaration;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
+import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
+
+import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
+
 public class DataFromSourceFile {
-	// local variables from editing source file
-	// <Name : String, Type : jdt.core.dom.Type>
-	public Map<String, Type> localVariables;
 
-	// represent the information of "this"
-	public IType thisIType;
+	ContentAssistInvocationContext context;
+	IProgressMonitor monitor;
 
-	// save the type informations of outer packages, such as imports
-	public Set<IType> typesFromOuterPackage;
+	private Vector<IType> allITypesFromSourceFile;
 
-	public DataFromSourceFile(Map<String, Type> localVariables, IType thisIType,
-			Set<IType> typesFromOuterPackage) {
-		super();
-		this.localVariables = localVariables;
-		this.thisIType = thisIType;
-		this.typesFromOuterPackage = typesFromOuterPackage;
+	public DataFromSourceFile(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+		this.context = context;
+		this.monitor = monitor;
 	}
 
-	public Map<String, IType> getMemberFields() throws JavaModelException {
-		Map<String, IType> res = new HashMap<String, IType>();
-		// deal with this type
-		IField[] fieldsOfThis = thisIType.getFields();
-		for (IField field_this : fieldsOfThis) {
-			String field_this_name = field_this.getElementName();
-			res.put(field_this_name, thisIType);
+	/**
+	 * Extract all IType from source files. Basically from package and import
+	 * declaration information.
+	 * 
+	 * TODO right now don't consider two classes with same name in different
+	 * package.
+	 * 
+	 * @throws JavaModelException
+	 * @since 2019/07/21
+	 */
+	public void setAllITypesFromSourceFile() throws JavaModelException {
+		this.allITypesFromSourceFile = new Vector<IType>();
+
+		/**
+		 * get ICompilationUnit of source file.
+		 */
+		ICompilationUnit icu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
+
+		this.allITypesFromSourceFile.addAll(this.getAllITypes(icu));
+
+	}
+
+	public Vector<IType> getAllITypes(ICompilationUnit icu) throws JavaModelException {
+		Vector<IType> res = new Vector<IType>();
+
+		/**
+		 * Extract all ITypes from same Package
+		 */
+		IPackageFragment ipf = (IPackageFragment) icu.getParent();
+		ICompilationUnit[] icus = ipf.getCompilationUnits();
+
+		for (ICompilationUnit icu_inner : icus) {
+			IType[] itypes = icu_inner.getAllTypes();
+			for (IType itype : itypes) {
+				res.add(itype);
+			}
 		}
 
-		return res;
-	}
-	
-	public Map<String,TypeWithSubTyping> getLocalVariables(){
-		Map<String,TypeWithSubTyping> res = new HashMap<String,TypeWithSubTyping>();
-		// TODO maybe could use stream
-		for(String s : localVariables.keySet()) {
-			Type type = localVariables.get(s);
-			TypeWithSubTyping type_s = resolveTypeBinding(type);
+		/**
+		 * Extract all ITypes from ImportDeclaration and its sub Classes
+		 * 
+		 * TODO consider the imports are independent which means one imports should not
+		 * be a super class or a sub class of another one.
+		 */
+		IImportDeclaration[] iimds = icu.getImports();
+
+		SearchEngine se = new SearchEngine();
+
+		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
+		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
+		// searchFor : right now just consider classes and interfaces
+		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
+		IJavaSearchScope scope = (IJavaSearchScope) icu.getJavaProject();
+		int waitingPolicy = 0;
+
+		for (IImportDeclaration iimd : iimds) {
+			String iimdName = iimd.getElementName();
+			int lastDotPos = iimdName.lastIndexOf('.');
+			char[] packageName = getPackageName(iimdName, lastDotPos);
+			char[] typeName = getTypeName(iimdName, lastDotPos);
+
+			MyTypeNameMatchRequestor nameMatchRequestor = new MyTypeNameMatchRequestor();
+
+			se.searchAllTypeNames(packageName, packageMatchRule, typeName, typeMatchRule, searchFor, scope,
+					nameMatchRequestor, waitingPolicy, monitor);
 			
-		}
-		
-		return res;
-	}
+			IType importDeclarationType = nameMatchRequestor.getIType();
+			res.add(importDeclarationType);
+			res.addAll(getAllSubITypes(importDeclarationType));
 
-	private TypeWithSubTyping resolveTypeBinding(Type type) {		
-		return new TypeWithSubTyping(type);
-	}
-
-	public Map<String, IType> getOutterFields() throws JavaModelException {
-		Map<String, IType> res = new HashMap<String, IType>();
-
-		for (IType type : typesFromOuterPackage) {
-			IField[] fieldsOfOutter = type.getFields();
-			for (IField field_outter : fieldsOfOutter) {
-				String field_outter_name = field_outter.getElementName();
-				res.put(field_outter_name, type);
-			}
 		}
 
 		return res;
+	}
+
+
+	private char[] getPackageName(String iimdName, int lastDotPos) {
+		return iimdName.substring(0, lastDotPos).toCharArray();
+	}
+
+	private char[] getTypeName(String iimdName, int lastDotPos) {
+		return iimdName.substring(lastDotPos + 1).toCharArray();
 	}
 	
-	public Vector<Method> getMemberMethod() throws JavaModelException {
-		Vector<Method> res = new Vector<Method>();
-		IMethod[] memberMethods = thisIType.getMethods();
-		for(IMethod memberMethod : memberMethods) {
-			res.add(new Method(memberMethod));
+	private Vector<IType> getAllSubITypes(IType importDeclarationType) throws JavaModelException {
+		Vector<IType> res = new Vector<IType>();
+		ITypeHierarchy ith = importDeclarationType.newTypeHierarchy(monitor);
+		IType[] subITypes = ith.getAllSubtypes(importDeclarationType);
+		for(IType subIType : subITypes) {
+			res.add(subIType);
 		}
 		return res;
 	}
-
-	public Vector<Method> getOutterMethod() throws JavaModelException {
-		Vector<Method> res = new Vector<Method>();
-
-		for(IType type : typesFromOuterPackage) {
-			IMethod[] outerMethods = type.getMethods();
-			for(IMethod outerMethod : outerMethods) {
-				res.add(new Method(outerMethod)); 
-			}
-		}
-		return res;
-	}
-
 }

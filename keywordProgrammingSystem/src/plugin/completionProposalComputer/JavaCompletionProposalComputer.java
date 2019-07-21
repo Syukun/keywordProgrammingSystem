@@ -46,113 +46,11 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			IProgressMonitor monitor) {
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-
-		// Step-1 : get the Local Variable and "this" information from ASTParser
-		ICompilationUnit cu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
-
-		ASTParser parser = ASTParser.newParser(AST.JLS11);
-		parser.setSource(cu);
-
-		// get local variables
-		CompilationUnit cu_ast = (CompilationUnit) parser.createAST(null);
-		// get cursor location
-		int cursorPos = context.getViewer().getSelectedRange().x;
-
-		MyVisitor mv = new MyVisitor(cursorPos);
-		cu_ast.accept(mv);
-
-//		/**
-//		 * Test
-//		 */
-//		NodeFinder nf = new NodeFinder(cu_ast,cursorPos,0);
-//		nf.getCoveredNode();
-//		nf.getCoveringNode();
 		
-		
-		Map<String,Type> localVars = mv.getLocalVariables();
-		String nameOfThis = mv.getNameOfThis();
-	
 		/**
-		 * get IType of "this"
+		 * Extract data from source codes
 		 */
-		IType thisIType = null;
-		// get information of "this"
-		try {
-			thisIType = cu.getType(nameOfThis);
-		} catch (NullPointerException npe) {
-			// TODO need to specify this code
-			System.out.println("Cursor is not in any Class");
-		}
-		
-		Set<IType> typesFromOuterPackage = new HashSet<IType>();
-		try {
-			IPackageDeclaration[] packageDeclarations = cu.getPackageDeclarations();
-			IImportDeclaration[] importDeclarations = cu.getImports();
-
-			SearchEngine se = new SearchEngine();
-			// using search engine
-			// set Scope
-			IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-
-			for (IPackageDeclaration pd : packageDeclarations) {
-				char[] pdName = pd.getElementName().toCharArray();
-				List<IType> types = new ArrayList<IType>();
-
-				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(pd, types);
-				se.searchAllTypeNames(pdName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE, scope,
-						nameRequestor, 0, monitor);
-
-				for(IType type : types) {
-					typesFromOuterPackage.add(type);
-				}
-
-			}
-
-			Set<String> importInfos = new HashSet<String>();
-			// TODO do something to process import declaration informations.
-			for (IImportDeclaration id : importDeclarations) {
-
-				String idName = id.getElementName().trim();
-				String packageName;
-				List<IType> types = new ArrayList<IType>();
-				MyTypeNameMatchRequestor nameRequestor = new MyTypeNameMatchRequestor(id, types);
-
-				int id_len = idName.length();
-				int lastDotPos = idName.lastIndexOf('.');
-				packageName = idName.substring(0, lastDotPos);
-
-				if (!importInfos.contains(packageName)) {
-
-					importInfos.add(packageName);
-
-					if (idName.endsWith(".*")) {
-						char[] pName = packageName.toCharArray();
-						se.searchAllTypeNames(pName, SearchPattern.R_PREFIX_MATCH, null, 0, IJavaSearchConstants.TYPE,
-								scope, nameRequestor, 0, monitor);
-					} else {
-
-						String typeName = idName.substring(lastDotPos + 1);
-						// TODO should figure out the exact way to use Search Pattern
-						se.searchAllTypeNames(packageName.toCharArray(), SearchPattern.R_PREFIX_MATCH,
-								typeName.toCharArray(), SearchPattern.R_SUBSTRING_MATCH, IJavaSearchConstants.TYPE,
-								scope, nameRequestor, 0, monitor);
-
-					}
-
-					// TODO 将下面的代码放到MyTypeNameMatchRequestor中
-					for (IType type : types) {
-						typesFromOuterPackage.add(type);
-					}
-				}
-			}
-
-		} catch (JavaModelException jme) {
-			// TODO Auto-generated catch block
-			jme.printStackTrace();
-		}
-		
-		DataFromSourceFile data = new DataFromSourceFile(localVars,thisIType,typesFromOuterPackage);
-
+		DataFromSourceFile dataFromSourceFile = new DataFromSourceFile(context,monitor);
 
 //		// get the innerest ASTNode
 //		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
@@ -163,7 +61,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		// test whether the keyword query have any influence on ast
 		String keywords = "add line";
 
-		Vector<Expression> exps = new ExpressionGenerator(data).generateExpression(10, keywords);
+		Vector<Expression> exps = new ExpressionGenerator().generateExpression(10, keywords);
 		for (Expression exp : exps) {
 			result.add(new MyCompletionProposal(context, exp));
 		}
