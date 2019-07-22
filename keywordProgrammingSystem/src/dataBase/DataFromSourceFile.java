@@ -234,7 +234,11 @@ public class DataFromSourceFile {
 			}
 		}
 	}
-
+ 
+	
+	public void setMethods() throws JavaModelException{
+		
+	}
 
 //	private IType findThisIType(String nameOfThis) throws JavaModelException {
 //		IType[] currentTypes = icu.getTypes();
