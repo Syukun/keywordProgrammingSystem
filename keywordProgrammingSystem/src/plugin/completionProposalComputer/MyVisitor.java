@@ -248,13 +248,13 @@ public class MyVisitor extends ASTVisitor {
 		return this.nameOfThis;
 	}
 
-	public Map<String, Type> getLocalVariables() {
-		Map<String, Type> localVariables = new HashMap<String, Type>();
+	public Map<String, String> getLocalVariables() {
+		Map<String, String> localVariables = new HashMap<String, String>();
 
 		while (!localVars_tmp.empty()) {
 			LocalVariable lv = localVars_tmp.pop();
 			String nameOfLv = lv.getName();
-			Type typeOfLv = lv.getType();
+			String typeOfLv = lv.getType().toString();
 
 			if (!localVariables.containsKey(nameOfLv)) {
 				localVariables.put(nameOfLv, typeOfLv);

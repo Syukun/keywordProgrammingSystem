@@ -47,13 +47,17 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		
-		/**
-		 * Extract data from source codes
-		 */
-		DataFromSourceFile dataFromSourceFile = new DataFromSourceFile(context,monitor);
 		try {
-			dataFromSourceFile.setAllITypesFromSourceFile();
-			dataFromSourceFile.setLocalVariables();
+			
+			/**
+			 * Extract data from source codes
+			 */
+			DataFromSourceFile dataFromSourceFile = new DataFromSourceFile(context,monitor);
+			
+			//TODO integrate to one method
+//			dataFromSourceFile.setAllITypesFromSourceFile();
+//			dataFromSourceFile.setTypeDictionary();
+//			dataFromSourceFile.setLocalVariables();
 //			Vector<IType> allITypesFromSourceFile = dataFromSourceFile.getAllITypesFromSourceFile();
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block

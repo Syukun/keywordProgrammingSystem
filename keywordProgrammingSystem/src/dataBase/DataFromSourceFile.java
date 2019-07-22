@@ -1,13 +1,14 @@
 package dataBase;
 
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
@@ -35,15 +36,28 @@ public class DataFromSourceFile {
 	private Vector<IType> allITypesFromSourceFile;
 	private ICompilationUnit icu;
 	// (name : IType) -> (SimpleName : String) -> TypeF
-	Map<IType,Map<String,TypeF>> typeDictionary;
+//	Map<IType,Map<String,TypeF>> typeDictionary;
+	// now just consider the type in current class
+	private Map<String, TypeF> typeDictionary;
+	
+	private Map<String, TypeF> localVariables;
+	
+	private Set<Field> fields;
 
-	public DataFromSourceFile(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+	public DataFromSourceFile(ContentAssistInvocationContext context, IProgressMonitor monitor) throws JavaModelException {
 		this.context = context;
 		this.monitor = monitor;
 		this.setThisICompilationUnit();
-		this.typeDictionary = new HashMap<IType, Map<String, TypeF>>();
+		this.setAllITypesFromSourceFile();
+		this.setTypeDictionary();
+//		this.typeDictionary = new HashMap<IType, Map<String, TypeF>>();
+		this.localVariables = new HashMap<String, TypeF>();
+		this.setLocalVariables();
 	}
-
+	
+	public void setThisICompilationUnit() {
+		this.icu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();		
+	}
 
 	/**
 	 * Extract all IType from source files. Basically from package and import
@@ -64,16 +78,28 @@ public class DataFromSourceFile {
 		this.allITypesFromSourceFile.addAll(getAllITypes(icu));
 
 	}
-
-	public void setThisICompilationUnit() {
-		this.icu = ((JavaContentAssistInvocationContext) context).getCompilationUnit();		
+	
+	private Map<String,TypeF> getPrimitiveTypes(){
+		Map<String,TypeF> res = new HashMap<String,TypeF>();
+		String[] priTypes = {"byte","int","short","long","char","double","boolean","float"};
+		for(String priType : priTypes) {
+			res.put(priType, new TypeF(priType));
+		}
+		return res;
 	}
 
-	
+	public void setTypeDictionary() throws JavaModelException {
+		typeDictionary = new HashMap<String, TypeF>();
+		typeDictionary.putAll(getPrimitiveTypes());
+		for(IType iType : allITypesFromSourceFile) {
+			String iTypeName = iType.getElementName();
+			typeDictionary.put(iTypeName, new TypeF(iType,monitor));
+		}
+		
+	}
 
 	public Vector<IType> getAllITypes(ICompilationUnit icu) throws JavaModelException {
 		Vector<IType> res = new Vector<IType>();
-
 		/**
 		 * Extract all ITypes from same Package
 		 */
@@ -120,13 +146,24 @@ public class DataFromSourceFile {
 			res.addAll(getAllSubITypes(importDeclarationType));
 
 		}
-
+		
+		/**
+		 * TODO Extract all ITypes from java.lang.*;
+		 */
+		char[] packageNameLang = "java.lang".toCharArray();
+		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
+		se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope,
+				nameMatchRequestorLang, waitingPolicy, monitor);
+		Vector<IType> iTypesLang = nameMatchRequestorLang.getITypes();
+		res.addAll(iTypesLang);
+		
 		return res;
 	}
 
 
 	private char[] getPackageName(String iimdName, int lastDotPos) {
 		return iimdName.substring(0, lastDotPos).toCharArray();
+		 
 	}
 
 	private char[] getTypeName(String iimdName, int lastDotPos) {
@@ -147,14 +184,6 @@ public class DataFromSourceFile {
 		return allITypesFromSourceFile;
 	}
 	
-	public Map<String,TypeF> getPrimitiveType(){
-		Map<String,TypeF> res = new HashMap<String,TypeF>();
-		String[] priTypes = {"byte","int","short","long","char","double","boolean","float"};
-		for(String priType : priTypes) {
-			res.put(priType, new TypeF(priType));
-		}
-		return res;
-	}
 	/**
 	 * extract all local variables by ASTParser
 	 * @throws JavaModelException 
@@ -170,23 +199,39 @@ public class DataFromSourceFile {
 		MyVisitor mv = new MyVisitor(cursorPos);
 		cu.accept(mv);
 		
-		Map<String,Type> localVariables_AST = mv.getLocalVariables();
-		IType thisIType = findThisIType(mv.getNameOfThis());
+		//Step-2 : Use ASTVisitor
+		Map<String,String> localVariables_AST = mv.getLocalVariables();
 		
-		
-		
-		
+		for(String localVarName : localVariables_AST.keySet()) {
+			String localTypeName = localVariables_AST.get(localVarName);
+			TypeF localTypeF = typeDictionary.get(localTypeName);
+			this.localVariables.put(localVarName, localTypeF);
+		}
 		
 	}
-
-
-	private IType findThisIType(String nameOfThis) throws JavaModelException {
-		IType[] currentTypes = icu.getTypes();
-		for(IType type : currentTypes) {
-			if(type.getElementName().equals(nameOfThis)) {
-				return type;
+	
+	/**
+	 * extract all fields 
+	 * @throws JavaModelException
+	 */
+	public void setFields() throws JavaModelException{
+		for(IType iType : this.allITypesFromSourceFile) {
+			IField[] iFields = iType.getFields();
+			for(IField iField : iFields) {
+				String iFieldName = iField.getElementName();
+				String iFieldTypeSig = iField.getTypeSignature();
 			}
 		}
-		return null;
 	}
+
+
+//	private IType findThisIType(String nameOfThis) throws JavaModelException {
+//		IType[] currentTypes = icu.getTypes();
+//		for(IType type : currentTypes) {
+//			if(type.getElementName().equals(nameOfThis)) {
+//				return type;
+//			}
+//		}
+//		return null;
+//	}
 }
