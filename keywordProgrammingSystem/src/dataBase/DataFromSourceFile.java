@@ -2,6 +2,7 @@ package dataBase;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -14,6 +15,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -53,6 +55,8 @@ public class DataFromSourceFile {
 //		this.typeDictionary = new HashMap<IType, Map<String, TypeF>>();
 		this.localVariables = new HashMap<String, TypeF>();
 		this.setLocalVariables();
+		this.fields = new HashSet<Field> ();
+		this.setFields();
 	}
 	
 	public void setThisICompilationUnit() {
@@ -218,8 +222,15 @@ public class DataFromSourceFile {
 		for(IType iType : this.allITypesFromSourceFile) {
 			IField[] iFields = iType.getFields();
 			for(IField iField : iFields) {
+				TypeF classType = new TypeF(iType,monitor);
 				String iFieldName = iField.getElementName();
 				String iFieldTypeSig = iField.getTypeSignature();
+				String iFieldType = Signature.getSignatureSimpleName(iFieldTypeSig);
+				TypeF iFieldTypeF = typeDictionary.get(iFieldType);
+				
+				if(iFieldTypeF != null) {
+					this.fields.add(new Field(classType, iFieldTypeF, iFieldName));
+				}
 			}
 		}
 	}
