@@ -54,11 +54,14 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			 */
 			DataFromSourceFile dataFromSourceFile = new DataFromSourceFile(context,monitor);
 			
-			//TODO integrate to one method
-//			dataFromSourceFile.setAllITypesFromSourceFile();
-//			dataFromSourceFile.setTypeDictionary();
-//			dataFromSourceFile.setLocalVariables();
-//			Vector<IType> allITypesFromSourceFile = dataFromSourceFile.getAllITypesFromSourceFile();
+			// test whether the keyword query have any influence on ast
+			String keywords = "add line";
+
+			Vector<Expression> exps = new ExpressionGenerator(dataFromSourceFile).generateExpression(10, keywords);
+			for (Expression exp : exps) {
+				result.add(new MyCompletionProposal(context, exp));
+			}
+
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -69,15 +72,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 //		ASTNode innerestNode = nodeFinder.getCoveringNode();
 //		ASTNode parsedNode = innerestNode;
 //		int startPos = cursorPos;
-
-		// test whether the keyword query have any influence on ast
-		String keywords = "add line";
-
-		Vector<Expression> exps = new ExpressionGenerator().generateExpression(10, keywords);
-		for (Expression exp : exps) {
-			result.add(new MyCompletionProposal(context, exp));
-		}
-
 		return result;
 	}
 
