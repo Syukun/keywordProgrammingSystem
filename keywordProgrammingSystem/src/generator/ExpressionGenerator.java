@@ -11,6 +11,7 @@ import basic.ScoreDef;
 import basic.Type;
 import dataBase.DataBase;
 import dataBase.DataFromSourceFile;
+import dataBase.TypeF;
 
 public class ExpressionGenerator implements Generator, GeneratorWithMultipleReturnType {
 	// do not use right now might be used later
@@ -23,32 +24,37 @@ public class ExpressionGenerator implements Generator, GeneratorWithMultipleRetu
 	// table2 : store expressions at exact depth d
 	public Table expsLEQDepth_Table;
 	public Table expsAtExactDepth_Table;
+	
+	public Set<String> allSimpleNameType;
+	public Map<String, TypeF> typeDictionary;
 
 	public ExpressionGenerator() {
-
+		
 	}
 
 	public ExpressionGenerator(DataFromSourceFile dataFromSourceFile ) {
 		this.dataFromSourceFile = dataFromSourceFile;
+		this.typeDictionary = dataFromSourceFile.getTypeDictionary();
+		this.allSimpleNameType = dataFromSourceFile.getAllTypes();
 	}
 
 	public Vector<Expression> generateExpression(int depth, String keywords) {
 //		DataBase.initDataBase();
 
 		Vector<Expression> result = new Vector<Expression>();
-		Set<String> receiveTypes = this.getAllPossibleReturnTypes();
+		Set<String> allTypeFs = this.dataFromSourceFile.getAllTypes();
 
 		this.expsLEQDepth_Table = new Table();
 		this.expsAtExactDepth_Table = new Table();
-		this.expsLEQDepth_Table.initTable(depth, receiveTypes);
-		this.expsAtExactDepth_Table.initTable(depth, receiveTypes);
+		this.expsLEQDepth_Table.initTable(depth, allTypeFs);
+		this.expsAtExactDepth_Table.initTable(depth, allTypeFs);
 
 		for (int d = 1; d <= depth; d++) {
 //				fillTwoTables
-			fillLEQTable(d, keywords, receiveTypes);
+			fillLEQTable(d, keywords, allTypeFs);
 		}
 
-		for (String t : receiveTypes) {
+		for (String t : allTypeFs) {
 			result.addAll(expsLEQDepth_Table.root_table.get(t).get(depth));
 		}
 		ScoreDef.selectMaxBWExpressions(result, keywords);
@@ -128,17 +134,17 @@ public class ExpressionGenerator implements Generator, GeneratorWithMultipleRetu
 		return res;
 	}
 
-	public Set<String> getAllPossibleReturnTypes() {
-//		Set<String> allPossibleReceiveType = new HashSet<String>();
-//		allPossibleReceiveType.add("boolean");
-//		allPossibleReceiveType.add("Integer");
-//		allPossibleReceiveType.add("String");
-//		allPossibleReceiveType.add("BufferedReader");
-//		allPossibleReceiveType.add("List<String>");
-//		return allPossibleReceiveType;
-
-		return DataBase.allTypes.keySet();
-	}
+//	public Set<String> getAllPossibleReturnTypes() {
+////		Set<String> allPossibleReceiveType = new HashSet<String>();
+////		allPossibleReceiveType.add("boolean");
+////		allPossibleReceiveType.add("Integer");
+////		allPossibleReceiveType.add("String");
+////		allPossibleReceiveType.add("BufferedReader");
+////		allPossibleReceiveType.add("List<String>");
+////		return allPossibleReceiveType;
+//
+//		return DataBase.allTypes.keySet();
+//	}
 
 	public void generateExpressionExact(int d, Vector<Expression> result) {
 //		int arity = this.getParameterGenerators().length;

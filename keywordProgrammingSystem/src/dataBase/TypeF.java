@@ -8,7 +8,7 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 
 public class TypeF {
-	String qulifiedName;
+	public String qulifiedName;
 	Set<TypeF> superTypes;
 	Set<TypeF> subTypes;
 	
@@ -20,7 +20,7 @@ public class TypeF {
 	}
 	
 	public TypeF(IType iType, IProgressMonitor monitor) throws JavaModelException {
-//		this.qulifiedName = iType.getFullyQualifiedName();
+		this.qulifiedName = iType.getFullyQualifiedName();
 //		ITypeHierarchy ith = iType.newTypeHierarchy(monitor);
 //		IType[] superITypes = ith.getAllSupertypes(iType);
 //		IType[] subITypes = ith.getAllSubtypes(iType);

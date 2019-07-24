@@ -280,7 +280,19 @@ public class DataFromSourceFile {
 	public Set<Method> getMethods(){
 		return this.methods;
 	}
+
+	public Set<TypeF> getAllTypeF() {
+//		TODO complete this method
+		return new HashSet<TypeF>(this.typeDictionary.values());
+	}
 	
+	public Set<String> getAllTypes(){
+		return this.typeDictionary.keySet();
+	}
+	
+	public Map<String, TypeF> getTypeDictionary(){
+		return this.typeDictionary;
+	}
 	
 	
 //	private IType findThisIType(String nameOfThis) throws JavaModelException {

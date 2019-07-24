@@ -2,6 +2,7 @@ package plugin.completionProposalComputer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -18,6 +19,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 
 import basic.Expression;
 import dataBase.DataFromSourceFile;
+import dataBase.TypeF;
 import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
