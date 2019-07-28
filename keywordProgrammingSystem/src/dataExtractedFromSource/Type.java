@@ -25,5 +25,6 @@ public class Type {
 	
 	public Type(IType iType, IProgressMonitor monitor) {
 		this.iType = iType;
+		this.simpleName = iType.getElementName();
 	}
 }

@@ -13,6 +13,9 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -20,7 +23,9 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 
+import dataBase.TypeF;
 import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
+import plugin.completionProposalComputer.MyVisitor;
 
 /**
  * the version when assume there is no Type with same Simple name
@@ -59,7 +64,7 @@ public class DataFromSource {
 
 	/**
 	 * All local variable <variable name : String,variable Simple type name String>
-	 * For example: String str ==> map of <str, String>
+	 * For example: String str ==> map of (str, String)
 	 */
 	private Map<String, String> localVariables;
 
@@ -115,6 +120,7 @@ public class DataFromSource {
 		this.monitor = monitor;
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 		this.initTypeSystem();
+		this.setLocalVariables();
 
 	}
 
@@ -242,4 +248,36 @@ public class DataFromSource {
 			this.setTypeSystem(iTypeLang);
 		}
 	}
+
+	/**
+	 * extract all local variables by ASTParser
+	 * 
+	 * @throws JavaModelException
+	 */
+	private void setLocalVariables() throws JavaModelException {
+		// Step-1 : create a parser
+		ASTParser parser = ASTParser.newParser(AST.JLS11);
+		parser.setSource(thisICU);
+		CompilationUnit cu = (CompilationUnit) parser.createAST(monitor);
+		// get the cursor position
+		int cursorPos = context.getViewer().getSelectedRange().x;
+		// Use ASTVisitor to get This Type and Local Variables
+		MyVisitor mv = new MyVisitor(cursorPos);
+		cu.accept(mv);
+
+		// Step-2 : Use ASTVisitor
+		this.localVariables = mv.getLocalVariables();
+
+	}
+
+	/**
+	 * Extract all Fields
+	 * @throws JavaModelException
+	 * @since 2019/07/28
+	 */
+	private void setFields() throws JavaModelException{
+		
+	}
+
+	
 }
