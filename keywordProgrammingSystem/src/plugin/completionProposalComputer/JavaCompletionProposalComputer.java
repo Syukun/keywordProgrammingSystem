@@ -20,6 +20,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import basic.Expression;
 import dataBase.DataFromSourceFile;
 import dataBase.TypeF;
+import dataExtractedFromSource.DataFromSource;
 import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
@@ -41,6 +42,8 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
 		
 		try {
+			
+			DataFromSource dfs = new DataFromSource(context,monitor);
 			
 			/**
 			 * Extract data from source codes
