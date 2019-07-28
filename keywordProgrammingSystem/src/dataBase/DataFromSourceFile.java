@@ -154,14 +154,14 @@ public class DataFromSourceFile {
 		}
 
 		/**
-		 * TODO Extract all ITypes from java.lang.*;
+		 * TODO Extract all ITypes from java.lang.*; now do not consider it cause testing
 		 */
-		char[] packageNameLang = "java.lang".toCharArray();
-		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
-		se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
-				waitingPolicy, monitor);
-		Vector<IType> iTypesLang = nameMatchRequestorLang.getITypes();
-		res.addAll(iTypesLang);
+//		char[] packageNameLang = "java.lang".toCharArray();
+//		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
+//		se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
+//				waitingPolicy, monitor);
+//		Vector<IType> iTypesLang = nameMatchRequestorLang.getITypes();
+//		res.addAll(iTypesLang);
 
 		return res;
 	}

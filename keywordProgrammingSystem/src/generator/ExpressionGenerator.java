@@ -42,19 +42,18 @@ public class ExpressionGenerator implements Generator, GeneratorWithMultipleRetu
 //		DataBase.initDataBase();
 
 		Vector<Expression> result = new Vector<Expression>();
-		Set<String> allTypeFs = this.dataFromSourceFile.getAllTypes();
 
 		this.expsLEQDepth_Table = new Table();
 		this.expsAtExactDepth_Table = new Table();
-		this.expsLEQDepth_Table.initTable(depth, allTypeFs);
-		this.expsAtExactDepth_Table.initTable(depth, allTypeFs);
+		this.expsLEQDepth_Table.initTable(depth, allSimpleNameType);
+		this.expsAtExactDepth_Table.initTable(depth, allSimpleNameType);
 
 		for (int d = 1; d <= depth; d++) {
 //				fillTwoTables
-			fillLEQTable(d, keywords, allTypeFs);
+			fillLEQTable(d, keywords, allSimpleNameType);
 		}
 
-		for (String t : allTypeFs) {
+		for (String t : allSimpleNameType) {
 			result.addAll(expsLEQDepth_Table.root_table.get(t).get(depth));
 		}
 		ScoreDef.selectMaxBWExpressions(result, keywords);
@@ -104,9 +103,8 @@ public class ExpressionGenerator implements Generator, GeneratorWithMultipleRetu
 //				subGeneratorsIncludeTypeT.add(g);
 //			}
 
-			Set<String> allPossibleReturnTypes = g.getAllPossibleReturnTypes();
-			int typesNum = allPossibleReturnTypes.size();
-			if (allPossibleReturnTypes.contains(t)) {
+			int typesNum = allSimpleNameType.size();
+			if (allSimpleNameType.contains(t)) {
 				if (typesNum > 1) {
 					// could create an interface
 					subGeneratorsIncludeTypeT.addAll(g.getAllSubGeneratorWithTypeT(t));
@@ -128,7 +126,8 @@ public class ExpressionGenerator implements Generator, GeneratorWithMultipleRetu
 //					,
 					new MethodInvocationGenerator(expsLEQDepth_Table, expsAtExactDepth_Table) };
 		} else {
-			res = new ExpressionGenerator[] { new StringLiteralGenerator(), new IntLiteralGenerator(),
+			res = new ExpressionGenerator[] { 
+//					new StringLiteralGenerator(), new IntLiteralGenerator(),
 					new VariableNameGenerator() };
 		}
 		return res;
