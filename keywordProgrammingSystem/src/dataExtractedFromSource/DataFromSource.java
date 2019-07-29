@@ -62,11 +62,12 @@ public class DataFromSource {
 	private Map<String, Type> typeDictionary;
 
 	/**
-	 * All local variable <variable name : String,variable Simple type name String>
-	 * For example: String str ==> map of (str, String)
+	 * All local variable < variable type : String, localVar : LocalVariable >
+	 * <p>For example: String str ==> map of < str, lv >
 	 */
-	private Map<String, String> localVariables;
+	private Map<String, Set<LocalVariable>> localVariablesRet;
 
+	private Map<String, Set<LocalVariable>> localVariablesRec;
 	/**
 	 * All available methods from allTypes
 	 * 
@@ -147,6 +148,8 @@ public class DataFromSource {
 		this.methodsRec = new HashMap<String, Set<Method>> ();
 		this.fieldsRet = new HashMap<String, Set<Field>>();
 		this.methodsRet = new HashMap<String, Set<Method>>();
+		this.localVariablesRec = new HashMap<String, Set<LocalVariable>>();
+		this.localVariablesRet = new HashMap<String, Set<LocalVariable>>();
 		/**
 		 * Process with ITypes from same package
 		 */
@@ -295,11 +298,30 @@ public class DataFromSource {
 		cu.accept(mv);
 
 		// Step-2 : Use ASTVisitor
-		this.localVariables = mv.getLocalVariables();
-		for (String name : localVariables.keySet()) {
-			String type = localVariables.get(name);
-			this.typeDictionary.get(type).addLocalVariable(name);
+		String thisType = mv.getNameOfThis();
+		Map<String, String> localVariables = mv.getLocalVariables();
+		
+		for(String localVarName : localVariables.keySet()) {
+			String localVarType = localVariables.get(localVarName);
+			LocalVariable lv = new LocalVariable(localVarName,localVarType,thisType);
+			this.addLocalVariableRec(thisType,lv);
+			this.addLocalVariableRet(localVarType,lv);
 		}
+	}
+
+	private void addLocalVariableRec(String thisType, LocalVariable lv) {
+		if(!this.localVariablesRec.containsKey(thisType)) {
+			this.localVariablesRec.put(thisType, new HashSet<LocalVariable>());
+		}
+		this.localVariablesRec.get(thisType).add(lv);
+		
+	}
+	
+	private void addLocalVariableRet(String type, LocalVariable lv) {
+		if(!this.localVariablesRet.containsKey(type)) {
+			this.localVariablesRet.put(type, new HashSet<LocalVariable>());
+		}
+		this.localVariablesRet.get(type).add(lv);
 	}
 
 	public IProgressMonitor getMonitor() {

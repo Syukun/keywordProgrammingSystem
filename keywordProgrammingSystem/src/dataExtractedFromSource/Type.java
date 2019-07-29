@@ -28,10 +28,10 @@ public class Type {
 	Set<String> subTypes;
 	Set<String> superTypes;
 
-	/**
-	 * TODO change this to Set < LocalVariable >
-	 */
-	Set<String> localVariables;
+//	/**
+//	 * change this to Set < LocalVariable >
+//	 */
+//	Set<String> localVariables;
 	
 	/**
 	 * All available fields from allTypes which receive type is this type
@@ -56,7 +56,7 @@ public class Type {
 	DataFromSource dfs;
 	
 	public Type(String primitiveType) {
-		this.localVariables = new HashSet<String>();
+//		this.localVariables = new HashSet<String>();
 	}
 
 	public Type(IType iType, DataFromSource dfs) throws JavaModelException {
@@ -65,25 +65,26 @@ public class Type {
 		this.simpleName = iType.getElementName();
 		this.qualifiedName = iType.getFullyQualifiedName();
 		this.monitor = dfs.getMonitor();
-		this.localVariables = new HashSet<String>();
-		this.setFieldRec();
-		this.setMethodRec();
+//		this.localVariables = new HashSet<String>();
+		
+		this.setField();
+		this.setMethod();
+		
 		ITypeHierarchy ith = iType.newTypeHierarchy(monitor);
 		this.setSubTypes(ith);
 		this.setSuperTypes(ith);
-		this.localVariables = new HashSet<String>();
 	}
 
-	public void addLocalVariable(String localVariable) {
-		this.localVariables.add(localVariable);
-	}
+//	public void addLocalVariable(String localVariable) {
+//		this.localVariables.add(localVariable);
+//	}
 
 	/**
 	 * set fields of an IType instance
  	 * 
 	 * @throws JavaModelException
 	 */
-	private void setFieldRec() throws JavaModelException {
+	private void setField() throws JavaModelException {
 //		this.fields_rec = new HashSet<Field>();
 		IField[] iFields = this.iType.getFields();
 		for (IField iField : iFields) {
@@ -96,7 +97,7 @@ public class Type {
 		}
 	}
 
-	private void setMethodRec() throws JavaModelException {
+	private void setMethod() throws JavaModelException {
 //		this.methods_rec = new HashSet<Method>();
 		IMethod[] iMethods = this.iType.getMethods();
 		for (IMethod iMethod : iMethods) {
