@@ -21,7 +21,10 @@ public class VariableNameGenerator extends ExpressionGenerator implements Genera
 		this.varName = varName;
 	}
 
-	@Override
+
+	/**
+	 * add all local variables from dataFromSourceFile
+	 */
 	public Vector<ExpressionGenerator> getAllSubGeneratorWithTypeT(String t) {
 		Vector<ExpressionGenerator> result = new Vector<ExpressionGenerator>();
 		for (VariableName varName : DataBase.allVariableName) {

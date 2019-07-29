@@ -10,11 +10,14 @@ import basic.Expression;
 import basic.ScoreDef;
 import basic.Type;
 import dataBase.DataBase;
+import dataBase.DataFromSourceFile;
+import dataBase.TypeF;
 
-public class ExpressionGenerator implements Generator,GeneratorWithMultipleReturnType {
+public class ExpressionGenerator implements Generator, GeneratorWithMultipleReturnType {
 	// do not use right now might be used later
 	String className = "Expression";
 	int BW = RelateBeamSearch.BEAMWIDTH;
+	DataFromSourceFile dataFromSourceFile;
 
 //	
 	// table1 : store expressions less than depth d
@@ -22,40 +25,46 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 	public Table expsLEQDepth_Table;
 	public Table expsAtExactDepth_Table;
 	
-	
+	public Set<String> allSimpleNameType;
+	public Map<String, TypeF> typeDictionary;
+
 	public ExpressionGenerator() {
 		
 	}
 
+	public ExpressionGenerator(DataFromSourceFile dataFromSourceFile ) {
+		this.dataFromSourceFile = dataFromSourceFile;
+		this.typeDictionary = dataFromSourceFile.getTypeDictionary();
+		this.allSimpleNameType = dataFromSourceFile.getAllTypes();
+	}
 
 	public Vector<Expression> generateExpression(int depth, String keywords) {
 //		DataBase.initDataBase();
-		
+
 		Vector<Expression> result = new Vector<Expression>();
-		Set<String> receiveTypes = this.getAllPossibleReturnTypes();
-		
+
 		this.expsLEQDepth_Table = new Table();
 		this.expsAtExactDepth_Table = new Table();
-		this.expsLEQDepth_Table.initTable(depth,receiveTypes);
-		this.expsAtExactDepth_Table.initTable(depth,receiveTypes);	
-		
+		this.expsLEQDepth_Table.initTable(depth, allSimpleNameType);
+		this.expsAtExactDepth_Table.initTable(depth, allSimpleNameType);
+
 		for (int d = 1; d <= depth; d++) {
 //				fillTwoTables
-			fillLEQTable(d,keywords,receiveTypes);
+			fillLEQTable(d, keywords, allSimpleNameType);
 		}
 
-		for (String t : receiveTypes) {
+		for (String t : allSimpleNameType) {
 			result.addAll(expsLEQDepth_Table.root_table.get(t).get(depth));
 		}
 		ScoreDef.selectMaxBWExpressions(result, keywords);
 		return result;
 	}
 
-	private void fillExactTable(int d,String keywords, Set<String> receiveTypes) {
+	private void fillExactTable(int d, String keywords, Set<String> receiveTypes) {
 		for (String t : receiveTypes) {
 			// expression with type t in depth d
 			Vector<Expression> result = new Vector<Expression>();
-			Vector<ExpressionGenerator> allSubGs = this.allSubGeneratorsIncludeTypeT(t,d);
+			Vector<ExpressionGenerator> allSubGs = this.allSubGeneratorsIncludeTypeT(t, d);
 			for (ExpressionGenerator g : allSubGs) {
 				g.generateExpressionExact(d, result);
 			}
@@ -67,18 +76,19 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 
 	}
 
-	private void fillLEQTable(int d,String keywords, Set<String> receiveTypes) {
-		fillExactTable(d,keywords, receiveTypes);
+	private void fillLEQTable(int d, String keywords, Set<String> receiveTypes) {
+		fillExactTable(d, keywords, receiveTypes);
 		if (d == 1) {
-			for(String type : receiveTypes) {
-				this.expsLEQDepth_Table.root_table.get(type).get(d).addAll(expsAtExactDepth_Table.root_table.get(type.toString()).get(d));
+			for (String type : receiveTypes) {
+				this.expsLEQDepth_Table.root_table.get(type).get(d)
+						.addAll(expsAtExactDepth_Table.root_table.get(type.toString()).get(d));
 			}
-			
+
 		} else {
 			for (String t : receiveTypes) {
 				Vector<Expression> result = new Vector<Expression>();
 				result.addAll(expsAtExactDepth_Table.root_table.get(t).get(d));
-				result.addAll(expsLEQDepth_Table.root_table.get(t).get(d-1));
+				result.addAll(expsLEQDepth_Table.root_table.get(t).get(d - 1));
 				ScoreDef.selectMaxBWExpressions(result, keywords);
 				expsLEQDepth_Table.root_table.get(t).get(d).addAll(result);
 			}
@@ -92,56 +102,49 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 //				g.changeProperty(t);
 //				subGeneratorsIncludeTypeT.add(g);
 //			}
-			
-			Set<String> allPossibleReturnTypes = g.getAllPossibleReturnTypes();
-			int typesNum = allPossibleReturnTypes.size();
-			if(allPossibleReturnTypes.contains(t)) {
-				if(typesNum>1) {
+
+			int typesNum = allSimpleNameType.size();
+			if (allSimpleNameType.contains(t)) {
+				if (typesNum > 1) {
 					// could create an interface
 					subGeneratorsIncludeTypeT.addAll(g.getAllSubGeneratorWithTypeT(t));
-				}else {
+				} else {
 					subGeneratorsIncludeTypeT.add(g);
 				}
 			}
-			
+
 		}
 		return subGeneratorsIncludeTypeT;
 	}
 
-
 	private ExpressionGenerator[] getAllSubGenerators(int d) {
 		// TODO Auto-generated method stub
 		ExpressionGenerator[] res;
-		if(d >1) {
-			res = new ExpressionGenerator[] { 
+		if (d > 1) {
+			res = new ExpressionGenerator[] {
 //					new BinaryConditionalExpressionGenerator(expsLEQDepth_Table,expsAtExactDepth_Table)
 //					,
-					new MethodInvocationGenerator(expsLEQDepth_Table,expsAtExactDepth_Table)
-					}; 
-		}else {
-			res = new ExpressionGenerator[] {
-					new StringLiteralGenerator()
-					,
-					new IntLiteralGenerator()
-					,new VariableNameGenerator()
-			};
+					new MethodInvocationGenerator(expsLEQDepth_Table, expsAtExactDepth_Table) };
+		} else {
+			res = new ExpressionGenerator[] { 
+//					new StringLiteralGenerator(), new IntLiteralGenerator(),
+					new VariableNameGenerator() };
 		}
 		return res;
 	}
 
-	public Set<String> getAllPossibleReturnTypes(){
-//		Set<String> allPossibleReceiveType = new HashSet<String>();
-//		allPossibleReceiveType.add("boolean");
-//		allPossibleReceiveType.add("Integer");
-//		allPossibleReceiveType.add("String");
-//		allPossibleReceiveType.add("BufferedReader");
-//		allPossibleReceiveType.add("List<String>");
-//		return allPossibleReceiveType;
-		
-		return DataBase.allTypes.keySet();
-	}
+//	public Set<String> getAllPossibleReturnTypes() {
+////		Set<String> allPossibleReceiveType = new HashSet<String>();
+////		allPossibleReceiveType.add("boolean");
+////		allPossibleReceiveType.add("Integer");
+////		allPossibleReceiveType.add("String");
+////		allPossibleReceiveType.add("BufferedReader");
+////		allPossibleReceiveType.add("List<String>");
+////		return allPossibleReceiveType;
+//
+//		return DataBase.allTypes.keySet();
+//	}
 
-	
 	public void generateExpressionExact(int d, Vector<Expression> result) {
 //		int arity = this.getParameterGenerators().length;
 		int arity = this.getArity();
@@ -158,7 +161,6 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 
 	private void generateWithArity(int d, int arity, Vector<Expression> result) {
 		for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
@@ -178,7 +180,7 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 			Vector<Expression> candidates = isBitOn(exactFlags, arity - 1)
 					? getPossibleExpressionsInDepth(d - 1, possibleParaType_arity)
 					: getPossibleExpressionsUnderDepth(d - 2, possibleParaType_arity);
-			if(candidates.size()>0) {
+			if (candidates.size() > 0) {
 				for (Expression e : candidates) {
 					subExps[arity - 1] = e;
 					generateWithArityAuxi(d, arity - 1, exactFlags, result, subExps);
@@ -191,7 +193,6 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 		}
 
 	}
-	
 
 	private Vector<Expression> getPossibleExpressionsInDepth(int d, String possibleParaType_arity) {
 		Vector<Expression> result = new Vector<Expression>();
@@ -199,15 +200,15 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 //		if(subT == null) {
 //			return result;
 //		}
-		for(String t_s : subT) {
+		for (String t_s : subT) {
 			// t_s : BufferReader
 			// d = 2
 			Table table2 = this.expsAtExactDepth_Table;
 			Map<String, Vector<Vector<Expression>>> root_table_2 = table2.root_table;
 			Vector<Vector<Expression>> exps = root_table_2.get(t_s);
 			Vector<Expression> res = exps.get(d);
-				result.addAll(res);
-			
+			result.addAll(res);
+
 		}
 		return result;
 	}
@@ -218,7 +219,7 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 //		if(subT == null) {
 //			return result;
 //		}
-		for(String t_s : subT) {
+		for (String t_s : subT) {
 			result.addAll(this.expsLEQDepth_Table.root_table.get(t_s).get(d));
 		}
 		return result;
@@ -228,17 +229,15 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 		return (x & (1 << i)) != 0;
 	}
 
-
 	public Generator[] getParameterGenerators() {
 		// TODO Auto-generated method stub
 		return new Generator[] {};
 	}
 
-
 	@Override
 	public void generateWithSubExps(Expression[] subExps, Vector<Expression> result) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -265,7 +264,5 @@ public class ExpressionGenerator implements Generator,GeneratorWithMultipleRetur
 	public String getReceiveType() {
 		return this.getParameterTypes()[0];
 	}
-
-
 
 }

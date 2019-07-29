@@ -66,20 +66,20 @@ public class DataBase {
 	
 	private static void initMethodNames() {
 		
-		allMethodNames.add(new MethodName("add", "boolean",
-				new String[] {"List<String>","String"}));
-		
-		allMethodNames.add(new MethodName("readLine","String",
-				new String[] {"BufferedReader"}));
-		
-		allMethodNames.add(new MethodName("concat","String",
-				new String[] {"String","String"}));
-		
-		allMethodNames.add(new MethodName("add","boolean",
-				new String[] {null,"Integer","Integer"}));
-		
-		allMethodNames.add(new MethodName("add_Int","Integer",
-				new String[] {"Integer","Integer"}));
+//		allMethodNames.add(new MethodName("add", "boolean",
+//				new String[] {"List<String>","String"}));
+//		
+//		allMethodNames.add(new MethodName("readLine","String",
+//				new String[] {"BufferedReader"}));
+//		
+//		allMethodNames.add(new MethodName("concat","String",
+//				new String[] {"String","String"}));
+//		
+//		allMethodNames.add(new MethodName("add","boolean",
+//				new String[] {null,"Integer","Integer"}));
+//		
+//		allMethodNames.add(new MethodName("add_Int","Integer",
+//				new String[] {"Integer","Integer"}));
 	}
 
 }
