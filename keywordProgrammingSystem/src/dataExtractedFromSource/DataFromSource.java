@@ -1,7 +1,9 @@
 package dataExtractedFromSource;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -65,7 +67,6 @@ public class DataFromSource {
 	 */
 	private Map<String, String> localVariables;
 
-
 	/**
 	 * All available methods from allTypes
 	 * 
@@ -105,6 +106,24 @@ public class DataFromSource {
 	 */
 	private ICompilationUnit thisICU;
 
+	/**
+	 * fields which receive type is the key
+	 */
+	private Map<String, Set<Field>> fieldsRec;
+	/**
+	 * methods which receive type is the key
+	 */
+	private Map<String, Set<Method>> methodsRec;
+	/**
+	 * fields which return type is the key
+	 */
+	private Map<String, Set<Field>> fieldsRet;
+
+	/**
+	 * methods which return type is the key
+	 */
+	private Map<String, Set<Method>> methodsRet;
+
 	public DataFromSource(ContentAssistInvocationContext context, IProgressMonitor monitor) throws JavaModelException {
 		this.context = context;
 		this.monitor = monitor;
@@ -116,6 +135,7 @@ public class DataFromSource {
 
 	/**
 	 * Initial allSimpleTypes, allITypes and typeDictionary
+	 * 
 	 * @throws JavaModelException
 	 * @since 2019/07/28
 	 */
@@ -123,7 +143,10 @@ public class DataFromSource {
 //		this.allSimpleTypes = new HashSet<String>();
 //		this.allITypes = new HashSet<IType>();
 		this.typeDictionary = new HashMap<String, Type>();
-
+		this.fieldsRec = new HashMap<String, Set<Field>> ();
+		this.methodsRec = new HashMap<String, Set<Method>> ();
+		this.fieldsRet = new HashMap<String, Set<Field>>();
+		this.methodsRet = new HashMap<String, Set<Method>>();
 		/**
 		 * Process with ITypes from same package
 		 */
@@ -194,18 +217,19 @@ public class DataFromSource {
 //		}
 //	}
 //
-	
+
 	/**
 	 * set simpleName, qualifiedName, hierarchy, field, methods of a type
+	 * 
 	 * @param typeSimpleName
 	 * @param iType
-	 * @throws JavaModelException 
+	 * @throws JavaModelException
 	 */
 	private void setTypeDictionary(IType iType) throws JavaModelException {
 		String typeSimpleName = iType.getElementName();
 		if (!this.typeDictionary.containsKey(typeSimpleName)) {
-			this.typeDictionary.put(typeSimpleName, new Type(iType,monitor));
-		}else {
+			this.typeDictionary.put(typeSimpleName, new Type(iType, this));
+		} else {
 			System.out.println("There are more than 2 class named " + typeSimpleName);
 		}
 
@@ -248,8 +272,8 @@ public class DataFromSource {
 		se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
 				waitingPolicy, monitor);
 		Vector<IType> iTypesLang = nameMatchRequestorLang.getITypes();
-		
-		for(IType iTypeLang : iTypesLang) {
+
+		for (IType iTypeLang : iTypesLang) {
 			this.setTypeDictionary(iTypeLang);
 		}
 	}
@@ -272,11 +296,41 @@ public class DataFromSource {
 
 		// Step-2 : Use ASTVisitor
 		this.localVariables = mv.getLocalVariables();
-		for(String name : localVariables.keySet()) {
+		for (String name : localVariables.keySet()) {
 			String type = localVariables.get(name);
 			this.typeDictionary.get(type).addLocalVariable(name);
 		}
 	}
 
+	public IProgressMonitor getMonitor() {
+		return this.monitor;
+	}
+
+	public void addFieldRec(String type, Field field) {
+		if(!this.fieldsRec.containsKey(type)) {
+			this.fieldsRec.put(type, new HashSet<Field>());
+		}
+		this.fieldsRec.get(type).add(field);
+	}
 	
+	public void addMethodRec(String type, Method method) {
+		if(!this.methodsRec.containsKey(type)) {
+			this.methodsRec.put(type, new HashSet<Method>());
+		}
+		this.methodsRec.get(type).add(method);
+	}
+	
+	public void addFieldRet(String type, Field field) {
+		if (!this.fieldsRet.containsKey(type)) {
+			this.fieldsRet.put(type, new HashSet<Field>());
+		}
+		this.fieldsRet.get(type).add(field);
+	}
+
+	public void addMethodRet(String type, Method method) {
+		if (!this.methodsRet.containsKey(type)) {
+			this.methodsRet.put(type, new HashSet<Method>());
+		}
+		this.methodsRet.get(type).add(method);
+	}
 }

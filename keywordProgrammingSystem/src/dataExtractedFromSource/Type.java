@@ -19,7 +19,7 @@ import dataBase.TypeF;
  * @date 2019/07/28
  */
 public class Type {
-
+	String simpleName;
 	String qualifiedName;
 
 	IType iType;
@@ -28,28 +28,46 @@ public class Type {
 	Set<String> subTypes;
 	Set<String> superTypes;
 
+	/**
+	 * TODO change this to Set < LocalVariable >
+	 */
 	Set<String> localVariables;
 	
 	/**
-	 * All available fields from allTypes
+	 * All available fields from allTypes which receive type is this type
 	 * 
 	 * <p>
 	 * If the type does not belong to allSimpleType, then don't use this field
 	 */
-	Set<Field> fields;
-	Set<Method> methods;
-
+//	Set<Field> fields_rec;
+//	/**
+//	 * all available fields which return type is this type;
+//	 */
+//	Set<Field> field_ret;
+	/**
+	 * All available methods which receive type is this type
+	 */
+//	Set<Method> methods_rec;
+//	/**
+//	 * All available methods which return type is this type
+//	 */
+//	Set<Method> methods_ret;
+	
+	DataFromSource dfs;
+	
 	public Type(String primitiveType) {
 		this.localVariables = new HashSet<String>();
 	}
 
-	public Type(IType iType, IProgressMonitor monitor) throws JavaModelException {
+	public Type(IType iType, DataFromSource dfs) throws JavaModelException {
 		this.iType = iType;
+		this.dfs = dfs;
+		this.simpleName = iType.getElementName();
 		this.qualifiedName = iType.getFullyQualifiedName();
-		this.monitor = monitor;
+		this.monitor = dfs.getMonitor();
 		this.localVariables = new HashSet<String>();
-		this.setField();
-		this.setMethod();
+		this.setFieldRec();
+		this.setMethodRec();
 		ITypeHierarchy ith = iType.newTypeHierarchy(monitor);
 		this.setSubTypes(ith);
 		this.setSuperTypes(ith);
@@ -65,21 +83,21 @@ public class Type {
  	 * 
 	 * @throws JavaModelException
 	 */
-	private void setField() throws JavaModelException {
-		this.fields = new HashSet<Field>();
+	private void setFieldRec() throws JavaModelException {
+//		this.fields_rec = new HashSet<Field>();
 		IField[] iFields = this.iType.getFields();
 		for (IField iField : iFields) {
 			String fieldName = iField.getElementName();
 			String iFieldTypeSig = iField.getTypeSignature();
 			String fieldType = this.sign2Type(iFieldTypeSig);
-
-			Field field = new Field(fieldType, fieldName);
-			this.fields.add(field);
+			Field field = new Field(simpleName, fieldType, fieldName);
+			this.dfs.addFieldRec(simpleName, field);
+			this.dfs.addFieldRet(fieldType, field);
 		}
 	}
 
-	private void setMethod() throws JavaModelException {
-		this.methods = new HashSet<Method>();
+	private void setMethodRec() throws JavaModelException {
+//		this.methods_rec = new HashSet<Method>();
 		IMethod[] iMethods = this.iType.getMethods();
 		for (IMethod iMethod : iMethods) {
 			String methodName = iMethod.getElementName();
@@ -91,8 +109,9 @@ public class Type {
 			String[] parameterTypes = Arrays.stream(parameterTypesSig).map(x -> this.sign2Type(x))
 					.toArray(String[]::new);
 			
-			Method method = new Method(methodName, returnType, parameterTypes);
-			this.methods.add(method);
+			Method method = new Method(methodName, returnType, simpleName, parameterTypes);
+			this.dfs.addMethodRec(simpleName, method);
+			this.dfs.addMethodRet(returnType, method);
 		}
 	}
 
