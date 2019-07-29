@@ -1,9 +1,7 @@
 package dataExtractedFromSource;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,7 +21,6 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 
-import dataBase.TypeF;
 import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
 import plugin.completionProposalComputer.MyVisitor;
 
@@ -52,7 +49,7 @@ public class DataFromSource {
 	 * - Types in SubTypes of ImportDeclaration Types
 	 * 
 	 */
-	private Set<String> allSimpleTypes;
+//	private Set<String> allSimpleTypes;
 
 	/**
 	 * Map from name of Type(String) to a type with hierarchy
@@ -68,13 +65,6 @@ public class DataFromSource {
 	 */
 	private Map<String, String> localVariables;
 
-	/**
-	 * All available fields from allTypes
-	 * 
-	 * <p>
-	 * If the type does not belong to allSimpleType, then don't use this field
-	 */
-//	private Map<Field, String> fields;
 
 	/**
 	 * All available methods from allTypes
@@ -96,7 +86,7 @@ public class DataFromSource {
 	 * <p>
 	 * - ITypes from subtypes of ImportDeclaration
 	 */
-	private Set<IType> allITypes;
+//	private Set<IType> allITypes;
 
 	/**
 	 * context from JavaCompletionProposalComputer in
@@ -130,8 +120,8 @@ public class DataFromSource {
 	 * @since 2019/07/28
 	 */
 	private void initTypeSystem() throws JavaModelException {
-		this.allSimpleTypes = new HashSet<String>();
-		this.allITypes = new HashSet<IType>();
+//		this.allSimpleTypes = new HashSet<String>();
+//		this.allITypes = new HashSet<IType>();
 		this.typeDictionary = new HashMap<String, Type>();
 
 		/**
@@ -143,7 +133,7 @@ public class DataFromSource {
 		for (ICompilationUnit iCompilationUnit : iCompilationUnits) {
 			IType[] iTypes = iCompilationUnit.getAllTypes();
 			for (IType iType : iTypes) {
-				this.setTypeSystem(iType);
+				this.setTypeDictionary(iType);
 			}
 		}
 
@@ -173,7 +163,7 @@ public class DataFromSource {
 					nameMatchRequestor, waitingPolicy, monitor);
 
 			IType importDeclarationType = nameMatchRequestor.getIType();
-			this.setTypeSystem(importDeclarationType);
+			this.setTypeDictionary(importDeclarationType);
 			// get subTypes of Import Declaration
 			this.setAllSubITypesFromImDe(importDeclarationType);
 		}
@@ -181,32 +171,42 @@ public class DataFromSource {
 		// TODO try later set default types
 //		this.setDefaultTypes();
 	}
-
-	private void setTypeSystem(IType iType) {
+//
+//	private void setTypeSystem(IType iType) {
+//		String typeSimpleName = iType.getElementName();
+//		this.setAllSimpleTypes(typeSimpleName);
+//		this.setAllITypes(iType);
+//		this.setTypeDictionary(typeSimpleName, iType);
+//
+//	}
+//
+//	private void setAllSimpleTypes(String typeSimpleName) {
+//		if (!this.allSimpleTypes.contains(typeSimpleName)) {
+//			this.allSimpleTypes.add(typeSimpleName);
+//		} else {
+//			System.out.println("There is two type with same name of : " + typeSimpleName);
+//		}
+//	}
+//
+//	private void setAllITypes(IType iType) {
+//		if (!this.allITypes.contains(iType)) {
+//			this.allITypes.add(iType);
+//		}
+//	}
+//
+	
+	/**
+	 * set simpleName, qualifiedName, hierarchy, field, methods of a type
+	 * @param typeSimpleName
+	 * @param iType
+	 * @throws JavaModelException 
+	 */
+	private void setTypeDictionary(IType iType) throws JavaModelException {
 		String typeSimpleName = iType.getElementName();
-		this.setAllSimpleTypes(typeSimpleName);
-		this.setAllITypes(iType);
-		this.setTypeDictionary(typeSimpleName, iType);
-
-	}
-
-	private void setAllSimpleTypes(String typeSimpleName) {
-		if (!this.allSimpleTypes.contains(typeSimpleName)) {
-			this.allSimpleTypes.add(typeSimpleName);
-		} else {
-			System.out.println("There is two type with same name of : " + typeSimpleName);
-		}
-	}
-
-	private void setAllITypes(IType iType) {
-		if (!this.allITypes.contains(iType)) {
-			this.allITypes.add(iType);
-		}
-	}
-
-	private void setTypeDictionary(String typeSimpleName, IType iType) {
 		if (!this.typeDictionary.containsKey(typeSimpleName)) {
-			this.typeDictionary.put(typeSimpleName, new Type(iType, monitor));
+			this.typeDictionary.put(typeSimpleName, new Type(iType,monitor));
+		}else {
+			System.out.println("There are more than 2 class named " + typeSimpleName);
 		}
 
 	}
@@ -224,7 +224,7 @@ public class DataFromSource {
 		ITypeHierarchy ith = importDeclarationType.newTypeHierarchy(monitor);
 		IType[] subITypes = ith.getAllSubtypes(importDeclarationType);
 		for (IType subIType : subITypes) {
-			this.setTypeSystem(subIType);
+			this.setTypeDictionary(subIType);
 		}
 
 	}
@@ -245,7 +245,7 @@ public class DataFromSource {
 		Vector<IType> iTypesLang = nameMatchRequestorLang.getITypes();
 		
 		for(IType iTypeLang : iTypesLang) {
-			this.setTypeSystem(iTypeLang);
+			this.setTypeDictionary(iTypeLang);
 		}
 	}
 
@@ -267,16 +267,10 @@ public class DataFromSource {
 
 		// Step-2 : Use ASTVisitor
 		this.localVariables = mv.getLocalVariables();
-
-	}
-
-	/**
-	 * Extract all Fields
-	 * @throws JavaModelException
-	 * @since 2019/07/28
-	 */
-	private void setFields() throws JavaModelException{
-		
+		for(String name : localVariables.keySet()) {
+			String type = localVariables.get(name);
+			this.typeDictionary.get(type).addLocalVariable(name);
+		}
 	}
 
 	
