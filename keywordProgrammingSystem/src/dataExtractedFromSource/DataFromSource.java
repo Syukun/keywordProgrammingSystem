@@ -229,6 +229,11 @@ public class DataFromSource {
 
 	}
 
+	/**
+	 * Get ITypes from java.lang.*;
+	 * 
+	 * @throws JavaModelException
+	 */
 	private void setDefaultTypes() throws JavaModelException {
 		SearchEngine se = new SearchEngine();
 
