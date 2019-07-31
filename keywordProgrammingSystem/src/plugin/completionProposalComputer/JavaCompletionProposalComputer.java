@@ -17,7 +17,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import basic.Expression;
 import dataBase.DataFromSourceFile;
 import dataExtractedFromSource.DataFromSource;
-import generator.ExpressionGenerator;
+import generator_origin.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
 

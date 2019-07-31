@@ -1,15 +1,15 @@
-package generator;
+package generator_origin;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
 import basic.Expression;
-import basic.IntegerLiteral;
+import basic.StringLiteral;
 import basic.Type;
 import dataBase.DataBase;
 
-public class IntLiteralGenerator extends ExpressionGenerator {
+public class StringLiteralGenerator extends ExpressionGenerator {
 
 	@Override
 	public Generator[] getParameterGenerators() {
@@ -25,16 +25,16 @@ public class IntLiteralGenerator extends ExpressionGenerator {
 	
 	public Set<String> getAllPossibleReturnTypes(){
 		Set<String> allPossibleReceiveType = new HashSet<String>();
-		allPossibleReceiveType.add("Integer");
+		allPossibleReceiveType.add("String");
 		return allPossibleReceiveType;
 	}
 
 	@Override
 	public void generateWithSubExps(Expression[] subExps, Vector<Expression> result) {
-		// TODO Auto-generated method stub
-		for(IntegerLiteral integerLiteral : DataBase.allIntegerLiterals) {
-			result.add(integerLiteral);
+		for(StringLiteral stringLiteral : DataBase.allStringLiterals) {
+			result.add(stringLiteral);
 		}
+
 	}
 
 }

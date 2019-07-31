@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import generator.RelateBeamSearch;
+import generator_origin.RelateBeamSearch;
 
 public class ScoreDef {
 	// score = 0

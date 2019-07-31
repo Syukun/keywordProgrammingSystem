@@ -1,4 +1,4 @@
-package generator;
+package generator_origin;
 
 public class RelateBeamSearch {
 	public static int BEAMWIDTH = 20;

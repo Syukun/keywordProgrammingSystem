@@ -1,4 +1,4 @@
-package generator;
+package generator_origin;
 
 import java.util.HashSet;
 import java.util.Set;
