@@ -23,6 +23,9 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 
+import astNode.Field;
+import astNode.LocalVariable;
+import astNode.Type;
 import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
 import plugin.completionProposalComputer.MyVisitor;
 

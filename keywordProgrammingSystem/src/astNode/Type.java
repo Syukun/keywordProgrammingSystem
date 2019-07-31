@@ -1,4 +1,4 @@
-package dataExtractedFromSource;
+package astNode;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,6 +13,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 
 import dataBase.TypeF;
+import dataExtractedFromSource.DataFromSource;
+import astNode.Field;
+import dataExtractedFromSource.Method;
 
 /**
  * @author Archer Shu
@@ -91,7 +94,7 @@ public class Type {
 			String fieldName = iField.getElementName();
 			String iFieldTypeSig = iField.getTypeSignature();
 			String fieldType = this.sign2Type(iFieldTypeSig);
-			Field field = new Field(simpleName, fieldType, fieldName);
+			Field field = new Field(fieldName, fieldType,simpleName);
 			this.dfs.addFieldRec(simpleName, field);
 			this.dfs.addFieldRet(fieldType, field);
 		}

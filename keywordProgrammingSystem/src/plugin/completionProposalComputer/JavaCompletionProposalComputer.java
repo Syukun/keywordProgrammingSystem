@@ -2,16 +2,13 @@ package plugin.completionProposalComputer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.*;
-import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
-import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -19,7 +16,6 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 
 import basic.Expression;
 import dataBase.DataFromSourceFile;
-import dataBase.TypeF;
 import dataExtractedFromSource.DataFromSource;
 import generator.ExpressionGenerator;
 
