@@ -9,7 +9,7 @@ import basic.ScoreDef;
 * @author Archer Shu
 * @date 2019/05/22
 */
-public abstract class Expression {
+public abstract class Expression extends Code{
 	/**
 	 * Expression ==> String
 	 */
