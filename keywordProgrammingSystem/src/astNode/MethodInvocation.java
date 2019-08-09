@@ -53,10 +53,4 @@ public class MethodInvocation extends Expression {
 		return null;
 	}
 
-	@Override
-	public String getReceiveType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

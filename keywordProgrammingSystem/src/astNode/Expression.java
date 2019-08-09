@@ -25,11 +25,6 @@ public abstract class Expression extends Code{
 	 * @return String
 	 */
 	public abstract String getReturnType();
-	/**
-	 * get receive type of this expression
-	 * @return receive type : String
-	 */
-	public abstract String getReceiveType();
 	
 	/**
 	 * TODO is this needed??

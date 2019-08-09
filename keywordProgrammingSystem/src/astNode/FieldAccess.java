@@ -12,6 +12,10 @@ public class FieldAccess extends Expression{
 	Expression expression;
 	Field field;
 	
+	public FieldAccess() {
+		
+	}
+	
 	public FieldAccess(Expression expression, Field field) {
 		super();
 		this.expression = expression;
