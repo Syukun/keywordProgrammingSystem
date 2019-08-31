@@ -3,6 +3,7 @@ package generator;
 import java.util.Vector;
 
 import astNode.Expression;
+import astNode.TypeName;
 
 /**
 * @author Archer Shu
@@ -11,7 +12,7 @@ import astNode.Expression;
 public class ExpressionGenerator extends AbsGenerator {
 
 	FieldAccessGenerator fieldAccessGenerator;
-	MethodInvocationGenerator methodInvocationGenerator;
+//	MethodInvocationGenerator methodInvocationGenerator;
 	
 	//TODO import allTypes;
 	String[] allTypes = {"String", "Integer"};
@@ -28,8 +29,14 @@ public class ExpressionGenerator extends AbsGenerator {
 	
 	@Override
 	public Vector<Expression> generateExactExpressionsMain(int depth, String type) {
-		// TODO Auto-generated method stub
-		return null;
+		Vector<Expression> res = new Vector<Expression>();
+		if(depth == 1) {
+			res.add(new TypeName(type));
+		}
+		res.addAll(fieldAccessGenerator.generateExactExpressionsSub(depth, type));
+//		res.addAll(methodInvocationGenerator.generateExactExpressionsSub(depth, type));
+		return res;
+
 	}
 
 	@Override

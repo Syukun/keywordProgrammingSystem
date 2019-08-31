@@ -1,5 +1,7 @@
 package generator;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
@@ -9,49 +11,60 @@ import astNode.Expression;
 * @date 2019/08/20
 */
 public abstract class AbsGenerator {
-	Table table;
+	Table tableUnder;
+	Table tableExact;
 	
 	public Vector<Expression> getExpressionsUnderDepthFromTable(int depth, String type) {
-		if(table.isUnderReady(depth, type)) {
-			return table.getExpressionsUnderDepth(depth, type);
+		
+		if(tableUnder.isReady(depth, type)) {
+			return getExpressionsUnder(depth, type);
 		}else {
 			Vector<Expression> exactExps;
-			if(table.isExactReady(depth, type)) {
-				exactExps = getExpressionsExactDepthFromTable(depth, type);
+			if(tableExact.isReady(depth, type)) {
+				exactExps = getExpressionsExact(depth, type);
 			}else {
-				exactExps = generateExactExpressionMain(depth, type);
-				exactExps.sort(keywords);
-				// TODO setExactReady();
-				table.addToExactTable(depth, type, exactExps);
+				exactExps = generateExactExpressionsMain(depth, type);
+//				exactExps.sort(keywords);
+				tableExact.addToTable(type, exactExps);
 			}
 			
 			if(depth == 1) {
-				//TODO setUnderReady();
-				table.addToUnderTable(depth, type, exactExps);
+				tableUnder.addToTable(type, exactExps);
 				return exactExps;
 			}else {
-				Vector<Expression> underOneExps = getExpressionsUnderDepthFromTable(depth-1, type);
-				Vector<Expression> underExps = getTopTenExps(exactExps, underOneExps);
-				//TODO setUnderReady();
-				table.addToUnderTable(depth, type, underExps);
-				return underExps;
+				Vector<Expression> lessOneExpsUnder = getExpressionsUnder(depth, type);
+				Vector<Expression> expsUnder = getTopTenExps(exactExps, lessOneExpsUnder);
+				tableUnder.addToTable(type, expsUnder);
+				return expsUnder;
 			}
 		}
+		
+	}
+
+
+
+	public Vector<Expression> getExpressionsUnder(int depth, String type) {
+		return tableUnder.getExpression(depth, type);
+	}
+
+
+
+	public Vector<Expression> getExpressionsExact(int depth, String type) {
+		return tableExact.getExpression(depth, type);
 	}
 	
-	public Vector<Expression> getExpressionsExactDepthFromTable(int depth, String type){
-		if(table.isExactReady(depth, type)) {
-			return table.getExpressionsExactDepth(depth, type);
-		}else {
-			Vector<Expression> exactExps = generateExactExpressionsMain(depth, type);
-			exactExps.sort(keywords);
-			//TODO setExactReady();
-			table.addToExactTable(depth, type, exactExps);
-			return exactExps;
-		}
+	
+
+	private Vector<Expression> getTopTenExps(Vector<Expression> exactExps, Vector<Expression> lessOneExpsUnder) {
+		// TODO modify it later
+		exactExps.addAll(lessOneExpsUnder);
+		return exactExps;
 	}
+
 
 	public abstract Vector<Expression> generateExactExpressionsMain(int depth, String type);
 	
 	public abstract Vector<Expression> generateExactExpressionsSub(int depth, String type);
+	
+
 }

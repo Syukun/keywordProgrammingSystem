@@ -1,5 +1,6 @@
 package generator;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -12,24 +13,28 @@ import astNode.Expression;
 */
 public class Table {
 	
-	Map<String, Vector<Expression>> table;
+	Map<String, Vector<Vector<Expression>>> table;
 	
-	public Table(Set<String> allTypes, int depth) {
+	public Table() {
+		String[] allTypes = {"String","int","Flora"};
+		this.table = new HashMap<String, Vector<Vector<Expression>>>();
 		for(String type : allTypes) {
-			Vector<Expression> exps = new Vector<Expression>();
-			table.put(type, exps);
+			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
+			this.table.put(type, expsFromEachDepth);
 		}
 	}
 	
-	public Vector<Expression> getExpressions(int depth, String type){
-		return table.get(type).get(depth-1).getExpression();
+	
+	public boolean isReady(int depth, String type) {
+		int maxDepth = table.get(type).size();
+		return maxDepth>=depth;		
 	}
 	
-	public void addToTable(int depth, String type, Vector<Expression> exps) {
-		table.get(type).get(depth)
+	public Vector<Expression> getExpression(int depth, String type){
+		return table.get(type).get(depth-1);
 	}
-	//TODO maybe not use this method
-	public void setReady(int depth, String type) {
-		table.get(type).get(depth-1).setReady(true);
+	
+	public void addToTable(String type, Vector<Expression> expressions) {
+		this.table.get(type).add(expressions);
 	}
 }
