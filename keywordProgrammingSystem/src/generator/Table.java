@@ -35,6 +35,12 @@ public class Table {
 	}
 	
 	public void addToTable(String type, Vector<Expression> expressions) {
-		this.table.get(type).add(expressions);
+		
+		Vector<Vector<Expression>> expressionsForEachDepth = this.table.get(type);
+		if(expressions.isEmpty()) {
+			expressionsForEachDepth.add(new Vector<Expression>());
+		}else {
+			expressionsForEachDepth.add(expressions);
+		}
 	}
 }
