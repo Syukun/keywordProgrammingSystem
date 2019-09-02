@@ -25,7 +25,8 @@ public class FieldAccessGenerator extends ExpressionGenerator {
 
 	public Vector<Expression> generateExactExpressionsSub(int depth, String type) {
 		// TODO modify this later
-		Field[] fields = { new Field("length", "int", "String"), new Field("number", "int", "int") };
+		Field[] fields = { new Field("length", "int", "String"), 
+				new Field("number", "int", "int")};
 
 		Vector<Expression> res = new Vector<Expression>();
 		// expressions in depth of exact d minus one

@@ -21,13 +21,17 @@ public class ExpressionGenerator extends AbstractGenerator {
 			/**
 			 * FieldAccessGenerator
 			 */
-			FieldAccessGenerator fieldAccessGenerator = new FieldAccessGenerator();
-			fieldAccessGenerator.setParent(this);
-			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type);
-			res.addAll(fieldAccess);
+//			FieldAccessGenerator fieldAccessGenerator = new FieldAccessGenerator();
+//			fieldAccessGenerator.setParent(this);
+//			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type);
+//			res.addAll(fieldAccess);
 			/**
 			 * MethodInvocationGenerator
 			 */
+			MethodInvocationGenerator methodInvocationGenerator = new MethodInvocationGenerator();
+			methodInvocationGenerator.setParent(this);
+			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
+			res.addAll(methodInvocation);
 		}
 
 		return res;
@@ -41,7 +45,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 	 */
 	public Vector<Expression> getFinalExpressions(int depth) {
 		// TODO modify it later
-		String[] allTypes = { "String", "int" };
+		String[] allTypes = { "String", "int", "Flora"};
 		Vector<Expression> res = new Vector<Expression>();
 		for (String type : allTypes) {
 			res.addAll(getUnderExpressions(depth, type));

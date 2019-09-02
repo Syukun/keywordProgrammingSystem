@@ -27,7 +27,7 @@ public class MethodName {
 	}
 	
 	public String getParameterTypeOf(int i) {
-		return parameterTypes[i];
+		return parameterTypes[i-1];
 	}
 	
 	public String getReturnType() {
