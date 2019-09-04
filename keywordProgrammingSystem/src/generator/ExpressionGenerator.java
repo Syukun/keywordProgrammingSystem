@@ -17,21 +17,29 @@ public class ExpressionGenerator extends AbstractGenerator {
 		Vector<Expression> res = new Vector<Expression>();
 		if (depth == 1) {
 			res.add(new TypeName(type));
+			
 		} else {
 			/**
 			 * FieldAccessGenerator
 			 */
-//			FieldAccessGenerator fieldAccessGenerator = new FieldAccessGenerator();
-//			fieldAccessGenerator.setParent(this);
-//			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type);
-//			res.addAll(fieldAccess);
+			FieldAccessGenerator fieldAccessGenerator = new FieldAccessGenerator();
+			fieldAccessGenerator.setParent(this);
+			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type);
+			res.addAll(fieldAccess);
+//			/**
+//			 * MethodInvocationGenerator
+//			 */
+//			MethodInvocationGenerator methodInvocationGenerator = new MethodInvocationGenerator();
+//			methodInvocationGenerator.setParent(this);
+//			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
+//			res.addAll(methodInvocation);
 			/**
-			 * MethodInvocationGenerator
+			 * IfThenElseConditionalExpression
 			 */
-			MethodInvocationGenerator methodInvocationGenerator = new MethodInvocationGenerator();
-			methodInvocationGenerator.setParent(this);
-			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
-			res.addAll(methodInvocation);
+			IfThenElseConditionalExpressionGenerator ifThenElseConditionalExpressionGenerator = new IfThenElseConditionalExpressionGenerator();
+			ifThenElseConditionalExpressionGenerator.setParent(this);
+			Vector<Expression>  ifThenElseConditionalExpression = ifThenElseConditionalExpressionGenerator.generateExactExpressionsSub(depth, type);
+			res.addAll(ifThenElseConditionalExpression);
 		}
 
 		return res;
@@ -45,7 +53,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 	 */
 	public Vector<Expression> getFinalExpressions(int depth) {
 		// TODO modify it later
-		String[] allTypes = { "String", "int", "Flora"};
+		String[] allTypes = { "String", "int", "boolean" };
 		Vector<Expression> res = new Vector<Expression>();
 		for (String type : allTypes) {
 			res.addAll(getUnderExpressions(depth, type));
@@ -54,4 +62,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 		return res;
 	}
 
+	public boolean isBitOn(int x, int i) {
+		return (x & (1 << i)) != 0;
+	}
 }

@@ -16,7 +16,7 @@ public class Table {
 	Map<String, Vector<Vector<Expression>>> table;
 	
 	public Table() {
-		String[] allTypes = {"String","int","Flora"};
+		String[] allTypes = {"String","int","boolean"};
 		this.table = new HashMap<String, Vector<Vector<Expression>>>();
 		for(String type : allTypes) {
 			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();

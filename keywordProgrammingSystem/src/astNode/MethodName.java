@@ -57,6 +57,9 @@ public class MethodName {
 		return this.parameterTypes.length;
 	}
 	
+	public String toString() {
+		return this.methodName;
+	}
 	
 	
 }
