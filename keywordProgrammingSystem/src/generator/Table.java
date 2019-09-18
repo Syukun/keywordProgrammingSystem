@@ -1,6 +1,7 @@
 package generator;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -16,7 +17,8 @@ public class Table {
 	Map<String, Vector<Vector<Expression>>> table;
 	
 	public Table() {
-		String[] allTypes = {"String","int","boolean"};
+		Set<String> allTypes = new HashSet<String>(); 
+//		String[] allTypes = {"String","int","boolean"};
 		this.table = new HashMap<String, Vector<Vector<Expression>>>();
 		for(String type : allTypes) {
 			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
@@ -26,6 +28,10 @@ public class Table {
 	
 	
 	public boolean isReady(int depth, String type) {
+		if(!table.containsKey(type)) {
+			this.addNewKey(type);
+			return false;
+		}
 		int maxDepth = table.get(type).size();
 		return maxDepth>=depth;		
 	}
@@ -41,6 +47,13 @@ public class Table {
 			expressionsForEachDepth.add(new Vector<Expression>());
 		}else {
 			expressionsForEachDepth.add(expressions);
+		}
+	}
+	
+	public void addNewKey(String type) {
+		if(!this.table.containsKey(type)) {
+			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
+			this.table.put(type, expsFromEachDepth);
 		}
 	}
 }

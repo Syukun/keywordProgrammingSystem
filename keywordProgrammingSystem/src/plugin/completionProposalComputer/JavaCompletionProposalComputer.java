@@ -14,10 +14,10 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 
-import basic.Expression;
+import astNode.Expression;
 import dataBase.DataFromSourceFile;
 import dataExtractedFromSource.DataFromSource;
-import generator_origin.ExpressionGenerator;
+import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
 
@@ -41,17 +41,16 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			
 			DataFromSource dfs = new DataFromSource(context,monitor);
 			
-			/**
-			 * Extract data from source codes
-			 */
-			DataFromSourceFile dataFromSourceFile = new DataFromSourceFile(context,monitor);
-			
 			// test whether the keyword query have any influence on ast
 			String keywords = "add line";
-
-			Vector<Expression> exps = new ExpressionGenerator(dataFromSourceFile).generateExpression(10, keywords);
-			for (Expression exp : exps) {
-				result.add(new MyCompletionProposal(context, exp));
+			
+			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
+			expressionGenerator.setDataFromSource(dfs);
+			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(2);
+			
+			for(Expression finalChoiceExpression : finalChoicesExpressions) {
+				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression);
+				result.add(mcp);
 			}
 
 		} catch (JavaModelException e) {

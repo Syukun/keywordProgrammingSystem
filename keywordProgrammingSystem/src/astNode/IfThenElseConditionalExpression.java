@@ -23,7 +23,7 @@ public class IfThenElseConditionalExpression extends Expression{
 	@Override
 	public String toString() {
 		
-		return "if" + "(" + ifExpression.toString() + ")"
+		return "(" + ifExpression.toString() + ")"
 				+ "?" + thenExpression.toString() + ":" + elseExpression.toString();
 	}
 

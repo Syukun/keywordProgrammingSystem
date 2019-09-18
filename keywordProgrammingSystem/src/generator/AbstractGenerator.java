@@ -46,6 +46,7 @@ public abstract class AbstractGenerator {
 			 * set tableUnder and return expressions from tableUnder
 			 */
 			if(depth == 1) {
+//				tableUnder.addNewKey(type);
 				tableUnder.addToTable(type, exactExps);
 				return exactExps;
 			}else {
