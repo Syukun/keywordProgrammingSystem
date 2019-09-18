@@ -15,7 +15,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 
 import astNode.Expression;
-import dataBase.DataFromSourceFile;
 import dataExtractedFromSource.DataFromSource;
 import generator.ExpressionGenerator;
 

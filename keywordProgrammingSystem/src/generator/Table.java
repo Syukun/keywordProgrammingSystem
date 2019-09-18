@@ -18,6 +18,7 @@ public class Table {
 	
 	public Table() {
 		Set<String> allTypes = new HashSet<String>(); 
+		allTypes.add("void");
 //		String[] allTypes = {"String","int","boolean"};
 		this.table = new HashMap<String, Vector<Vector<Expression>>>();
 		for(String type : allTypes) {

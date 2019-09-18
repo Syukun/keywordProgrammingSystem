@@ -12,7 +12,6 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 
-import dataBase.TypeF;
 import dataExtractedFromSource.DataFromSource;
 import astNode.Field;
 import dataExtractedFromSource.Method;

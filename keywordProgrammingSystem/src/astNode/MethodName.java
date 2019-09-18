@@ -3,8 +3,6 @@ package astNode;
 import java.math.BigDecimal;
 import java.util.List;
 
-import basic.ScoreDef;
-
 /**
 * @author Archer Shu
 * @date 2019/07/31

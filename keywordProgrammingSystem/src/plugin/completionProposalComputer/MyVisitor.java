@@ -10,7 +10,7 @@ import java.util.Stack;
 
 import org.eclipse.jdt.core.dom.*;
 
-import basic.LocalVariable;
+import astNode.LocalVariable;
 
 public class MyVisitor extends ASTVisitor {
 	int cursorPos = -1;
@@ -201,7 +201,7 @@ public class MyVisitor extends ASTVisitor {
 		for (VariableDeclarationFragment localVariable : localVariables) {
 
 			String varName = localVariable.getName().toString();
-			LocalVariable lv = new LocalVariable(varName, type);
+			LocalVariable lv = new LocalVariable(varName, type.toString(), this.getNameOfThis());
 			localVars_tmp.push(lv);
 		}
 	}
@@ -213,7 +213,7 @@ public class MyVisitor extends ASTVisitor {
 		for (VariableDeclarationFragment localVariable : localVariables) {
 
 			String varName = localVariable.getName().toString();
-			LocalVariable lv = new LocalVariable(varName, type);
+			LocalVariable lv = new LocalVariable(varName, type.toString(), this.getNameOfThis());
 			localVars_tmp.push(lv);
 		}
 		
@@ -223,7 +223,7 @@ public class MyVisitor extends ASTVisitor {
 
 		Type type = node.getType();
 		String varName = node.getName().toString();
-		LocalVariable lv = new LocalVariable(varName, type);
+		LocalVariable lv = new LocalVariable(varName, type.toString(), this.getNameOfThis());
 		localVars_tmp.push(lv);
 	
 	}
@@ -253,8 +253,8 @@ public class MyVisitor extends ASTVisitor {
 
 		while (!localVars_tmp.empty()) {
 			LocalVariable lv = localVars_tmp.pop();
-			String nameOfLv = lv.getName();
-			String typeOfLv = lv.getType().toString();
+			String nameOfLv = lv.getVarName();
+			String typeOfLv = lv.getTypeName();
 
 			if (!localVariables.containsKey(nameOfLv)) {
 				localVariables.put(nameOfLv, typeOfLv);

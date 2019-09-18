@@ -1,4 +1,4 @@
-package basic;
+package astNode;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-import generator_origin.RelateBeamSearch;
+import astNode.Expression;
 
 public class ScoreDef {
 	// score = 0
@@ -49,7 +49,8 @@ public class ScoreDef {
 		sortExpression(result,keywords);
 		Vector<Expression> temp = new Vector<Expression>();
 		int count = 0;
-		while(count < RelateBeamSearch.BEAMWIDTH) {
+		//beam width
+		while(count < 3) {
 			if(count < result.size()) {
 				temp.add(result.get(count));
 			}else {

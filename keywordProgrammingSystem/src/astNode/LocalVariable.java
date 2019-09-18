@@ -3,8 +3,6 @@ package astNode;
 import java.math.BigDecimal;
 import java.util.List;
 
-import basic.ScoreDef;
-
 /**
 * @author Archer Shu
 * @date 2019/07/30
@@ -56,5 +54,11 @@ public class LocalVariable {
 		return score;
 	}
 	
+	public String getVarName() {
+		return this.varName;
+	}
 	
+	public String getTypeName() {
+		return this.typeName;
+	}
 }
