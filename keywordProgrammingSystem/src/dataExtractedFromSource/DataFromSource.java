@@ -358,4 +358,11 @@ public class DataFromSource {
 		}
 		this.methodsRet.get(type).add(method);
 	}
+	/**
+	 * @since 2019/09/18
+	 * @return all possible type name
+	 */
+	public Set<String> getAllType() {
+		return this.typeDictionary.keySet();
+	}
 }
