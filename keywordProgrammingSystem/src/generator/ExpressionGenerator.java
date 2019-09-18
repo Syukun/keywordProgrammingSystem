@@ -53,6 +53,15 @@ public class ExpressionGenerator extends AbstractGenerator {
 
 		return res;
 	}
+	
+	public Vector<ExpressionGenerator> getGeneratorsInDepthOne(){
+		Vector<ExpressionGenerator> res = new Vector<ExpressionGenerator>();
+//		res.add(new TypeNameGenerator());
+		res.add(new ClassInstanceCreationGenerator());//=2
+		res.add(new LocalVariableGenerator());
+		
+		return res;
+	}
 
 	/**
 	 * main function to return expressions under depth
