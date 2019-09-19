@@ -22,10 +22,18 @@ public class ExpressionGenerator extends AbstractGenerator {
 		// this is ugly, hope somebody could modify it
 		Vector<Expression> res = new Vector<Expression>();
 		if (depth == 1) {
-			TypeNameGenerator typeNameGenerator = new TypeNameGenerator();
-			typeNameGenerator.setParent(this);
-			Expression typeName = typeNameGenerator.generateExactExpressionsSub(depth, type);
-			res.add(typeName);
+//			TypeNameGenerator typeNameGenerator = new TypeNameGenerator();
+//			typeNameGenerator.setParent(this);
+//			Expression typeName = typeNameGenerator.generateExactExpressionsSub(depth, type);
+//			res.add(typeName);
+			
+			/**
+			 * Local Variable Generator
+			 */
+			LocalVariableGenerator localVariableGenerator = new LocalVariableGenerator();
+			localVariableGenerator.setParent(this);
+			Vector<Expression> localVariables = localVariableGenerator.generateExactExpressionsSub(depth, type);
+			res.addAll(localVariables);
 			
 		} else {
 			/**
@@ -57,7 +65,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 	public Vector<ExpressionGenerator> getGeneratorsInDepthOne(){
 		Vector<ExpressionGenerator> res = new Vector<ExpressionGenerator>();
 //		res.add(new TypeNameGenerator());
-		res.add(new ClassInstanceCreationGenerator());//=2
+//		res.add(new ClassInstanceCreationGenerator());//=2
 		res.add(new LocalVariableGenerator());
 		
 		return res;

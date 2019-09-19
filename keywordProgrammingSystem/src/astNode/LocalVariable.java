@@ -7,7 +7,7 @@ import java.util.List;
 * @author Archer Shu
 * @date 2019/07/30
 */
-public class LocalVariable {
+public class LocalVariable extends Expression{
 /**
  * String str in class ClassA
  */

@@ -365,4 +365,17 @@ public class DataFromSource {
 	public Set<String> getAllType() {
 		return this.typeDictionary.keySet();
 	}
+	
+	/**
+	 * get all local variable according to return types
+	 * @param retType
+	 * @return
+	 */
+	public Set<LocalVariable> getLocalVariablesFromRetType(String retType){
+		if(this.localVariablesRet.containsKey(retType)) {
+			return this.localVariablesRet.get(retType);
+		}else {
+			return new HashSet<LocalVariable>();
+		}
+	}
 }
