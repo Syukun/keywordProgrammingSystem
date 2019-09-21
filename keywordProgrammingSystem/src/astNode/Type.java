@@ -13,8 +13,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 
 import dataExtractedFromSource.DataFromSource;
-import astNode.Field;
-import dataExtractedFromSource.Method;
 
 /**
  * @author Archer Shu
@@ -115,7 +113,7 @@ public class Type {
 			String[] parameterTypes = Arrays.stream(parameterTypesSig).map(x -> this.sign2Type(x))
 					.toArray(String[]::new);
 			
-			Method method = new Method(methodName, returnType, simpleName, parameterTypes);
+			MethodName method = new MethodName(methodName, returnType, simpleName, parameterTypes);
 			this.dfs.addMethodRec(simpleName, method);
 			this.dfs.addMethodRet(returnType, method);
 		}

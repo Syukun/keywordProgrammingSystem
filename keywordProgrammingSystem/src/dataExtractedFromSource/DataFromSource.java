@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -26,6 +25,7 @@ import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import astNode.Field;
 import astNode.LocalVariable;
 import astNode.Type;
+import astNode.MethodName;
 import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
 import plugin.completionProposalComputer.MyVisitor;
 
@@ -118,7 +118,7 @@ public class DataFromSource {
 	/**
 	 * methods which receive type is the key
 	 */
-	private Map<String, Set<Method>> methodsRec;
+	private Map<String, Set<MethodName>> methodsRec;
 	/**
 	 * fields which return type is the key
 	 */
@@ -127,7 +127,7 @@ public class DataFromSource {
 	/**
 	 * methods which return type is the key
 	 */
-	private Map<String, Set<Method>> methodsRet;
+	private Map<String, Set<MethodName>> methodsRet;
 
 	public DataFromSource(ContentAssistInvocationContext context, IProgressMonitor monitor) throws JavaModelException {
 		this.context = context;
@@ -149,9 +149,9 @@ public class DataFromSource {
 //		this.allITypes = new HashSet<IType>();
 		this.typeDictionary = new HashMap<String, Type>();
 		this.fieldsRec = new HashMap<String, Set<Field>>();
-		this.methodsRec = new HashMap<String, Set<Method>>();
+		this.methodsRec = new HashMap<String, Set<MethodName>>();
 		this.fieldsRet = new HashMap<String, Set<Field>>();
-		this.methodsRet = new HashMap<String, Set<Method>>();
+		this.methodsRet = new HashMap<String, Set<MethodName>>();
 		this.localVariablesRec = new HashMap<String, Set<LocalVariable>>();
 		this.localVariablesRet = new HashMap<String, Set<LocalVariable>>();
 		/**
@@ -349,9 +349,9 @@ public class DataFromSource {
 		this.fieldsRec.get(type).add(field);
 	}
 
-	public void addMethodRec(String type, Method method) {
+	public void addMethodRec(String type, MethodName method) {
 		if (!this.methodsRec.containsKey(type)) {
-			this.methodsRec.put(type, new HashSet<Method>());
+			this.methodsRec.put(type, new HashSet<MethodName>());
 		}
 		this.methodsRec.get(type).add(method);
 	}
@@ -363,9 +363,9 @@ public class DataFromSource {
 		this.fieldsRet.get(type).add(field);
 	}
 
-	public void addMethodRet(String type, Method method) {
+	public void addMethodRet(String type, MethodName method) {
 		if (!this.methodsRet.containsKey(type)) {
-			this.methodsRet.put(type, new HashSet<Method>());
+			this.methodsRet.put(type, new HashSet<MethodName>());
 		}
 		this.methodsRet.get(type).add(method);
 	}
@@ -395,5 +395,9 @@ public class DataFromSource {
 	public Set<Field> getFieldsFromReceiveType(String type) {
 
 		return this.fieldsRec.containsKey(type) ? this.fieldsRec.get(type) : new HashSet<Field>();
+	}
+	
+	public Set<MethodName> getMethodFromReturnType(String type){
+		return this.methodsRet.containsKey(type)? this.methodsRet.get(type) : new HashSet<MethodName>();
 	}
 }

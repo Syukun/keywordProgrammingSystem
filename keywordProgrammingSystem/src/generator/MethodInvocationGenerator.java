@@ -1,5 +1,6 @@
 package generator;
 
+import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
@@ -18,25 +19,26 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 	}
 	
 	public Vector<Expression> generateExactExpressionsSub(int depth, String type){
-		//TODO get all method name information from database later
-		MethodName methodName1 = new MethodName("concat","String","String",new String[] {"String"});
-		MethodName methodName2 = new MethodName("add","int","int",new String[] {"int","int"});
-		MethodName methodName3 = new MethodName("addzero", "String", "String", new String[] {"String","int"});
-		MethodName[] methodNames = {methodName1
-				};
+		//get all method name information from database later
+//		MethodName methodName1 = new MethodName("concat","String","String",new String[] {"String"});
+//		MethodName methodName2 = new MethodName("add","int","int",new String[] {"int","int"});
+//		MethodName methodName3 = new MethodName("addzero", "String", "String", new String[] {"String","int"});
+//		MethodName[] methodNames = {methodName1
+//				};
 //				,methodName2,methodName3};
 		
+		Set<MethodName> methodNames = parent.dataFromExtraction.getMethodFromReturnType(type);
 		//result
 		Vector<Expression> res = new Vector<Expression>();
 		
-		Vector<MethodName> methodNamesReturnEqualTypes = new Vector<MethodName>();
-		for(MethodName methodName : methodNames) {
-			if(methodName.getReturnType() == type) {
-				methodNamesReturnEqualTypes.add(methodName);
-			}
-		}
+//		Vector<MethodName> methodNamesReturnEqualTypes = new Vector<MethodName>();
+//		for(MethodName methodName : methodNames) {
+//			if(methodName.getReturnType() == type) {
+//				methodNamesReturnEqualTypes.add(methodName);
+//			}
+//		}
 		
-		for(MethodName mthName : methodNamesReturnEqualTypes) {
+		for(MethodName mthName : methodNames) {
 			int parametersNumber = mthName.getParameterNumber();
 			int arity = parametersNumber+1;
 			
