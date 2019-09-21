@@ -292,7 +292,13 @@ public class DataFromSource {
 //			this.setTypeDictionary(iTypeLang);
 //		}
 		this.setTypeDictionary("int");
-
+		this.setTypeDictionary("double");
+		this.setTypeDictionary("float");
+		this.setTypeDictionary("byte");
+		this.setTypeDictionary("short");
+		this.setTypeDictionary("long");
+		this.setTypeDictionary("boolean");
+		this.setTypeDictionary("void");
 	}
 
 	/**
