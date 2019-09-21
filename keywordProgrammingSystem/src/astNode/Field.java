@@ -12,6 +12,8 @@ public class Field {
 	private String typeSimpleName;
 	private String fieldName;
 	
+	
+	
 	public Field(String fieldName, String typeName, String className) {
 		this.fieldName = fieldName;
 		this.typeSimpleName = typeName;

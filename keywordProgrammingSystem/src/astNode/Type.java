@@ -57,8 +57,11 @@ public class Type {
 	
 	DataFromSource dfs;
 	
-	public Type(String primitiveType) {
+	public Type(String primitiveType) throws JavaModelException {
 //		this.localVariables = new HashSet<String>();
+		this.qualifiedName = primitiveType;
+		this.simpleName = primitiveType;
+		
 	}
 
 	public Type(IType iType, DataFromSource dfs) throws JavaModelException {

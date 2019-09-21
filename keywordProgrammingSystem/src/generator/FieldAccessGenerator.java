@@ -1,5 +1,6 @@
 package generator;
 
+import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
@@ -25,22 +26,15 @@ public class FieldAccessGenerator extends ExpressionGenerator {
 
 	public Vector<Expression> generateExactExpressionsSub(int depth, String type) {
 		// TODO modify this later
-		Field[] fields = { new Field("length", "int", "String"), 
-				new Field("number", "int", "int")};
-
+//		Field[] fields = { new Field("length", "int", "String"), 
+//				new Field("number", "int", "int")};
+		Set<Field> fields = parent.dataFromExtraction.getFieldsFromReceiveType(type);
 		Vector<Expression> res = new Vector<Expression>();
 		// expressions in depth of exact d minus one
 		Vector<Expression> exactM1Exps = parent.getExactExpressions(depth - 1, type);
 		for (Expression exactM1Exp : exactM1Exps) {
-			// TODO use stream later
-			Vector<Field> fieldsReceiveEqualType = new Vector<Field>();
+			
 			for (Field f : fields) {
-				if (f.getReceiveType() == type) {
-					fieldsReceiveEqualType.add(f);
-				}
-			}
-
-			for (Field f : fieldsReceiveEqualType) {
 				FieldAccess fa = new FieldAccess(exactM1Exp, f);
 				res.add(fa);
 			}

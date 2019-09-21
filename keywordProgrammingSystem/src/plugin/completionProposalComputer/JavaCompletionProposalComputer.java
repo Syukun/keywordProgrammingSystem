@@ -20,7 +20,7 @@ import generator.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
 
-	public static Stack<String> localVariables;
+//	public static Stack<String> localVariables;
 
 	@Override
 	public void sessionStarted() {
@@ -45,7 +45,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			
 			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
 			expressionGenerator.setDataFromSource(dfs);
-			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(1);
+			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(3);
 			
 			for(Expression finalChoiceExpression : finalChoicesExpressions) {
 				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression);

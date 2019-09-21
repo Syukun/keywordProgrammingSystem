@@ -66,7 +66,8 @@ public class DataFromSource {
 
 	/**
 	 * All local variable < variable type : String, localVar : LocalVariable >
-	 * <p>For example: String str ==> map of < str, lv >
+	 * <p>
+	 * For example: String str ==> map of < str, lv >
 	 */
 	private Map<String, Set<LocalVariable>> localVariablesRet;
 
@@ -147,8 +148,8 @@ public class DataFromSource {
 //		this.allSimpleTypes = new HashSet<String>();
 //		this.allITypes = new HashSet<IType>();
 		this.typeDictionary = new HashMap<String, Type>();
-		this.fieldsRec = new HashMap<String, Set<Field>> ();
-		this.methodsRec = new HashMap<String, Set<Method>> ();
+		this.fieldsRec = new HashMap<String, Set<Field>>();
+		this.methodsRec = new HashMap<String, Set<Method>>();
 		this.fieldsRet = new HashMap<String, Set<Field>>();
 		this.methodsRet = new HashMap<String, Set<Method>>();
 		this.localVariablesRec = new HashMap<String, Set<LocalVariable>>();
@@ -198,7 +199,7 @@ public class DataFromSource {
 		}
 
 		// TODO try later set default types
-//		this.setDefaultTypes();
+		this.setDefaultTypes();
 	}
 //
 //	private void setTypeSystem(IType iType) {
@@ -241,6 +242,14 @@ public class DataFromSource {
 
 	}
 
+	private void setTypeDictionary(String primitiveType) throws JavaModelException {
+		if (!this.typeDictionary.containsKey(primitiveType)) {
+			this.typeDictionary.put(primitiveType, new Type(primitiveType));
+		} else {
+			System.out.println("There are more than 2 class named " + primitiveType);
+		}
+	}
+
 	private char[] getPackageName(String iimdName, int lastDotPos) {
 		return iimdName.substring(0, lastDotPos).toCharArray();
 
@@ -265,23 +274,25 @@ public class DataFromSource {
 	 * @throws JavaModelException
 	 */
 	private void setDefaultTypes() throws JavaModelException {
-		SearchEngine se = new SearchEngine();
+//		SearchEngine se = new SearchEngine();
+//
+//		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
+//		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
+//		// searchFor : right now just consider classes and interfaces
+//		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
+//		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+//		int waitingPolicy = 0;
+//		char[] packageNameLang = "java.lang".toCharArray();
+//		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
+//		se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
+//				waitingPolicy, monitor);
+//		Vector<IType> iTypesLang = nameMatchRequestorLang.getITypes();
+//
+//		for (IType iTypeLang : iTypesLang) {
+//			this.setTypeDictionary(iTypeLang);
+//		}
+		this.setTypeDictionary("int");
 
-		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
-		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
-		// searchFor : right now just consider classes and interfaces
-		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
-		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-		int waitingPolicy = 0;
-		char[] packageNameLang = "java.lang".toCharArray();
-		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
-		se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
-				waitingPolicy, monitor);
-		Vector<IType> iTypesLang = nameMatchRequestorLang.getITypes();
-
-		for (IType iTypeLang : iTypesLang) {
-			this.setTypeDictionary(iTypeLang);
-		}
 	}
 
 	/**
@@ -303,25 +314,25 @@ public class DataFromSource {
 		// Step-2 : Use ASTVisitor
 		String thisType = mv.getNameOfThis();
 		Map<String, String> localVariables = mv.getLocalVariables();
-		
-		for(String localVarName : localVariables.keySet()) {
+
+		for (String localVarName : localVariables.keySet()) {
 			String localVarType = localVariables.get(localVarName);
-			LocalVariable lv = new LocalVariable(localVarName,localVarType,thisType);
-			this.addLocalVariableRec(thisType,lv);
-			this.addLocalVariableRet(localVarType,lv);
+			LocalVariable lv = new LocalVariable(localVarName, localVarType, thisType);
+			this.addLocalVariableRec(thisType, lv);
+			this.addLocalVariableRet(localVarType, lv);
 		}
 	}
 
 	private void addLocalVariableRec(String thisType, LocalVariable lv) {
-		if(!this.localVariablesRec.containsKey(thisType)) {
+		if (!this.localVariablesRec.containsKey(thisType)) {
 			this.localVariablesRec.put(thisType, new HashSet<LocalVariable>());
 		}
 		this.localVariablesRec.get(thisType).add(lv);
-		
+
 	}
-	
+
 	private void addLocalVariableRet(String type, LocalVariable lv) {
-		if(!this.localVariablesRet.containsKey(type)) {
+		if (!this.localVariablesRet.containsKey(type)) {
 			this.localVariablesRet.put(type, new HashSet<LocalVariable>());
 		}
 		this.localVariablesRet.get(type).add(lv);
@@ -332,19 +343,19 @@ public class DataFromSource {
 	}
 
 	public void addFieldRec(String type, Field field) {
-		if(!this.fieldsRec.containsKey(type)) {
+		if (!this.fieldsRec.containsKey(type)) {
 			this.fieldsRec.put(type, new HashSet<Field>());
 		}
 		this.fieldsRec.get(type).add(field);
 	}
-	
+
 	public void addMethodRec(String type, Method method) {
-		if(!this.methodsRec.containsKey(type)) {
+		if (!this.methodsRec.containsKey(type)) {
 			this.methodsRec.put(type, new HashSet<Method>());
 		}
 		this.methodsRec.get(type).add(method);
 	}
-	
+
 	public void addFieldRet(String type, Field field) {
 		if (!this.fieldsRet.containsKey(type)) {
 			this.fieldsRet.put(type, new HashSet<Field>());
@@ -358,6 +369,7 @@ public class DataFromSource {
 		}
 		this.methodsRet.get(type).add(method);
 	}
+
 	/**
 	 * @since 2019/09/18
 	 * @return all possible type name
@@ -365,17 +377,23 @@ public class DataFromSource {
 	public Set<String> getAllType() {
 		return this.typeDictionary.keySet();
 	}
-	
+
 	/**
 	 * get all local variable according to return types
+	 * 
 	 * @param retType
 	 * @return
 	 */
-	public Set<LocalVariable> getLocalVariablesFromRetType(String retType){
-		if(this.localVariablesRet.containsKey(retType)) {
+	public Set<LocalVariable> getLocalVariablesFromRetType(String retType) {
+		if (this.localVariablesRet.containsKey(retType)) {
 			return this.localVariablesRet.get(retType);
-		}else {
+		} else {
 			return new HashSet<LocalVariable>();
 		}
+	}
+
+	public Set<Field> getFieldsFromReceiveType(String type) {
+
+		return this.fieldsRec.containsKey(type) ? this.fieldsRec.get(type) : new HashSet<Field>();
 	}
 }
