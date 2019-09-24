@@ -32,8 +32,9 @@ public class FieldAccess extends Expression{
 
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
-		// TODO Auto-generated method stub
-		return this.expression.getScore(keywords);
+		BigDecimal score = ScoreDef.DEFSCORE;
+		score = score.add(this.expression.getScore(keywords)).add(this.field.getScore(keywords));
+		return score;
 	}
 
 	@Override

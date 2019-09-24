@@ -42,10 +42,11 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			
 			// test whether the keyword query have any influence on ast
 			String keywords = "add line";
+			int depth = 2;
 			
 			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
 			expressionGenerator.setDataFromSource(dfs);
-			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(1);
+			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth);
 			
 			for(Expression finalChoiceExpression : finalChoicesExpressions) {
 				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression);

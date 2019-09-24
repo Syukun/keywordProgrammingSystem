@@ -6,7 +6,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 
 import astNode.Expression;
 
@@ -25,6 +28,8 @@ public class ScoreDef {
 
 	
 	public static BigDecimal checkInKeyword(BigDecimal score,String word,List<String> keywords) {
+		String[] wordArray = splitName(word);
+		
 		if(keywords.contains(word)) {
 			score = score.add(WIK);
 			keywords.remove(word);
@@ -35,6 +40,7 @@ public class ScoreDef {
 	}
 	
 	public static BigDecimal checkInKeyword_LocalVariable(BigDecimal score,String word,List<String> keywords) {
+		
 		if(keywords.contains(word)) {
 			score = score.add(WIK);
 			score = score.add(LMVAR);
@@ -79,4 +85,31 @@ public class ScoreDef {
 		
 	}
 	
+	public static String[] splitName(String name) {
+		name = name.replaceAll("_", " ");
+		name = name.replaceAll("([a-z0-9]+)([A-Z])", "$1 $2");
+		
+		/**
+		 * recursive
+		 */
+		name = splitUpCase(name);
+		
+		/**
+		 * to lower case
+		 */
+		name = name.toLowerCase();
+		
+		return name.split("[^\\w]");
+	}
+	
+	private static String splitUpCase(String word) {
+		Pattern pattern = Pattern.compile("([A-Z]{1})([A-Z])");
+		Matcher matcher = pattern.matcher(word);
+		if(matcher.find()) {
+			word = word.replaceAll("([A-Z]{1})([A-Z])", "$1 $2");
+			return splitUpCase(word);
+		}else {
+			return word;
+		}
+	}
 }

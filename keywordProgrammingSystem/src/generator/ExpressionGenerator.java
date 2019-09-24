@@ -43,20 +43,20 @@ public class ExpressionGenerator extends AbstractGenerator {
 			fieldAccessGenerator.setParent(this);
 			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type);
 			res.addAll(fieldAccess);
-			/**
-			 * MethodInvocationGenerator
-			 */
-			MethodInvocationGenerator methodInvocationGenerator = new MethodInvocationGenerator();
-			methodInvocationGenerator.setParent(this);
-			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
-			res.addAll(methodInvocation);
-			/**
-			 * IfThenElseConditionalExpression
-			 */
-			IfThenElseConditionalExpressionGenerator ifThenElseConditionalExpressionGenerator = new IfThenElseConditionalExpressionGenerator();
-			ifThenElseConditionalExpressionGenerator.setParent(this);
-			Vector<Expression>  ifThenElseConditionalExpression = ifThenElseConditionalExpressionGenerator.generateExactExpressionsSub(depth, type);
-			res.addAll(ifThenElseConditionalExpression);
+//			/**
+//			 * MethodInvocationGenerator
+//			 */
+//			MethodInvocationGenerator methodInvocationGenerator = new MethodInvocationGenerator();
+//			methodInvocationGenerator.setParent(this);
+//			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
+//			res.addAll(methodInvocation);
+//			/**
+//			 * IfThenElseConditionalExpression
+//			 */
+//			IfThenElseConditionalExpressionGenerator ifThenElseConditionalExpressionGenerator = new IfThenElseConditionalExpressionGenerator();
+//			ifThenElseConditionalExpressionGenerator.setParent(this);
+//			Vector<Expression>  ifThenElseConditionalExpression = ifThenElseConditionalExpressionGenerator.generateExactExpressionsSub(depth, type);
+//			res.addAll(ifThenElseConditionalExpression);
 		}
 
 		return res;
