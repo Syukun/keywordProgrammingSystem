@@ -14,6 +14,8 @@ public class MyCompletionProposal implements ICompletionProposal {
 
 	public Expression expression;
 	public ContentAssistInvocationContext context;
+	
+	private String keywords;
 
 //	need parameter keywords
 	public MyCompletionProposal(ContentAssistInvocationContext context,Expression exp) {
@@ -61,7 +63,7 @@ public class MyCompletionProposal implements ICompletionProposal {
 
 	@Override
 	public String getDisplayString() {	
-		return this.expression.toString();
+		return this.expression.toString() + "      score : " + this.expression.getScore(keywords).toString();
 	}
 
 
@@ -76,6 +78,11 @@ public class MyCompletionProposal implements ICompletionProposal {
 	public IContextInformation getContextInformation() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
+		
 	}
 
 }

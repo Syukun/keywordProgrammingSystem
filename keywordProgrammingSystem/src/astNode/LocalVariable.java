@@ -50,7 +50,7 @@ public class LocalVariable extends Expression{
 	
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		score = ScoreDef.checkInKeyword(score, this.toString(), keywords);
+		score = ScoreDef.checkInKeyword_LocalVariable(score, this.toString(), keywords);
 		return score;
 	}
 	
