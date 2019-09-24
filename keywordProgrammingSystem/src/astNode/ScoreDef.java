@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-
 import astNode.Expression;
 
 public class ScoreDef {
@@ -26,89 +25,94 @@ public class ScoreDef {
 	// of the enclosing class;
 	public static final BigDecimal LMVAR = new BigDecimal(Float.toString(0.001f));
 
-	
-	public static BigDecimal checkInKeyword(BigDecimal score,String word,List<String> keywords) {
+	public static BigDecimal checkInKeyword(BigDecimal score, String word, List<String> keywords) {
 		String[] wordArray = splitName(word);
-		
-		if(keywords.contains(word)) {
-			score = score.add(WIK);
-			keywords.remove(word);
-		}else {
-			score = score.add(WNIK);
+
+		for (String wordSingle : wordArray) {
+			if (keywords.contains(wordSingle)) {
+				score = score.add(WIK);
+				keywords.remove(wordSingle);
+			} else {
+				score = score.add(WNIK);
+			}
+		}
+
+		return score;
+	}
+
+	public static BigDecimal checkInKeyword_LocalVariable(BigDecimal score, String word, List<String> keywords) {
+		String[] wordArray = splitName(word);
+
+		for (String wordSingle : wordArray) {
+			if (keywords.contains(wordSingle)) {
+				score = score.add(WIK);
+				score = score.add(LMVAR);
+				keywords.remove(wordSingle);
+			} else {
+				score = score.add(WNIK);
+			}
 		}
 		return score;
 	}
-	
-	public static BigDecimal checkInKeyword_LocalVariable(BigDecimal score,String word,List<String> keywords) {
-		
-		if(keywords.contains(word)) {
-			score = score.add(WIK);
-			score = score.add(LMVAR);
-			keywords.remove(word);
-		}else {
-			score = score.add(WNIK);
-		}
-		return score;
-	}
-	
+
 	public static void selectMaxBWExpressions(Vector<Expression> result, String keywords) {
-		sortExpression(result,keywords);
+		sortExpression(result, keywords);
 		Vector<Expression> temp = new Vector<Expression>();
 		int count = 0;
-		//beam width
-		while(count < 3) {
-			if(count < result.size()) {
+		// beam width
+		while (count < 3) {
+			if (count < result.size()) {
 				temp.add(result.get(count));
-			}else {
+			} else {
 				break;
 			}
-			count ++;
+			count++;
 		}
 		result.clear();
 		result.addAll(temp);
 
 	}
-	
+
 	public static List<String> splitKeyword(String keywords) {
 		return Arrays.asList(keywords.toLowerCase().split("[^\\w]")).stream().distinct().collect(Collectors.toList());
 //		return new ArrayList<String>(Arrays.asList(keywords.toLowerCase().split("[^\\w]")));
 	}
 
 	public static void sortExpression(Vector<Expression> result, String keywords) {
-		Collections.sort(result,new Comparator<Expression>() {
+		Collections.sort(result, new Comparator<Expression>() {
 			@Override
 			public int compare(Expression e1, Expression e2) {
 				return e2.getScore(keywords).compareTo(e1.getScore(keywords));
 			}
-			
+
 		});
-		
+
 	}
-	
+
 	public static String[] splitName(String name) {
 		name = name.replaceAll("_", " ");
 		name = name.replaceAll("([a-z0-9]+)([A-Z])", "$1 $2");
-		
+
 		/**
 		 * recursive
 		 */
 		name = splitUpCase(name);
-		
+
 		/**
 		 * to lower case
 		 */
 		name = name.toLowerCase();
-		
+
 		return name.split("[^\\w]");
 	}
-	
+
 	private static String splitUpCase(String word) {
 		Pattern pattern = Pattern.compile("([A-Z]{1})([A-Z])");
 		Matcher matcher = pattern.matcher(word);
-		if(matcher.find()) {
+		if (matcher.find()) {
 			word = word.replaceAll("([A-Z]{1})([A-Z])", "$1 $2");
 			return splitUpCase(word);
-		}else {
+		} else {
 			return word;
 		}
 	}
