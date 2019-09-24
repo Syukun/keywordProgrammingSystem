@@ -42,11 +42,10 @@ public class ScoreDef {
 
 	public static BigDecimal checkInKeyword_LocalVariable(BigDecimal score, String word, List<String> keywords) {
 		String[] wordArray = splitName(word);
-
+		score = score.add(LMVAR);
 		for (String wordSingle : wordArray) {
 			if (keywords.contains(wordSingle)) {
 				score = score.add(WIK);
-				score = score.add(LMVAR);
 				keywords.remove(wordSingle);
 			} else {
 				score = score.add(WNIK);

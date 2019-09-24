@@ -42,8 +42,8 @@ public class MethodName {
 	
 	// need split methodName
 	public BigDecimal getScore(List<String> keywords) {
-		BigDecimal score = ScoreDef.DEFSCORE;
-		String[] methodNameArray = this.methodName.split("(?<!^)(?=[A-Z])");
+		BigDecimal score = ScoreDef.ZERO;
+		String[] methodNameArray = ScoreDef.splitName(methodName);
 		for(String word : methodNameArray) {
 			score = ScoreDef.checkInKeyword(score, word.toLowerCase(), keywords);
 		}

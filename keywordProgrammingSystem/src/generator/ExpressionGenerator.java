@@ -43,13 +43,13 @@ public class ExpressionGenerator extends AbstractGenerator {
 			fieldAccessGenerator.setParent(this);
 			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type);
 			res.addAll(fieldAccess);
-//			/**
-//			 * MethodInvocationGenerator
-//			 */
-//			MethodInvocationGenerator methodInvocationGenerator = new MethodInvocationGenerator();
-//			methodInvocationGenerator.setParent(this);
-//			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
-//			res.addAll(methodInvocation);
+			/**
+			 * MethodInvocationGenerator
+			 */
+			MethodInvocationGenerator methodInvocationGenerator = new MethodInvocationGenerator();
+			methodInvocationGenerator.setParent(this);
+			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
+			res.addAll(methodInvocation);
 //			/**
 //			 * IfThenElseConditionalExpression
 //			 */

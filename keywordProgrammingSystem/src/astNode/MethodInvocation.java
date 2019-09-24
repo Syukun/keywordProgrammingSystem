@@ -43,14 +43,20 @@ public class MethodInvocation extends Expression {
 
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
-		// TODO Auto-generated method stub
-		return null;
+		BigDecimal score = ScoreDef.DEFSCORE;
+		score = score.add(this.receiver.getScore(keywords))
+				.add(this.methodName.getScore(keywords));
+		for(Expression paraExpression : this.parameters) {
+			score = score.add(paraExpression.getScore(keywords));
+		}
+		
+		return score;
 	}
 
 	@Override
 	public String getReturnType() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.methodName.getReturnType();
 	}
 
 }
