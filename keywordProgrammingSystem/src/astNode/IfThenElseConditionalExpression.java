@@ -29,8 +29,11 @@ public class IfThenElseConditionalExpression extends Expression{
 
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
-		// TODO Auto-generated method stub
-		return null;
+		BigDecimal score = ScoreDef.DEFSCORE;
+		score.add(this.ifExpression.getScore(keywords))
+		.add(this.elseExpression.getScore(keywords))
+		.add(this.thenExpression.getScore(keywords));
+		return score;
 	}
 
 	@Override

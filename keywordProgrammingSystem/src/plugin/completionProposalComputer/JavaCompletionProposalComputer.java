@@ -46,7 +46,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			
 			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
 			expressionGenerator.setDataFromSource(dfs);
-			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth);
+			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth,keywords);
 			
 			for(Expression finalChoiceExpression : finalChoicesExpressions) {
 				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression);

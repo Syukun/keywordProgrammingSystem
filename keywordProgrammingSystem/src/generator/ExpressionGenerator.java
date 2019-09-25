@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
+import astNode.ScoreDef;
 import astNode.TypeName;
 import dataExtractedFromSource.DataFromSource;
 
@@ -50,13 +51,13 @@ public class ExpressionGenerator extends AbstractGenerator {
 			methodInvocationGenerator.setParent(this);
 			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
 			res.addAll(methodInvocation);
-//			/**
-//			 * IfThenElseConditionalExpression
-//			 */
-//			IfThenElseConditionalExpressionGenerator ifThenElseConditionalExpressionGenerator = new IfThenElseConditionalExpressionGenerator();
-//			ifThenElseConditionalExpressionGenerator.setParent(this);
-//			Vector<Expression>  ifThenElseConditionalExpression = ifThenElseConditionalExpressionGenerator.generateExactExpressionsSub(depth, type);
-//			res.addAll(ifThenElseConditionalExpression);
+			/**
+			 * IfThenElseConditionalExpression
+			 */
+			IfThenElseConditionalExpressionGenerator ifThenElseConditionalExpressionGenerator = new IfThenElseConditionalExpressionGenerator();
+			ifThenElseConditionalExpressionGenerator.setParent(this);
+			Vector<Expression>  ifThenElseConditionalExpression = ifThenElseConditionalExpressionGenerator.generateExactExpressionsSub(depth, type);
+			res.addAll(ifThenElseConditionalExpression);
 		}
 
 		return res;
@@ -77,7 +78,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 	 * @param depth
 	 * @return
 	 */
-	public Vector<Expression> getFinalExpressions(int depth) {
+	public Vector<Expression> getFinalExpressions(int depth, String keywords) {
 		// TODO modify it later
 //		String[] allTypes = { "String", "int", "boolean" };
 		Set<String> allTypes = this.dataFromExtraction.getAllType();
@@ -85,6 +86,8 @@ public class ExpressionGenerator extends AbstractGenerator {
 		for (String type : allTypes) {
 			res.addAll(getUnderExpressions(depth, type));
 		}
+		ScoreDef.sortExpression(res, keywords);
+		
 
 		return res;
 	}
