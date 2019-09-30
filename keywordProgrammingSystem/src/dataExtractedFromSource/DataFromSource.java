@@ -71,7 +71,7 @@ public class DataFromSource {
 	 */
 	private Map<String, Set<LocalVariable>> localVariablesRet;
 
-	private Map<String, Set<LocalVariable>> localVariablesRec;
+//	private Map<String, Set<LocalVariable>> localVariablesRec;
 	/**
 	 * All available methods from allTypes
 	 * 
@@ -118,11 +118,11 @@ public class DataFromSource {
 	/**
 	 * methods which receive type is the key
 	 */
-	private Map<String, Set<MethodName>> methodsRec;
+//	private Map<String, Set<MethodName>> methodsRec;
 	/**
 	 * fields which return type is the key
 	 */
-	private Map<String, Set<Field>> fieldsRet;
+//	private Map<String, Set<Field>> fieldsRet;
 
 	/**
 	 * methods which return type is the key
@@ -149,10 +149,10 @@ public class DataFromSource {
 //		this.allITypes = new HashSet<IType>();
 		this.typeDictionary = new HashMap<String, Type>();
 		this.fieldsRec = new HashMap<String, Set<Field>>();
-		this.methodsRec = new HashMap<String, Set<MethodName>>();
-		this.fieldsRet = new HashMap<String, Set<Field>>();
+//		this.methodsRec = new HashMap<String, Set<MethodName>>();
+//		this.fieldsRet = new HashMap<String, Set<Field>>();
 		this.methodsRet = new HashMap<String, Set<MethodName>>();
-		this.localVariablesRec = new HashMap<String, Set<LocalVariable>>();
+//		this.localVariablesRec = new HashMap<String, Set<LocalVariable>>();
 		this.localVariablesRet = new HashMap<String, Set<LocalVariable>>();
 		/**
 		 * Process with ITypes from same package
@@ -324,18 +324,18 @@ public class DataFromSource {
 		for (String localVarName : localVariables.keySet()) {
 			String localVarType = localVariables.get(localVarName);
 			LocalVariable lv = new LocalVariable(localVarName, localVarType, thisType);
-			this.addLocalVariableRec(thisType, lv);
+//			this.addLocalVariableRec(thisType, lv);
 			this.addLocalVariableRet(localVarType, lv);
 		}
 	}
 
-	private void addLocalVariableRec(String thisType, LocalVariable lv) {
-		if (!this.localVariablesRec.containsKey(thisType)) {
-			this.localVariablesRec.put(thisType, new HashSet<LocalVariable>());
-		}
-		this.localVariablesRec.get(thisType).add(lv);
-
-	}
+//	private void addLocalVariableRec(String thisType, LocalVariable lv) {
+//		if (!this.localVariablesRec.containsKey(thisType)) {
+//			this.localVariablesRec.put(thisType, new HashSet<LocalVariable>());
+//		}
+//		this.localVariablesRec.get(thisType).add(lv);
+//
+//	}
 
 	private void addLocalVariableRet(String type, LocalVariable lv) {
 		if (!this.localVariablesRet.containsKey(type)) {
@@ -355,19 +355,19 @@ public class DataFromSource {
 		this.fieldsRec.get(type).add(field);
 	}
 
-	public void addMethodRec(String type, MethodName method) {
-		if (!this.methodsRec.containsKey(type)) {
-			this.methodsRec.put(type, new HashSet<MethodName>());
-		}
-		this.methodsRec.get(type).add(method);
-	}
+//	public void addMethodRec(String type, MethodName method) {
+//		if (!this.methodsRec.containsKey(type)) {
+//			this.methodsRec.put(type, new HashSet<MethodName>());
+//		}
+//		this.methodsRec.get(type).add(method);
+//	}
 
-	public void addFieldRet(String type, Field field) {
-		if (!this.fieldsRet.containsKey(type)) {
-			this.fieldsRet.put(type, new HashSet<Field>());
-		}
-		this.fieldsRet.get(type).add(field);
-	}
+//	public void addFieldRet(String type, Field field) {
+//		if (!this.fieldsRet.containsKey(type)) {
+//			this.fieldsRet.put(type, new HashSet<Field>());
+//		}
+//		this.fieldsRet.get(type).add(field);
+//	}
 
 	public void addMethodRet(String type, MethodName method) {
 		if (!this.methodsRet.containsKey(type)) {
