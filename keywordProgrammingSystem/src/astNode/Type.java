@@ -96,7 +96,7 @@ public class Type {
 			String fieldType = this.sign2Type(iFieldTypeSig);
 			Field field = new Field(fieldName, fieldType,simpleName);
 			this.dfs.addFieldRec(simpleName, field);
-			this.dfs.addFieldRet(fieldType, field);
+//			this.dfs.addFieldRet(fieldType, field);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class Type {
 					.toArray(String[]::new);
 			
 			MethodName method = new MethodName(methodName, returnType, simpleName, parameterTypes);
-			this.dfs.addMethodRec(simpleName, method);
+//			this.dfs.addMethodRec(simpleName, method);
 			this.dfs.addMethodRet(returnType, method);
 		}
 	}
