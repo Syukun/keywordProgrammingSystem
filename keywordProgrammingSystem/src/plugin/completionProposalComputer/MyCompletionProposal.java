@@ -37,7 +37,7 @@ public class MyCompletionProposal implements ICompletionProposal {
 			int lastPosition = document.getLineOffset(line+1);
 			
 			res.append(currentText.substring(0, firstPosition));
-			res.append("\t\t" + getDisplayString()+"\n");
+			res.append("\t\t" + getExpressionString()+"\n");
 			res.append(currentText.substring(lastPosition));
 			document.set(res.toString());
 			
@@ -46,7 +46,7 @@ public class MyCompletionProposal implements ICompletionProposal {
 			e.printStackTrace();
 		}
 		
-		context.getViewer().setSelectedRange(position + getDisplayString().length(), -1);
+		context.getViewer().setSelectedRange(position + getExpressionString().length(), -1);
 	}
 
 	@Override
@@ -61,6 +61,9 @@ public class MyCompletionProposal implements ICompletionProposal {
 		return null;
 	}
 
+	public String getExpressionString() {
+		return this.expression.toString();
+	}
 	@Override
 	public String getDisplayString() {	
 		return this.expression.toString() + "      score : " + this.expression.getScore(keywords).toString();

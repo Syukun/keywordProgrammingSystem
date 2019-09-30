@@ -24,7 +24,6 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 	@Override
 	public void sessionStarted() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -41,7 +40,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			DataFromSource dfs = new DataFromSource(context,monitor);
 			
 			// test whether the keyword query have any influence on ast
-			String keywords = "add line";
+			String keywords = getKeywords(context);
 			int depth = 3;
 			
 			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
@@ -101,6 +100,8 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//eliminate "//"
+		res = res.replaceFirst("//", "");
 		return res;
 	}
 
