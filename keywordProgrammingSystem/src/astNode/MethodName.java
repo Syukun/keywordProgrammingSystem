@@ -24,6 +24,8 @@ public class MethodName {
 		return this.receiveType;
 	}
 	
+	
+	
 	public String getParameterTypeOf(int i) {
 		return parameterTypes[i-1];
 	}
