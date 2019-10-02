@@ -48,6 +48,7 @@ public abstract class AbstractGenerator {
 			 */
 			if(depth == 1) {
 //				tableUnder.addNewKey(type);
+				//sort
 				Vector<Expression> sortedExactExpressions = ScoreDef.selectMaxBWExpressions(exactExps, keywords);
 				tableUnder.addToTable(type, sortedExactExpressions);
 				return exactExps;
@@ -56,6 +57,7 @@ public abstract class AbstractGenerator {
 				Vector<Expression> underExps = new Vector<Expression>();
 				underExps.addAll(lessOneUnderExps);
 				underExps.addAll(exactExps);
+				//sort
 				Vector<Expression> sortedUnderExpressions = ScoreDef.selectMaxBWExpressions(underExps, keywords);
 				tableUnder.addToTable(type, sortedUnderExpressions);
 				return underExps;
