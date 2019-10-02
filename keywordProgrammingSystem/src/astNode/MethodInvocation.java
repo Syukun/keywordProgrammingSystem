@@ -4,35 +4,35 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
-* @author Archer Shu
-* @date 2019/08/01
-*/
+ * @author Archer Shu
+ * @date 2019/08/01
+ */
 public class MethodInvocation extends Expression {
 
 	Expression receiver;
 	MethodName methodName;
 	Expression[] parameters;
-	
+
 	public MethodInvocation(Expression receiver, MethodName methodName, Expression[] parameters) {
 		this.receiver = receiver;
 		this.methodName = methodName;
 		this.parameters = parameters;
 	}
-	
+
 	/**
 	 * receiver.methodName(para1,para2...)
 	 */
 	public String toString() {
 		StringBuffer res = new StringBuffer();
-		
-		if(receiver != null) {
+
+		if (receiver != null) {
 			res.append(receiver.toString() + ".");
 		}
-		
-		res.append(methodName.toString()+"(");
-		if(parameters != null) {
+
+		res.append(methodName.toString() + "(");
+		if (parameters != null) {
 			String seperator = "";
-			for(Expression exp : parameters) {
+			for (Expression exp : parameters) {
 				res.append(seperator + exp.toString());
 				seperator = ",";
 			}
@@ -44,12 +44,12 @@ public class MethodInvocation extends Expression {
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		score = score.add(this.receiver.getScore(keywords))
-				.add(this.methodName.getScore(keywords));
-		for(Expression paraExpression : this.parameters) {
+		score = score.add(this.receiver.getScore(keywords));
+		score = score.add(this.methodName.getScore(keywords));
+		for (Expression paraExpression : this.parameters) {
 			score = score.add(paraExpression.getScore(keywords));
 		}
-		
+
 		return score;
 	}
 
