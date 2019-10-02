@@ -16,21 +16,21 @@ public class IfThenElseConditionalExpressionGenerator extends ExpressionGenerato
 		this.parent = expressionGenerator;
 	}
 
-	public Vector<Expression> generateExactExpressionsSub(int depth, String type) {
+	public Vector<Expression> generateExactExpressionsSub(int depth, String type, String keywords) {
 		// result
 		Vector<Expression> res = new Vector<Expression>();
 
 		int arity = 3;
 		for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
 			Expression[] subExps = new Expression[arity];
-			generateWithArityAuxi(depth, arity, exactFlags, res, subExps, type);
+			generateWithArityAuxi(depth, arity, exactFlags, res, subExps, type, keywords);
 		}
 		
 		return res;
 	}
 
 	private void generateWithArityAuxi(int depth, int arity, int exactFlags, Vector<Expression> result,
-			Expression[] subExps, String type) {
+			Expression[] subExps, String type, String keywords) {
 		if(arity == 0) {
 			generateWithSubExps(subExps, result);
 		}else {
@@ -38,10 +38,10 @@ public class IfThenElseConditionalExpressionGenerator extends ExpressionGenerato
 			
 			Vector<Expression> candidate;
 			if(isBitOn(exactFlags, arity-1)) {
-				candidate = parent.getExactExpressions(depth-1, elementType);
+				candidate = parent.getExactExpressions(depth-1, elementType, keywords);
 			}else {
 				if(depth>2) {
-					candidate = parent.getUnderExpressions(depth-2, elementType);
+					candidate = parent.getUnderExpressions(depth-2, elementType, keywords);
 				}else {
 					candidate = new Vector<Expression>();
 				}
@@ -50,7 +50,7 @@ public class IfThenElseConditionalExpressionGenerator extends ExpressionGenerato
 			if(candidate.size()>0) {
 				for(Expression c : candidate) {
 					subExps[arity-1] = c;
-					generateWithArityAuxi(depth, arity-1, exactFlags, result, subExps, type);
+					generateWithArityAuxi(depth, arity-1, exactFlags, result, subExps, type, keywords);
 				}
 			}
 			

@@ -24,14 +24,14 @@ public class FieldAccessGenerator extends ExpressionGenerator {
 		this.parent = expressionGenerator;
 	}
 
-	public Vector<Expression> generateExactExpressionsSub(int depth, String type) {
+	public Vector<Expression> generateExactExpressionsSub(int depth, String type, String keywords) {
 		// TODO modify this later
 //		Field[] fields = { new Field("length", "int", "String"), 
 //				new Field("number", "int", "int")};
 		Set<Field> fields = parent.dataFromExtraction.getFieldsFromReceiveType(type);
 		Vector<Expression> res = new Vector<Expression>();
 		// expressions in depth of exact d minus one
-		Vector<Expression> exactM1Exps = parent.getExactExpressions(depth - 1, type);
+		Vector<Expression> exactM1Exps = parent.getExactExpressions(depth - 1, type, keywords);
 		for (Expression exactM1Exp : exactM1Exps) {
 			
 			for (Field f : fields) {

@@ -24,7 +24,7 @@ public class ScoreDef {
 	// add +0.001 where f is a local variable , member variable or member method
 	// of the enclosing class;
 	public static final BigDecimal LMVAR = new BigDecimal(Float.toString(0.001f));
-	
+
 	public static int BEAMWIDTH = 10;
 
 	public static BigDecimal checkInKeyword(BigDecimal score, String word, List<String> keywords) {
@@ -57,29 +57,20 @@ public class ScoreDef {
 	}
 
 	public static Vector<Expression> selectMaxBWExpressions(Vector<Expression> result, String keywords) {
+		return selectMaxExpressions(result, keywords, BEAMWIDTH);
+
+	}
+
+	public static Vector<Expression> selectMaxExpressions(Vector<Expression> result, String keywords, int num) {
 		sortExpression(result, keywords);
-		
+
 		int lengthResult = result.size();
-		if(lengthResult > BEAMWIDTH ) {
-			for(int i = lengthResult-1; i>=BEAMWIDTH; i--) {
+		if (lengthResult > num) {
+			for (int i = lengthResult - 1; i >= num; i--) {
 				result.remove(i);
 			}
 		}
 		return result;
-//		Vector<Expression> temp = new Vector<Expression>();
-//		int count = 0;
-//		// beam width
-//		while (count < BEAMWIDTH) {
-//			if (count < result.size()) {
-//				temp.add(result.get(count));
-//			} else {
-//				break;
-//			}
-//			count++;
-//		}
-//		result.clear();
-//		result.addAll(temp);
-
 	}
 
 	public static List<String> splitKeyword(String keywords) {

@@ -19,7 +19,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 		this.dataFromExtraction = data;
 	}
 	@Override
-	public Vector<Expression> generateExactExpressionsMain(int depth, String type) {
+	public Vector<Expression> generateExactExpressionsMain(int depth, String type, String keywords) {
 		// this is ugly, hope somebody could modify it
 		Vector<Expression> res = new Vector<Expression>();
 		if (depth == 1) {
@@ -42,21 +42,21 @@ public class ExpressionGenerator extends AbstractGenerator {
 			 */
 			FieldAccessGenerator fieldAccessGenerator = new FieldAccessGenerator();
 			fieldAccessGenerator.setParent(this);
-			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type);
+			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type, keywords);
 			res.addAll(fieldAccess);
 			/**
 			 * MethodInvocationGenerator
 			 */
 			MethodInvocationGenerator methodInvocationGenerator = new MethodInvocationGenerator();
 			methodInvocationGenerator.setParent(this);
-			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type);
+			Vector<Expression> methodInvocation = methodInvocationGenerator.generateExactExpressionsSub(depth, type, keywords);
 			res.addAll(methodInvocation);
 			/**
 			 * IfThenElseConditionalExpression
 			 */
 			IfThenElseConditionalExpressionGenerator ifThenElseConditionalExpressionGenerator = new IfThenElseConditionalExpressionGenerator();
 			ifThenElseConditionalExpressionGenerator.setParent(this);
-			Vector<Expression>  ifThenElseConditionalExpression = ifThenElseConditionalExpressionGenerator.generateExactExpressionsSub(depth, type);
+			Vector<Expression>  ifThenElseConditionalExpression = ifThenElseConditionalExpressionGenerator.generateExactExpressionsSub(depth, type, keywords);
 			res.addAll(ifThenElseConditionalExpression);
 		}
 
@@ -76,9 +76,9 @@ public class ExpressionGenerator extends AbstractGenerator {
 		Set<String> allTypes = this.dataFromExtraction.getAllType();
 		Vector<Expression> res = new Vector<Expression>();
 		for (String type : allTypes) {
-			res.addAll(getUnderExpressions(depth, type));
+			res.addAll(getUnderExpressions(depth, type, keywords));
 		}
-		return ScoreDef.selectMaxBWExpressions(res, keywords);
+		return ScoreDef.selectMaxExpressions(res, keywords, 9);
 	}
 
 	public boolean isBitOn(int x, int i) {

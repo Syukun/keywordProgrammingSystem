@@ -41,7 +41,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			
 			// test whether the keyword query have any influence on ast
 			String keywords = getKeywords(context);
-			int depth = 3;
+			int depth = 4;
 			
 			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
 			expressionGenerator.setDataFromSource(dfs);
