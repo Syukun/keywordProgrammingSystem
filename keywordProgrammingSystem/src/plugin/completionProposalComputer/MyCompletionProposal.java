@@ -72,8 +72,8 @@ public class MyCompletionProposal implements IJavaCompletionProposal {
 
 	@Override
 	public String getDisplayString() {
-		return "No." + (index+1) + "  " + this.expression.toString() + "  Score : ("
-				+ this.expression.getScore(keywords).toString() + ") ";
+		return this.expression.toString() + ": " + this.expression.getReturnType() + "   【Score : "
+				+ this.expression.getScore(keywords).toString() + "】";
 	}
 
 	@Override

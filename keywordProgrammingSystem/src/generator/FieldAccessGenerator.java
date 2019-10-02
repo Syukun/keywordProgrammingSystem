@@ -28,10 +28,16 @@ public class FieldAccessGenerator extends ExpressionGenerator {
 		// TODO modify this later
 //		Field[] fields = { new Field("length", "int", "String"), 
 //				new Field("number", "int", "int")};
+		Set<String> typesIncludingSuperType = parent.getAllTypesIncludeSuper(type);
 		Set<Field> fields = parent.dataFromExtraction.getFieldsFromReceiveType(type);
 		Vector<Expression> res = new Vector<Expression>();
 		// expressions in depth of exact d minus one
-		Vector<Expression> exactM1Exps = parent.getExactExpressions(depth - 1, type, keywords);
+		Vector<Expression> exactM1Exps = new Vector<Expression>();
+		//inheritance
+		for(String typeIncludingSuperType : typesIncludingSuperType) {
+			exactM1Exps.addAll(parent.getExactExpressions(depth-1, typeIncludingSuperType, keywords));
+		}
+//		Vector<Expression> exactM1Exps = parent.getExactExpressions(depth - 1, type, keywords);
 		for (Expression exactM1Exp : exactM1Exps) {
 			
 			for (Field f : fields) {

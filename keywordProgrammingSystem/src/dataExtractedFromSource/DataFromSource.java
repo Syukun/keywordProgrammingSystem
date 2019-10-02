@@ -299,6 +299,9 @@ public class DataFromSource {
 		this.setTypeDictionary("long");
 		this.setTypeDictionary("boolean");
 		this.setTypeDictionary("void");
+		
+		// TODO Deal with "Object"
+		this.setTypeDictionary("Object");
 	}
 
 	/**
@@ -406,4 +409,19 @@ public class DataFromSource {
 	public Set<MethodName> getMethodFromReturnType(String type){
 		return this.methodsRet.containsKey(type)? this.methodsRet.get(type) : new HashSet<MethodName>();
 	}
+	
+	public Map<String, Type> getTypeDictionary(){
+		return this.typeDictionary;
+	}
+
+	public Set<String> getAllTypesIncludeSuper(String type) {
+		try {
+		return this.typeDictionary.get(type).getAllTypesIncludeSuper();
+		}catch(NullPointerException e) {
+			System.out.print(type);
+		}
+		return null;
+	}
+	
+	
 }

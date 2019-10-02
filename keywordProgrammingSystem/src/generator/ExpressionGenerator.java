@@ -84,4 +84,8 @@ public class ExpressionGenerator extends AbstractGenerator {
 	public boolean isBitOn(int x, int i) {
 		return (x & (1 << i)) != 0;
 	}
+	public Set<String> getAllTypesIncludeSuper(String type) {
+		
+		return this.dataFromExtraction.getAllTypesIncludeSuper(type);
+	}
 }

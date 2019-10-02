@@ -60,6 +60,21 @@ public class Type {
 		this.qualifiedName = primitiveType;
 		this.simpleName = primitiveType;
 		
+		this.setSubTypes();
+		this.setSuperTypes();
+		
+	}
+	/**
+	 * set super types to be null when it is a primitive type
+	 */
+	private void setSuperTypes() {
+		this.superTypes = new HashSet<String>();	
+	}
+	/**
+	 * set sub types to be null when it is a primitive type
+	 */
+	private void setSubTypes() {
+		this.subTypes = new HashSet<String>();
 	}
 
 	public Type(IType iType, DataFromSource dfs) throws JavaModelException {
@@ -143,4 +158,25 @@ public class Type {
 		}
 		
 	}
+	
+	public Set<String> getSuperTypes(){
+		return this.superTypes;
+	}
+	
+	public Set<String> getSubTypes(){
+		return this.subTypes;
+	}
+	
+	/**
+	 * TODO test whether superTypes contains this type
+	 * @return
+	 */
+	public Set<String> getAllTypesIncludeSuper(){
+		Set<String> res = new HashSet<String>();
+		res.addAll(superTypes);
+		res.add(simpleName);
+		return res;
+		
+	}
+	
 }
