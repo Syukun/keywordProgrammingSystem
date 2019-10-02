@@ -1,6 +1,9 @@
 package plugin.completionProposalComputer;
 
+import java.math.BigDecimal;
+
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
+import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -10,7 +13,7 @@ import org.eclipse.swt.graphics.Point;
 
 import astNode.Expression;
 
-public class MyCompletionProposal implements ICompletionProposal {
+public class MyCompletionProposal implements IJavaCompletionProposal {
 
 	private Expression expression;
 	private ContentAssistInvocationContext context;
@@ -88,6 +91,12 @@ public class MyCompletionProposal implements ICompletionProposal {
 	public void setKeywords(String keywords) {
 		this.keywords = keywords;
 
+	}
+
+	@Override
+	public int getRelevance() {
+		// TODO Use other way to do it without changing it to int
+		return this.expression.getScore(keywords).multiply(BigDecimal.valueOf(100000)).intValueExact();
 	}
 
 }
