@@ -88,4 +88,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 		
 		return this.dataFromExtraction.getAllTypesIncludeSuper(type);
 	}
+	public Set<String> getAllTypesIncludeSub(String type) {
+		return this.dataFromExtraction.getAllTypesIncludeSub(type);
+	}
 }

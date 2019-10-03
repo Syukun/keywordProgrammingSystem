@@ -111,7 +111,7 @@ public class Type {
 			String fieldType = this.sign2Type(iFieldTypeSig);
 			Field field = new Field(fieldName, fieldType,simpleName);
 			this.dfs.addFieldRec(simpleName, field);
-//			this.dfs.addFieldRet(fieldType, field);
+			this.dfs.addFieldRet(fieldType, field);
 		}
 	}
 
@@ -177,6 +177,12 @@ public class Type {
 		res.add(simpleName);
 		return res;
 		
+	}
+	public Set<String> getAllTypesIncludeSub() {
+		Set<String> res = new HashSet<String>();
+		res.addAll(subTypes);
+		res.add(simpleName);
+		return res;
 	}
 	
 }
