@@ -56,7 +56,7 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 				elementTypes = parent.getAllTypesIncludeSub(receiveType);
 			} else {
 				String paraType = mthName.getParameterTypeOf(arity - 1);
-				elementTypes = parent.getAllTypesIncludeSuper(paraType);
+				elementTypes = parent.getAllTypesIncludeSub(paraType);
 			}
 			Vector<Expression> candidate;
 			for (String elementType : elementTypes) {
