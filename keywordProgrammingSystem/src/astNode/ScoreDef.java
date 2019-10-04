@@ -103,7 +103,9 @@ public class ScoreDef {
 		 */
 		name = name.toLowerCase();
 
-		return name.split("[^\\w]");
+		//TODO eliminate duplicate word
+		return Arrays.stream(name.split("[^\\w]")).distinct().toArray(String[]::new);
+//		return name.split("[^\\w]");
 	}
 
 	private static String splitUpCase(String word) {
