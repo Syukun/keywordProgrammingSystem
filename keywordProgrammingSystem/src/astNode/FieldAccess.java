@@ -1,6 +1,7 @@
 package astNode;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +37,7 @@ public class FieldAccess extends Expression {
 		BigDecimal score = ScoreDef.DEFSCORE;
 		score = score.add(this.expression.getScore(keywords));
 		score = score.add(this.field.getScore(keywords));
+//		score = score.add(this.expression.getScore(keywords)).add(this.field.getScore(keywords));
 		return score;
 	}
 

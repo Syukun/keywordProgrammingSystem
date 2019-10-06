@@ -33,7 +33,7 @@ public class Field {
 	}
 	
 	public BigDecimal getScore(List<String> keywords) {
-		BigDecimal score = ScoreDef.DEFSCORE;
+		BigDecimal score = ScoreDef.ZERO;
 		score = ScoreDef.checkInKeyword(score, this.toString(), keywords);
 		return score;
 	}
