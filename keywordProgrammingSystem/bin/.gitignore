@@ -1,21 +1,8 @@
-<<<<<<< HEAD
-=======
+/.DS_Store
 /basic/
->>>>>>> refs/remotes/origin/master
 /dataBase/
-<<<<<<< HEAD
-/basic/
-/generator/
-=======
-<<<<<<< HEAD
-/plugin/
-/generator/
-=======
+/dataExtractedFromSource/
 /generator/
 /keywordprogrammingsystem/
 /parsingTest/
 /plugin/
->>>>>>> refs/remotes/origin/master
-/dataExtractedFromSource/
->>>>>>> refs/heads/getElement(final_type_is_String)
-/.DS_Store
