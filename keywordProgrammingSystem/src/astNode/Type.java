@@ -27,8 +27,11 @@ public class Type {
 
 	Set<String> subTypes;
 	Set<String> superTypes;
-	
-	boolean isThisType=false;
+
+	// decide whether current type is "this" type
+	boolean isThisType = false;
+	// decide whether current type is a brother or son of "this" type
+	boolean isBrotherType = false;
 
 //	/**
 //	 * change this to Set < LocalVariable >
@@ -111,28 +114,49 @@ public class Type {
 		IField[] iFields = this.iType.getFields();
 
 		for (IField iField : iFields) {
+			int modifierNum = iField.getFlags();
+			/**
+			 * modifier=1 : public
+			 */
+			if (modifierNum == 1) {
+				setFieldRecAndRet(iField);
+			}
+			
 			if (isThisType()) {
 
-			} else {
-				int modifierNum = iField.getFlags();
-				if(modifierNum == 1) {
-				String fieldName = iField.getElementName();
-				String iFieldTypeSig = iField.getTypeSignature();
-				String fieldType = this.sign2Type(iFieldTypeSig);
-				Field field = new Field(fieldName, fieldType, simpleName);
-				this.dfs.addFieldRec(simpleName, field);
-				this.dfs.addFieldRet(fieldType, field);
+			} else if (isBrotherType()) {
+				if (modifierNum == 2) {
+					
 				}
+			} else {
+				
 			}
 		}
+	}
+
+	public void setFieldRecAndRet(IField iField) throws JavaModelException {
+		String fieldName = iField.getElementName();
+		String iFieldTypeSig = iField.getTypeSignature();
+		String fieldType = this.sign2Type(iFieldTypeSig);
+		Field field = new Field(fieldName, fieldType, simpleName);
+		this.dfs.addFieldRec(simpleName, field);
+		this.dfs.addFieldRet(fieldType, field);
 	}
 
 	private boolean isThisType() {
 		return this.isThisType;
 	}
-	
+
+	private boolean isBrotherType() {
+		return this.isBrotherType;
+	}
+
+	public void setBrotherType() {
+
+	}
+
 	public void setThisType() {
-		this.isThisType=true;
+		this.isThisType = true;
 	}
 
 	private void setMethod() throws JavaModelException {
