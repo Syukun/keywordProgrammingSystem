@@ -6,14 +6,18 @@ import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.BoldStylerProvider;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension7;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
 import astNode.Expression;
 
-public class MyCompletionProposal implements IJavaCompletionProposal {
+public class MyCompletionProposal implements IJavaCompletionProposal, ICompletionProposalExtension7 {
 
 	private Expression expression;
 	private ContentAssistInvocationContext context;
@@ -72,8 +76,8 @@ public class MyCompletionProposal implements IJavaCompletionProposal {
 
 	@Override
 	public String getDisplayString() {
-		return this.expression.toString() + ": " + this.expression.getReturnType() + "   【Score : "
-				+ this.expression.getScore(keywords).toString() + "】";
+		return this.expression.toString();
+
 	}
 
 	@Override
@@ -97,6 +101,27 @@ public class MyCompletionProposal implements IJavaCompletionProposal {
 	public int getRelevance() {
 		// TODO Use other way to do it without changing it to int
 		return this.expression.getScore(keywords).multiply(BigDecimal.valueOf(100000)).intValueExact();
+	}
+
+	/**
+	 * change the color and font of proposal
+	 * COUNTER_STYLER : Tian Qing Se
+	 * DECORATIONS_STYLER : Shi Huang se
+	 */
+	@Override
+	public StyledString getStyledDisplayString(IDocument document, int offset, BoldStylerProvider boldStylerProvider) {
+		StyledString styledDisplayString = new StyledString();
+		String expressionName = this.expression.toString();
+		String expressionType = this.expression.getReturnType();
+		String expressionScore = this.expression.getScore(keywords).toString();
+		styledDisplayString.append(expressionName, StyledString.COUNTER_STYLER);
+		styledDisplayString.append(": ");
+		styledDisplayString.append(expressionType, StyledString.DECORATIONS_STYLER);
+		styledDisplayString.append("   ");
+		styledDisplayString.append("Score : ", StyledString.COUNTER_STYLER);
+		styledDisplayString.append(expressionScore, StyledString.DECORATIONS_STYLER);
+
+		return styledDisplayString;
 	}
 
 }
