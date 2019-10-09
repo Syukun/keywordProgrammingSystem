@@ -129,12 +129,27 @@ public class DataFromSource {
 	 */
 	private Map<String, Set<MethodName>> methodsRet;
 
+	/**
+	 * Qualified name of this IType
+	 */
+	private String thisTypeName;
+	
+	/**
+	 * Package Name of this Type
+	 */
+	private String thisPackageName;
+	
+	/**
+	 * 
+	 * @param context
+	 * @param monitor
+	 * @throws JavaModelException
+	 */
 	public DataFromSource(ContentAssistInvocationContext context, IProgressMonitor monitor) throws JavaModelException {
 		this.context = context;
 		this.monitor = monitor;
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 		this.initTypeSystem();
-		this.setLocalVariables();
 
 	}
 
@@ -160,6 +175,7 @@ public class DataFromSource {
 		IPackageFragment iPackageFragment = (IPackageFragment) thisICU.getParent();
 		ICompilationUnit[] iCompilationUnits = iPackageFragment.getCompilationUnits();
 
+		this.setLocalVariables();
 		for (ICompilationUnit iCompilationUnit : iCompilationUnits) {
 			IType[] iTypes = iCompilationUnit.getAllTypes();
 			for (IType iType : iTypes) {
@@ -323,6 +339,9 @@ public class DataFromSource {
 
 		// Step-2 : Use ASTVisitor
 		String thisType = mv.getNameOfThis();
+		this.setThisTypeName(thisType);
+		String thisPackage = mv.getNameOfThisPackage();
+		this.setThisPackageName(thisPackage);
 		Map<String, String> localVariables = mv.getLocalVariables();
 
 		for (String localVarName : localVariables.keySet()) {
@@ -340,6 +359,11 @@ public class DataFromSource {
 //		this.localVariablesRec.get(thisType).add(lv);
 //
 //	}
+
+	private void setThisPackageName(String thisPackage) {
+		this.thisPackageName = thisPackage;
+		
+	}
 
 	private void addLocalVariableRet(String type, LocalVariable lv) {
 		if (!this.localVariablesRet.containsKey(type)) {
@@ -434,6 +458,19 @@ public class DataFromSource {
 			System.out.print("getAllTypesIncludeSub Errot in " + type);
 			return null;
 		}
+	}
+	
+	private void setThisTypeName(String name) {
+		this.thisTypeName = name;
+	}
+
+	public String getThisTypeName() {
+		return thisTypeName;
+	}
+
+	public String getThisPackageName() {
+		// TODO Auto-generated method stub
+		return this.thisPackageName;
 	}
 
 }

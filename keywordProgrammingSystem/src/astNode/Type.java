@@ -92,6 +92,12 @@ public class Type {
 		this.monitor = dfs.getMonitor();
 //		this.localVariables = new HashSet<String>();
 
+		this.setIsThisType(simpleName.equals(dfs.getThisTypeName()));
+
+		String packageName = iType.getPackageFragment().getElementName();
+		String thisPackageName = dfs.getThisPackageName();
+		boolean isBrother = packageName.equals(thisPackageName);
+		this.setBrotherType(isBrother);
 		this.setField();
 		this.setMethod();
 
@@ -103,6 +109,15 @@ public class Type {
 //	public void addLocalVariable(String localVariable) {
 //		this.localVariables.add(localVariable);
 //	}
+
+	private void setBrotherType(boolean equals) {
+		this.isBrotherType = equals;
+
+	}
+
+	private void setIsThisType(boolean equals) {
+		this.isThisType = equals;
+	}
 
 	/**
 	 * set fields of an IType instance
@@ -116,20 +131,29 @@ public class Type {
 		for (IField iField : iFields) {
 			int modifierNum = iField.getFlags();
 			/**
-			 * modifier=1 : public
+			 * modifier=1 : public can be used in every case
+			 * 
+			 * modifier=2 : private can be used in this class only
+			 * 
+			 * modifier=0 : default can be used in a same package
+			 * 
+			 * modifier=4 : protected TODO later
+			 * 
 			 */
-			if (modifierNum == 1) {
-				setFieldRecAndRet(iField);
-			}
-			
+
 			if (isThisType()) {
+				setFieldRecAndRet(iField);
 
 			} else if (isBrotherType()) {
-				if (modifierNum == 2) {
-					
+
+				if (modifierNum != 2) {
+					setFieldRecAndRet(iField);
 				}
+
 			} else {
-				
+				if (modifierNum == 1) {
+					setFieldRecAndRet(iField);
+				}
 			}
 		}
 	}
@@ -151,31 +175,53 @@ public class Type {
 		return this.isBrotherType;
 	}
 
-	public void setBrotherType() {
-
-	}
-
-	public void setThisType() {
-		this.isThisType = true;
-	}
-
 	private void setMethod() throws JavaModelException {
 //		this.methods_rec = new HashSet<Method>();
 		IMethod[] iMethods = this.iType.getMethods();
 		for (IMethod iMethod : iMethods) {
-			String methodName = iMethod.getElementName();
+			int modifierNum = iMethod.getFlags();
+			
+			/**
+			 * modifier=1 : public can be used in every case
+			 * 
+			 * modifier=2 : private can be used in this class only
+			 * 
+			 * modifier=0 : default can be used in a same package
+			 * 
+			 * modifier=4 : protected TODO later
+			 * 
+			 */
 
-			String returnTypeSig = iMethod.getReturnType();
-			String returnType = this.sign2Type(returnTypeSig);
+			if (isThisType()) {
+				setMethodRet(iMethod);
 
-			String[] parameterTypesSig = iMethod.getParameterTypes();
-			String[] parameterTypes = Arrays.stream(parameterTypesSig).map(x -> this.sign2Type(x))
-					.toArray(String[]::new);
+			} else if (isBrotherType()) {
 
-			MethodName method = new MethodName(methodName, returnType, simpleName, parameterTypes);
-//			this.dfs.addMethodRec(simpleName, method);
-			this.dfs.addMethodRet(returnType, method);
+				if (modifierNum != 2) {
+					setMethodRet(iMethod);
+				}
+
+			} else {
+				if (modifierNum == 1) {
+					setMethodRet(iMethod);
+				}
+			}
 		}
+	}
+
+	private void setMethodRet(IMethod iMethod) throws JavaModelException {
+		String methodName = iMethod.getElementName();
+
+		String returnTypeSig = iMethod.getReturnType();
+		String returnType = this.sign2Type(returnTypeSig);
+
+		String[] parameterTypesSig = iMethod.getParameterTypes();
+		String[] parameterTypes = Arrays.stream(parameterTypesSig).map(x -> this.sign2Type(x))
+				.toArray(String[]::new);
+
+		MethodName method = new MethodName(methodName, returnType, simpleName, parameterTypes);
+//			this.dfs.addMethodRec(simpleName, method);
+		this.dfs.addMethodRet(returnType, method);
 	}
 
 	private String sign2Type(String signature) {

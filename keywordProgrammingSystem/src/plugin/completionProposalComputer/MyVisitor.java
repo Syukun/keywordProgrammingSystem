@@ -24,6 +24,8 @@ public class MyVisitor extends ASTVisitor {
 	private final String CATCHCLAUSE = "org.eclipse.jdt.core.dom.CatchClause";
 	private final String MD = "org.eclipse.jdt.core.dom.MethodDeclaration";
 	private final String CD = "org.eclipse.jdt.core.dom.ConstructorDeclaration";
+	
+	private String packageName;
 
 	public MyVisitor(int cursorPos) {
 		this.cursorPos = cursorPos;
@@ -238,7 +240,6 @@ public class MyVisitor extends ASTVisitor {
 		int startPos = node.getStartPosition();
 		int nodeLength = node.getLength();
 		if ((startPos < cursorPos) && (cursorPos < startPos + nodeLength)) {
-
 			nameOfThis = node.getName().toString();
 		}
 		return true;
@@ -262,6 +263,16 @@ public class MyVisitor extends ASTVisitor {
 		}
 
 		return localVariables;
+	}
+	
+	public boolean visit(PackageDeclaration node) {
+		this.packageName = node.getName().toString();
+		return true;
+	}
+
+	public String getNameOfThisPackage() {
+		
+		return this.packageName;
 	}
 
 }
