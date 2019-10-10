@@ -114,12 +114,13 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 		String expressionName = this.expression.toString();
 		String expressionType = this.expression.getReturnType();
 		String expressionScore = this.expression.getScore(keywords).toString();
-		styledDisplayString.append(expressionName, StyledString.COUNTER_STYLER);
+		styledDisplayString.append(" ");
+		styledDisplayString.append(expressionName);
 		styledDisplayString.append(": ");
 		styledDisplayString.append(expressionType, StyledString.DECORATIONS_STYLER);
 		styledDisplayString.append("   ");
 		styledDisplayString.append("Score : ", StyledString.COUNTER_STYLER);
-		styledDisplayString.append(expressionScore, StyledString.DECORATIONS_STYLER);
+		styledDisplayString.append(expressionScore, StyledString.QUALIFIER_STYLER);
 
 		return styledDisplayString;
 	}
