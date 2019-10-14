@@ -133,12 +133,12 @@ public class DataFromSource {
 	 * Qualified name of this IType
 	 */
 	private String thisTypeName;
-	
+
 	/**
 	 * Package Name of this Type
 	 */
 	private String thisPackageName;
-	
+
 	/**
 	 * 
 	 * @param context
@@ -174,8 +174,11 @@ public class DataFromSource {
 		 */
 		IPackageFragment iPackageFragment = (IPackageFragment) thisICU.getParent();
 		ICompilationUnit[] iCompilationUnits = iPackageFragment.getCompilationUnits();
+		// TODO try later set default types
+		this.setDefaultTypes();
 
 		this.setLocalVariables();
+
 		for (ICompilationUnit iCompilationUnit : iCompilationUnits) {
 			IType[] iTypes = iCompilationUnit.getAllTypes();
 			for (IType iType : iTypes) {
@@ -213,9 +216,6 @@ public class DataFromSource {
 			// get subTypes of Import Declaration
 			this.setAllSubITypesFromImDe(importDeclarationType);
 		}
-
-		// TODO try later set default types
-		this.setDefaultTypes();
 	}
 //
 //	private void setTypeSystem(IType iType) {
@@ -316,6 +316,9 @@ public class DataFromSource {
 		this.setTypeDictionary("boolean");
 		this.setTypeDictionary("char");
 		this.setTypeDictionary("void");
+		
+		//TODO Delete this later
+		this.setTypeDictionary("int[]");
 
 		// TODO Deal with "Object"
 		this.setTypeDictionary("Object");
@@ -362,7 +365,7 @@ public class DataFromSource {
 
 	private void setThisPackageName(String thisPackage) {
 		this.thisPackageName = thisPackage;
-		
+
 	}
 
 	private void addLocalVariableRet(String type, LocalVariable lv) {
@@ -429,8 +432,8 @@ public class DataFromSource {
 	public Set<Field> getFieldsFromReceiveType(String type) {
 		return this.fieldsRec.containsKey(type) ? this.fieldsRec.get(type) : new HashSet<Field>();
 	}
-	
-	public Set<Field> getFieldsFromReturnType(String type){
+
+	public Set<Field> getFieldsFromReturnType(String type) {
 		return this.fieldsRet.containsKey(type) ? this.fieldsRet.get(type) : new HashSet<Field>();
 	}
 
@@ -459,7 +462,7 @@ public class DataFromSource {
 			return null;
 		}
 	}
-	
+
 	private void setThisTypeName(String name) {
 		this.thisTypeName = name;
 	}
