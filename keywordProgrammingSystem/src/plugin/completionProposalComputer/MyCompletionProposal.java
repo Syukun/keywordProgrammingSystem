@@ -100,7 +100,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 	@Override
 	public int getRelevance() {
 		// TODO Use other way to do it without changing it to int
-		return this.expression.getScore(keywords).multiply(BigDecimal.valueOf(100000)).intValueExact();
+		return this.expression.getScore(keywords).multiply(BigDecimal.valueOf(100000000)).intValueExact();
 	}
 
 	/**
