@@ -1,5 +1,6 @@
 package dataExtractedFromSource;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -7,11 +8,14 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -150,8 +154,122 @@ public class DataFromSource {
 		this.context = context;
 		this.monitor = monitor;
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
+
+		Set<Type4Data> rawTypeInformation = this.setDataRaw();
+		
+
 		this.initTypeSystem();
 
+	}
+
+	private Set<Type4Data> setDataRaw() {
+		Set<Type4Data> res = new HashSet<Type4Data>();
+
+		Set<Type4Data> typesFromSamePackage = getTypesFromSamePackage();
+//		Set<Type4Data> typesFromImportPackages = getTypesFromImportPackages();
+//		Set<Type4Data> defaultTypes = getDefaultTypes();
+		res.addAll(typesFromSamePackage);
+		return res;
+	}
+
+	private Set<Type4Data> getTypesFromSamePackage() {
+		Set<Type4Data> res = new HashSet<Type4Data>();
+		// get package declaration information
+		IPackageFragment iPackageFragment = (IPackageFragment) thisICU.getParent();
+		try {
+			ICompilationUnit[] iCompilationUnits = iPackageFragment.getCompilationUnits();
+			for (ICompilationUnit iCompilationUnit : iCompilationUnits) {
+				IType[] iTypes = iCompilationUnit.getAllTypes();
+				for (IType iType : iTypes) {
+					Type4Data type4Data = setType4Data(iType);
+					res.add(type4Data);
+				}
+			}
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	private Type4Data setType4Data(IType iType) {
+		String qualifiedName = iType.getFullyQualifiedName();
+		Type4Data res = new Type4Data(qualifiedName);
+
+		String simpleName = iType.getElementName();
+		res.setSimplifiedName(simpleName);
+
+		try {
+			// setField
+			IField[] iFields = iType.getFields();
+			for (IField iField : iFields) {
+				int modifier = iField.getFlags();
+				String fieldName = iField.getElementName();
+				String fieldQualifiedTypeName = getFieldQualifiedTypeName(iField);
+				Field4Data field4Data = new Field4Data(modifier, fieldQualifiedTypeName, fieldName);
+				res.setFields(field4Data);
+
+			}
+			// set Method
+			IMethod[] iMethods = iType.getMethods();
+			for (IMethod iMethod : iMethods) {
+				int modifier = iMethod.getFlags();
+				String methodName = iMethod.getElementName();
+				String returnTypeQualifiedName = getMethodReturnTypeQualifiedName(iMethod);
+				String[] parameterTypeQualifiedNames = getParameterTypeQualifiedNames(iMethod);
+				Method4Data method4Data = new Method4Data(modifier, methodName, returnTypeQualifiedName,
+						parameterTypeQualifiedNames);
+				res.setMethods(method4Data);
+			}
+
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+
+		return res;
+	}
+
+	private String[] getParameterTypeQualifiedNames(IMethod iMethod) {
+		String[] parameterTypesSig = iMethod.getParameterTypes();
+		String[] res = Arrays.stream(parameterTypesSig).map(x -> this.sign2QualifiedType(x)).toArray(String[]::new);
+		return res;
+	}
+
+	private String getMethodReturnTypeQualifiedName(IMethod iMethod) {
+		String res = "";
+		String returnTypeSig;
+		try {
+			returnTypeSig = iMethod.getReturnType();
+			res += sign2QualifiedType(returnTypeSig);
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return res;
+	}
+
+	private String getFieldQualifiedTypeName(IField iField) {
+		String res = "";
+		try {
+			String iFieldTypeSig = iField.getTypeSignature();
+			res += sign2QualifiedType(iFieldTypeSig);
+
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+
+		return res;
+	}
+
+	private String sign2QualifiedType(String signature) {
+		// TODO need to be testified
+		String qualifier = Signature.getSignatureQualifier(signature);
+		String simpleName = Signature.getSignatureSimpleName(signature);
+		if (qualifier.equals("")) {
+			return simpleName;
+		} else {
+			return qualifier + "." + simpleName;
+		}
 	}
 
 	/**
@@ -317,8 +435,8 @@ public class DataFromSource {
 		this.setTypeDictionary("boolean");
 		this.setTypeDictionary("char");
 		this.setTypeDictionary("void");
-		
-		//TODO Delete this later
+
+		// TODO Delete this later
 		this.setTypeDictionary("int[]");
 
 		// TODO Deal with "Object"
