@@ -19,6 +19,25 @@ import dataExtractedFromSource.DataFromSource;
  * @date 2019/07/28
  */
 public class Type {
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//	-==============================================================================================-
+	
 	String simpleName;
 	String qualifiedName;
 

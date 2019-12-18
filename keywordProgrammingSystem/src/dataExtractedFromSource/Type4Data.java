@@ -8,8 +8,8 @@ public class Type4Data {
 	private String simplifiedName;
 	String qualifiedName;
 	
-	public String[] superTypes;
-	public String[] subTypes;
+	private String[] superTypes;
+	private String[] subTypes;
 	
 	private Set<Field4Data> fields; 
 	private Set<Method4Data> methods;
@@ -39,6 +39,22 @@ public class Type4Data {
 	}
 	public void setSimplifiedName(String simplifiedName) {
 		this.simplifiedName = simplifiedName;
+	}
+
+	public String[] getSuperTypes() {
+		return superTypes;
+	}
+
+	public void setSuperTypes(String[] superTypes) {
+		this.superTypes = superTypes;
+	}
+
+	public String[] getSubTypes() {
+		return subTypes;
+	}
+
+	public void setSubTypes(String[] subTypes) {
+		this.subTypes = subTypes;
 	}
 	
 	

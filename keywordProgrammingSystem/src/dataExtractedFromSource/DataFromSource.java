@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -143,6 +144,11 @@ public class DataFromSource {
 	 * Package Name of this Type
 	 */
 	private String thisPackageName;
+	
+	/**
+	 * Raw Data Informations 
+	 */
+	private Set<Type4Data> rawTypeInformation;
 
 	/**
 	 * 
@@ -155,20 +161,95 @@ public class DataFromSource {
 		this.monitor = monitor;
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 
-		Set<Type4Data> rawTypeInformation = this.setDataRaw();
-		
+		rawTypeInformation = this.getDataRaw();
+		this.setTypeDictionary();
 
 		this.initTypeSystem();
 
 	}
 
-	private Set<Type4Data> setDataRaw() {
+	private Set<Type4Data> getDataRaw() {
 		Set<Type4Data> res = new HashSet<Type4Data>();
 
 		Set<Type4Data> typesFromSamePackage = getTypesFromSamePackage();
-//		Set<Type4Data> typesFromImportPackages = getTypesFromImportPackages();
-//		Set<Type4Data> defaultTypes = getDefaultTypes();
+		Set<Type4Data> typesFromImportPackages = getTypesFromImportPackages();
+		Set<Type4Data> defaultTypes = getDefaultTypes();
 		res.addAll(typesFromSamePackage);
+		res.addAll(typesFromImportPackages);
+		res.addAll(defaultTypes);
+
+		return res;
+	}
+
+	private Set<Type4Data> getDefaultTypes() {
+		Set<Type4Data> res = new HashSet<Type4Data>();
+		SearchEngine se = new SearchEngine();
+
+		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
+		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
+		// searchFor : right now just consider classes and interfaces
+		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
+		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+		int waitingPolicy = 0;
+		char[] packageNameLang = "java.lang".toCharArray();
+		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
+		try {
+			se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
+					waitingPolicy, monitor);
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Vector<IType> iTypeInJavaDotLang = nameMatchRequestorLang.getITypes();
+
+		for (IType iType : iTypeInJavaDotLang) {
+			Type4Data type4Data = setType4Data(iType);
+			res.add(type4Data);
+		}
+		/**
+		 * add primitive types
+		 */
+		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void" };
+		for (String primitiveType : primitiveTypes) {
+			Type4Data type4Data = new Type4Data(primitiveType);
+			type4Data.setSimplifiedName(primitiveType);
+		}
+		return res;
+	}
+
+	private Set<Type4Data> getTypesFromImportPackages() {
+		Set<Type4Data> res = new HashSet<Type4Data>();
+		try {
+			// get import declaration information
+			IImportDeclaration[] iImportDeclarations = thisICU.getImports();
+			// setting Search Engine parameters
+			SearchEngine se = new SearchEngine();
+			int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
+			int typeMatchRule = SearchPattern.R_EXACT_MATCH;
+			// searchFor : right now just consider classes and interfaces
+			int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
+			IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+			int waitingPolicy = 0;
+
+			for (IImportDeclaration iImportDeclaration : iImportDeclarations) {
+				String iImportDeclarationName = iImportDeclaration.getElementName();
+				int lastPos = iImportDeclarationName.lastIndexOf('.');
+				char[] packageName = this.getPackageName(iImportDeclarationName, lastPos);
+				char[] typeName = this.getTypeName(iImportDeclarationName, lastPos);
+
+				MyTypeNameMatchRequestor nameMatchRequestor = new MyTypeNameMatchRequestor();
+
+				se.searchAllTypeNames(packageName, packageMatchRule, typeName, typeMatchRule, searchFor, scope,
+						nameMatchRequestor, waitingPolicy, monitor);
+				IType importDeclarationType = nameMatchRequestor.getIType();
+				Type4Data type4Data = setType4Data(importDeclarationType);
+				res.add(type4Data);
+			}
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return res;
 	}
 
@@ -200,6 +281,15 @@ public class DataFromSource {
 		res.setSimplifiedName(simpleName);
 
 		try {
+			// set super and sub types
+			ITypeHierarchy ith = iType.newTypeHierarchy(monitor);
+			IType[] subITypes = ith.getAllSubtypes(iType);
+			IType[] superITypes = ith.getSupertypes(iType);
+			String[] subTypes = Arrays.stream(subITypes).map(x -> x.getFullyQualifiedName()).toArray(String[]::new);
+			String[] superTypes = Arrays.stream(superITypes).map(x -> x.getFullyQualifiedName()).toArray(String[]::new);
+			res.setSubTypes(subTypes);
+			res.setSuperTypes(superTypes);
+
 			// setField
 			IField[] iFields = iType.getFields();
 			for (IField iField : iFields) {
@@ -270,6 +360,12 @@ public class DataFromSource {
 		} else {
 			return qualifier + "." + simpleName;
 		}
+	}
+//	========================================================================================-
+	
+	public void setTypeDictionary() {
+		this.typeDictionary = new HashMap<String, Type>();
+		
 	}
 
 	/**
