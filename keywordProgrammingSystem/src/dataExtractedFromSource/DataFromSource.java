@@ -338,8 +338,8 @@ public class DataFromSource {
 		// get the cursor position
 		int cursorPos = context.getViewer().getSelectedRange().x;
 		// Use ASTVisitor to get This Type and Local Variables
-		MyVisitor mv = new MyVisitor(cursorPos);
-//		LocalVariableVisitior mv = new LocalVariableVisitior(cursorPos, cu);
+//		MyVisitor mv = new MyVisitor(cursorPos);
+		LocalVariableVisitior mv = new LocalVariableVisitior(cursorPos, cu);
 		cu.accept(mv);
 
 		// Step-2 : Use ASTVisitor
