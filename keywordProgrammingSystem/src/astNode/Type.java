@@ -19,11 +19,35 @@ import dataExtractedFromSource.DataFromSource;
  * @date 2019/07/28
  */
 public class Type {
+	private String simpleName;
+	private String qualifiedName;
+	private String[] superClass;
+	private String[] subClass;
+	
+	public Type(String simpleName, String qualifiedName, String[] superClass, String[] subClass) {
+		this.simpleName = simpleName;
+		this.qualifiedName = qualifiedName;
+		this.superClass = superClass;
+		this.subClass = subClass;
+		
+	}
 	
 	
+	public String getSimpleName() {
+		return this.simpleName;
+	}
 	
+	public String getQualifiedName() {
+		return this.qualifiedName;
+	}
 	
+	public String[] getSuperClass() {
+		return this.superClass;
+	}
 	
+	public String[] getSubClass() {
+		return this.subClass;
+	}
 	
 	
 	
@@ -38,8 +62,8 @@ public class Type {
 	
 //	-==============================================================================================-
 	
-	String simpleName;
-	String qualifiedName;
+//	String simpleName;
+//	String qualifiedName;
 
 	IType iType;
 	IProgressMonitor monitor;
@@ -297,3 +321,4 @@ public class Type {
 	}
 
 }
+

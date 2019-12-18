@@ -6,7 +6,7 @@ import java.util.Set;
 public class Type4Data {
 	
 	private String simplifiedName;
-	String qualifiedName;
+	private String qualifiedName;
 	
 	private String[] superTypes;
 	private String[] subTypes;
@@ -55,6 +55,10 @@ public class Type4Data {
 
 	public void setSubTypes(String[] subTypes) {
 		this.subTypes = subTypes;
+	}
+	
+	public String getQualifiedName() {
+		return this.qualifiedName;
 	}
 	
 	

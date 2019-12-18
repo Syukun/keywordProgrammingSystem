@@ -16,11 +16,11 @@ import astNode.Type;
  */
 public class MethodInvocationGenerator extends ExpressionGenerator {
 	ExpressionGenerator parent;
-	Map<String, Type> typeDictionary;
+//	Map<String, Type> typeDictionary;
 
 	public void setParent(ExpressionGenerator expressionGenerator) {
 		this.parent = expressionGenerator;
-		this.typeDictionary = parent.dataFromExtraction.getTypeDictionary();
+//		this.typeDictionary = parent.dataFromExtraction.getTypeDictionary();
 	}
 
 	public Vector<Expression> generateExactExpressionsSub(int depth, String type, String keywords) {

@@ -144,9 +144,9 @@ public class DataFromSource {
 	 * Package Name of this Type
 	 */
 	private String thisPackageName;
-	
+
 	/**
-	 * Raw Data Informations 
+	 * Raw Data Informations
 	 */
 	private Set<Type4Data> rawTypeInformation;
 
@@ -171,11 +171,11 @@ public class DataFromSource {
 	private Set<Type4Data> getDataRaw() {
 		Set<Type4Data> res = new HashSet<Type4Data>();
 
-		Set<Type4Data> typesFromSamePackage = getTypesFromSamePackage();
 		Set<Type4Data> typesFromImportPackages = getTypesFromImportPackages();
+		Set<Type4Data> typesFromSamePackage = getTypesFromSamePackage();
 		Set<Type4Data> defaultTypes = getDefaultTypes();
-		res.addAll(typesFromSamePackage);
 		res.addAll(typesFromImportPackages);
+		res.addAll(typesFromSamePackage);
 		res.addAll(defaultTypes);
 
 		return res;
@@ -362,12 +362,99 @@ public class DataFromSource {
 		}
 	}
 //	========================================================================================-
-	
+
 	public void setTypeDictionary() {
 		this.typeDictionary = new HashMap<String, Type>();
-		
+		for (Type4Data type4Data : this.rawTypeInformation) {
+			String simpleName = type4Data.getSimplifiedName();
+			String qualifiedName = type4Data.getQualifiedName();
+			String[] superClass = type4Data.getSuperTypes();
+			String[] subClass = type4Data.getSubTypes();
+			Type type = new Type(simpleName, qualifiedName, superClass, subClass);
+			typeDictionary.put(simpleName, type);
+		}
 	}
 
+	public Map<String, Type> getTypeDictionary() {
+		return this.typeDictionary;
+	}
+
+	/**
+	 * @since 2019/09/18
+	 * @return all possible type name
+	 */
+	public Set<String> getAllType() {
+		return this.typeDictionary.keySet();
+	}
+
+	public Set<String> getAllTypesIncludeSuper(String type) {
+
+		Set<String> res = new HashSet<String>();
+		Type t = this.typeDictionary.get(type);
+		if (t != null) {
+			String[] superClasses = t.getSuperClass();
+			res.add(type);
+			if (superClasses != null) {
+				for (String superClass : superClasses) {
+					res.add(superClass);
+				}
+			}
+		}
+		return res;
+	}
+
+	public Set<String> getAllTypesIncludeSub(String type) {
+		Set<String> res = new HashSet<String>();
+		Type t = this.typeDictionary.get(type);
+		if (t != null) {
+			String[] subClasses = t.getSubClass();
+			res.add(type);
+			if (subClasses != null) {
+				for (String subClass : subClasses) {
+					res.add(subClass);
+				}
+			}
+		}
+
+		return res;
+
+	}
+	
+	/**
+	 * extract all local variables by ASTParser
+	 * 
+	 * @throws JavaModelException
+	 */
+	private void setLocalVariables() throws JavaModelException {
+		// Step-1 : create a parser
+		ASTParser parser = ASTParser.newParser(AST.JLS11);
+		parser.setSource(thisICU);
+		CompilationUnit cu = (CompilationUnit) parser.createAST(monitor);
+		// get the cursor position
+		int cursorPos = context.getViewer().getSelectedRange().x;
+		// Use ASTVisitor to get This Type and Local Variables
+//		MyVisitor mv = new MyVisitor(cursorPos);
+		LocalVariableVisitior mv = new LocalVariableVisitior(cursorPos, cu);
+		cu.accept(mv);
+
+		// Step-2 : Use ASTVisitor
+		String thisType = mv.getNameOfThis();
+		this.setThisTypeName(thisType);
+		String thisPackage = mv.getNameOfThisPackage();
+		this.setThisPackageName(thisPackage);
+		Map<String, String> localVariables = mv.getLocalVariables();
+
+		for (String localVarName : localVariables.keySet()) {
+			String localVarType = localVariables.get(localVarName);
+			LocalVariable lv = new LocalVariable(localVarName, localVarType, thisType);
+//			this.addLocalVariableRec(thisType, lv);
+			this.addLocalVariableRet(localVarType, lv);
+		}
+	}
+	
+	
+
+//	========================================================================================-
 	/**
 	 * Initial allSimpleTypes, allITypes and typeDictionary
 	 * 
@@ -539,37 +626,6 @@ public class DataFromSource {
 		this.setTypeDictionary("Object");
 	}
 
-	/**
-	 * extract all local variables by ASTParser
-	 * 
-	 * @throws JavaModelException
-	 */
-	private void setLocalVariables() throws JavaModelException {
-		// Step-1 : create a parser
-		ASTParser parser = ASTParser.newParser(AST.JLS11);
-		parser.setSource(thisICU);
-		CompilationUnit cu = (CompilationUnit) parser.createAST(monitor);
-		// get the cursor position
-		int cursorPos = context.getViewer().getSelectedRange().x;
-		// Use ASTVisitor to get This Type and Local Variables
-//		MyVisitor mv = new MyVisitor(cursorPos);
-		LocalVariableVisitior mv = new LocalVariableVisitior(cursorPos, cu);
-		cu.accept(mv);
-
-		// Step-2 : Use ASTVisitor
-		String thisType = mv.getNameOfThis();
-		this.setThisTypeName(thisType);
-		String thisPackage = mv.getNameOfThisPackage();
-		this.setThisPackageName(thisPackage);
-		Map<String, String> localVariables = mv.getLocalVariables();
-
-		for (String localVarName : localVariables.keySet()) {
-			String localVarType = localVariables.get(localVarName);
-			LocalVariable lv = new LocalVariable(localVarName, localVarType, thisType);
-//			this.addLocalVariableRec(thisType, lv);
-			this.addLocalVariableRet(localVarType, lv);
-		}
-	}
 
 //	private void addLocalVariableRec(String thisType, LocalVariable lv) {
 //		if (!this.localVariablesRec.containsKey(thisType)) {
@@ -624,14 +680,6 @@ public class DataFromSource {
 	}
 
 	/**
-	 * @since 2019/09/18
-	 * @return all possible type name
-	 */
-	public Set<String> getAllType() {
-		return this.typeDictionary.keySet();
-	}
-
-	/**
 	 * get all local variable according to return types
 	 * 
 	 * @param retType
@@ -655,28 +703,6 @@ public class DataFromSource {
 
 	public Set<MethodName> getMethodFromReturnType(String type) {
 		return this.methodsRet.containsKey(type) ? this.methodsRet.get(type) : new HashSet<MethodName>();
-	}
-
-	public Map<String, Type> getTypeDictionary() {
-		return this.typeDictionary;
-	}
-
-	public Set<String> getAllTypesIncludeSuper(String type) {
-		try {
-			return this.typeDictionary.get(type).getAllTypesIncludeSuper();
-		} catch (NullPointerException e) {
-			System.out.print("getAllTypesIncludeSuper Errot in " + type);
-			return null;
-		}
-	}
-
-	public Set<String> getAllTypesIncludeSub(String type) {
-		try {
-			return this.typeDictionary.get(type).getAllTypesIncludeSub();
-		} catch (NullPointerException e) {
-			System.out.print("getAllTypesIncludeSub Errot in " + type);
-			return null;
-		}
 	}
 
 	private void setThisTypeName(String name) {
