@@ -26,6 +26,7 @@ import astNode.Field;
 import astNode.LocalVariable;
 import astNode.Type;
 import astNode.MethodName;
+import plugin.completionProposalComputer.LocalVariableVisitior;
 import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
 import plugin.completionProposalComputer.MyVisitor;
 
@@ -338,6 +339,7 @@ public class DataFromSource {
 		int cursorPos = context.getViewer().getSelectedRange().x;
 		// Use ASTVisitor to get This Type and Local Variables
 		MyVisitor mv = new MyVisitor(cursorPos);
+//		LocalVariableVisitior mv = new LocalVariableVisitior(cursorPos, cu);
 		cu.accept(mv);
 
 		// Step-2 : Use ASTVisitor

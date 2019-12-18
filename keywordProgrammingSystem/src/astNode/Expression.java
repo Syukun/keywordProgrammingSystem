@@ -40,7 +40,8 @@ public abstract class Expression extends Code{
 //		System.out.println(123 + this.toString());
 //		return this.getScore(ScoreDef.splitKeyword(keywords));
 
-		return this.getScore(ScoreDef.splitKeyword(keywords)).multiply(this.getProbability());
+		return this.getScore(ScoreDef.splitKeyword(keywords))
+				.multiply(this.getProbability());
 	}
 	
 	public BigDecimal getProbability() {

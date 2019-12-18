@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -26,6 +27,7 @@ import astNode.LocalVariable;
  */
 public class LocalVariableVisitior extends ASTVisitor {
 
+	private String packageName;
 	private final String BLOCK = "org.eclipse.jdt.core.dom.Block";
 
 	private final String EFS = "org.eclipse.jdt.core.dom.EnhancedForStatement";
@@ -293,6 +295,16 @@ public class LocalVariableVisitior extends ASTVisitor {
 			}
 		}
 		return res;
+	}
+	
+	public boolean visit(PackageDeclaration node) {
+		this.packageName = node.getName().toString();
+		return true;
+	}
+
+	public String getNameOfThisPackage() {
+		
+		return this.packageName;
 	}
 
 }

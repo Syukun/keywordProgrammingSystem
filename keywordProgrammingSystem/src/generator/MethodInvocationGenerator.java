@@ -76,7 +76,6 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 					}
 				}
 			}
-
 		}
 
 	}

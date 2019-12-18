@@ -1,7 +1,8 @@
 /astNode/
+/editor/
+/plugin/
 /dataExtractedFromSource/
+/.DS_Store
 /generator/
 /keywordprogrammingsystem/
-/plugin/
-/dataBase/
 /probabilityVectorFromMarkov/

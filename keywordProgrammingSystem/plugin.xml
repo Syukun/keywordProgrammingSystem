@@ -11,5 +11,62 @@
             class="plugin.completionProposalComputer.JavaCompletionProposalComputer">
       </javaCompletionProposalComputer>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="keywordProgrammingSystem.commands.category"
+            name="Source Code Category">
+      </category>
+      <command
+            categoryId="keywordProgrammingSystem.commands.category"
+            id="keywordProgrammingSystem.command"
+            name="Source Code Command">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="editor.handler.Handler"
+            commandId="keywordProgrammingSystem.command">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="keywordProgrammingSystem.command"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+6">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="keywordProgrammingSystem.menu"
+               label="Menu"
+               mnemonic="M">
+            <command
+                  commandId="keywordProgrammingSystem.command"
+                  id="keywordProgrammingSystem.command"
+                  mnemonic="S">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="keywordProgrammingSystem.toolbar">
+            <command
+                  commandId="keywordProgrammingSystem.command"
+                  icon="initialization.png"
+                  id="keywordProgrammingSystem.toolbars.command"
+                  style="push">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
 
 </plugin>

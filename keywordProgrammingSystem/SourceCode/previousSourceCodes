@@ -1,0 +1,29 @@
+package example;
+ 
+ public class ScoreTest {
+ 	// Local Variable
+ 	{
+ 		
+ 		int score;	 // should be -0.05 + 1 + 0.001 = 0.951 OK
+ 		int scoreNumber; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
+ 		int score_Number; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
+ 		int score_number; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
+ 		int score_number_score; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
+ 		int score_number_number; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
+ //		 keyword for Local Variable
+ //		score
+ 		
+ 	}
+ 	// Field Access
+ 	{
+ 		
+ 		
+ 		//Simple Field Access
+ 		/**
+ 		 * Instance of FieldInstanceOne
+ 		 */
+ 		FieldInstanceScore fieldInstanceOne = new FieldInstanceScore();
+ 		FieldInstanceScore instanceOne = new FieldInstanceScore();
+ 		
+ 		// keyword for Field Access
+ 

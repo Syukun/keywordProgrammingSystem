@@ -2,24 +2,16 @@ package plugin.completionProposalComputer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.*;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
-import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 
 import astNode.Expression;
 import dataExtractedFromSource.DataFromSource;
@@ -41,94 +33,88 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			IProgressMonitor monitor) {
 
 		List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
-		
-		/**
-		 * Extract Local Variables
-		 */
-		int cursorPos = context.getViewer().getSelectedRange().x;
-		ASTParser parser = ASTParser.newParser(AST.JLS12);
-		parser.setSource(((JavaContentAssistInvocationContext) context).getCompilationUnit());
-		CompilationUnit cu = (CompilationUnit) parser.createAST(monitor);
-		
-		LocalVariableVisitior lvv = new LocalVariableVisitior(cursorPos, cu);
-		cu.accept(lvv);
-		
-		Map<String, String> localVariables = lvv.getLocalVariables();
-		
-		for(String name: localVariables.keySet()) {
-			String type = localVariables.get(name);
-			ICompletionProposal icp = new ICompletionProposal() {
 
-				@Override
-				public void apply(IDocument document) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public Point getSelection(IDocument document) {
-					// TODO Auto-generated method stub
-					return null;
-				}
-
-				@Override
-				public String getAdditionalProposalInfo() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-
-				@Override
-				public String getDisplayString() {
-					// TODO Auto-generated method stub
-					return "Name : " + name + "  Type : " + type ;
-				}
-
-				@Override
-				public Image getImage() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-
-				@Override
-				public IContextInformation getContextInformation() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-				
-			};
-			result.add(icp);
-		}
-		
-//		try {
-//			
-//			DataFromSource dfs = new DataFromSource(context,monitor);
-//			
-//			// test whether the keyword query have any influence on ast
-//			String keywords = getKeywords(context);
-//			int depth = 3;
-//			
-//			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
-//			expressionGenerator.setDataFromSource(dfs);
-//			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth,keywords);
-//			int finalResultSize = finalChoicesExpressions.size();
-//			
-//			for(int i=0;i<finalResultSize;i++) {
-//				Expression finalChoiceExpression = finalChoicesExpressions.get(i);
-//				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression,i);
-//				mcp.setKeywords(keywords);
-//				result.add(mcp);
-//			}
+//		/**
+//		 * Extract Local Variables
+//		 */
+//		int cursorPos = context.getViewer().getSelectedRange().x;
+//		ASTParser parser = ASTParser.newParser(AST.JLS12);
+//		parser.setSource(((JavaContentAssistInvocationContext) context).getCompilationUnit());
+//		CompilationUnit cu = (CompilationUnit) parser.createAST(monitor);
 //
-//		} catch (JavaModelException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
+//		LocalVariableVisitior lvv = new LocalVariableVisitior(cursorPos, cu);
+//		cu.accept(lvv);
+//
+//		Map<String, String> localVariables = lvv.getLocalVariables();
+//
+//		for (String name : localVariables.keySet()) {
+//			String type = localVariables.get(name);
+//			ICompletionProposal icp = new ICompletionProposal() {
+//
+//				@Override
+//				public void apply(IDocument document) {
+//					// TODO Auto-generated method stub
+//
+//				}
+//
+//				@Override
+//				public Point getSelection(IDocument document) {
+//					// TODO Auto-generated method stub
+//					return null;
+//				}
+//
+//				@Override
+//				public String getAdditionalProposalInfo() {
+//					// TODO Auto-generated method stub
+//					return null;
+//				}
+//
+//				@Override
+//				public String getDisplayString() {
+//					// TODO Auto-generated method stub
+//					return "Name : " + name + "  Type : " + type;
+//				}
+//
+//				@Override
+//				public Image getImage() {
+//					// TODO Auto-generated method stub
+//					return null;
+//				}
+//
+//				@Override
+//				public IContextInformation getContextInformation() {
+//					// TODO Auto-generated method stub
+//					return null;
+//				}
+//
+//			};
+//			result.add(icp);
 //		}
 
-//		// get the innerest ASTNode
-//		NodeFinder nodeFinder = new NodeFinder(cu, cursorPos, 0);
-//		ASTNode innerestNode = nodeFinder.getCoveringNode();
-//		ASTNode parsedNode = innerestNode;
-//		int startPos = cursorPos;
+		try {
+			
+			DataFromSource dfs = new DataFromSource(context,monitor);
+			
+			// test whether the keyword query have any influence on ast
+			String keywords = getKeywords(context);
+			int depth = 3;
+			
+			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
+			expressionGenerator.setDataFromSource(dfs);
+			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth,keywords);
+			int finalResultSize = finalChoicesExpressions.size();
+			
+			for(int i=0;i<finalResultSize;i++) {
+				Expression finalChoiceExpression = finalChoicesExpressions.get(i);
+				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression,i);
+				mcp.setKeywords(keywords);
+				result.add(mcp);
+			}
+
+		} catch (JavaModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return result;
 	}
 
@@ -166,7 +152,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//eliminate "//"
+		// eliminate "//"
 		res = res.replaceFirst("//", "");
 		return res;
 	}
