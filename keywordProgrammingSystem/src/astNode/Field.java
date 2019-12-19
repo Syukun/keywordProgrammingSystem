@@ -13,7 +13,6 @@ public class Field {
 	private String fieldName;
 	
 	
-	
 	public Field(String fieldName, String typeName, String className) {
 		this.fieldName = fieldName;
 		this.typeSimpleName = typeName;
@@ -37,4 +36,5 @@ public class Field {
 		score = ScoreDef.checkInKeyword(score, this.toString(), keywords);
 		return score;
 	}
+
 }

@@ -1,14 +1,61 @@
 package dataExtractedFromSource;
 
 public class Field4Data {
-	String qualifiedTypeName;
-	String fieldName;
-	int modifier;
+	private String simpleTypeName;
+	private String fieldName;
+	private int modifier;
 	
 	public Field4Data(int modifier, String simpleTypeName, String fieldName) {
-		this.modifier = modifier;
-		this.qualifiedTypeName = simpleTypeName;
+		this.setModifier(modifier);
+		this.setSimpleTypeName(simpleTypeName);
+		this.setFieldName(fieldName);
+	}
+
+
+	/**
+	 * @return the fieldName
+	 */
+	public String getFieldName() {
+		return fieldName;
+	}
+
+	/**
+	 * @param fieldName the fieldName to set
+	 */
+	public void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
 	}
+
+	/**
+	 * @return the modifier
+	 */
+	public int getModifier() {
+		return modifier;
+	}
+
+	/**
+	 * @param modifier the modifier to set
+	 */
+	public void setModifier(int modifier) {
+		this.modifier = modifier;
+	}
+
+
+	/**
+	 * @return the simpleTypeName
+	 */
+	public String getSimpleTypeName() {
+		return simpleTypeName;
+	}
+
+
+	/**
+	 * @param simpleTypeName the simpleTypeName to set
+	 */
+	public void setSimpleTypeName(String simpleTypeName) {
+		this.simpleTypeName = simpleTypeName;
+	}
+	
+	
 
 }

@@ -118,9 +118,9 @@ public class DataFromSource {
 	private ICompilationUnit thisICU;
 
 	/**
-	 * fields which receive type is the key
-	 */
-	private Map<String, Set<Field>> fieldsRec;
+//	 * fields which receive type is the key
+//	 */
+//	private Map<String, Set<Field>> fieldsRec;
 	/**
 	 * methods which receive type is the key
 	 */
@@ -160,11 +160,17 @@ public class DataFromSource {
 		this.context = context;
 		this.monitor = monitor;
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
+		
+		
+		
 
 		rawTypeInformation = this.getDataRaw();
 		this.setTypeDictionary();
+		this.setLocalVariablesWithReturnType();
+		this.setFieldsWithReturnType();
+		this.setMethodWithReturnType();
 
-		this.initTypeSystem();
+//		this.initTypeSystem();
 
 	}
 
@@ -186,7 +192,7 @@ public class DataFromSource {
 		SearchEngine se = new SearchEngine();
 
 		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
-		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
+//		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
 		// searchFor : right now just consider classes and interfaces
 		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
 		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
@@ -251,6 +257,15 @@ public class DataFromSource {
 		}
 
 		return res;
+	}
+
+	private char[] getPackageName(String iimdName, int lastDotPos) {
+		return iimdName.substring(0, lastDotPos).toCharArray();
+
+	}
+
+	private char[] getTypeName(String iimdName, int lastDotPos) {
+		return iimdName.substring(lastDotPos + 1).toCharArray();
 	}
 
 	private Set<Type4Data> getTypesFromSamePackage() {
@@ -419,13 +434,14 @@ public class DataFromSource {
 		return res;
 
 	}
-	
+
 	/**
 	 * extract all local variables by ASTParser
 	 * 
 	 * @throws JavaModelException
 	 */
-	private void setLocalVariables() throws JavaModelException {
+	private void setLocalVariablesWithReturnType() {
+		this.localVariablesRet = new HashMap<String, Set<LocalVariable>>();
 		// Step-1 : create a parser
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
 		parser.setSource(thisICU);
@@ -452,233 +468,92 @@ public class DataFromSource {
 		}
 	}
 	
-	
-
-//	========================================================================================-
-	/**
-	 * Initial allSimpleTypes, allITypes and typeDictionary
-	 * 
-	 * @throws JavaModelException
-	 * @since 2019/07/28
-	 */
-	private void initTypeSystem() throws JavaModelException {
-//		this.allSimpleTypes = new HashSet<String>();
-//		this.allITypes = new HashSet<IType>();
-		this.typeDictionary = new HashMap<String, Type>();
-		this.fieldsRec = new HashMap<String, Set<Field>>();
-//		this.methodsRec = new HashMap<String, Set<MethodName>>();
-		this.fieldsRet = new HashMap<String, Set<Field>>();
-		this.methodsRet = new HashMap<String, Set<MethodName>>();
-//		this.localVariablesRec = new HashMap<String, Set<LocalVariable>>();
-		this.localVariablesRet = new HashMap<String, Set<LocalVariable>>();
-		/**
-		 * Process with ITypes from same package
-		 */
-		IPackageFragment iPackageFragment = (IPackageFragment) thisICU.getParent();
-		ICompilationUnit[] iCompilationUnits = iPackageFragment.getCompilationUnits();
-		// TODO try later set default types
-		this.setDefaultTypes();
-
-		this.setLocalVariables();
-
-		for (ICompilationUnit iCompilationUnit : iCompilationUnits) {
-			IType[] iTypes = iCompilationUnit.getAllTypes();
-			for (IType iType : iTypes) {
-				this.setTypeDictionary(iType);
-			}
-		}
-
-		/**
-		 * Extract all ITypes from ImportDeclaration and its sub Classes
-		 */
-		IImportDeclaration[] iImportDeclarations = this.thisICU.getImports();
-
-		SearchEngine se = new SearchEngine();
-
-		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
-		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
-		// searchFor : right now just consider classes and interfaces
-		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
-		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-		int waitingPolicy = 0;
-
-		for (IImportDeclaration iImportDelcaration : iImportDeclarations) {
-			String iimdName = iImportDelcaration.getElementName();
-			int lastDotPos = iimdName.lastIndexOf('.');
-			char[] packageName = getPackageName(iimdName, lastDotPos);
-			char[] typeName = getTypeName(iimdName, lastDotPos);
-
-			MyTypeNameMatchRequestor nameMatchRequestor = new MyTypeNameMatchRequestor();
-
-			se.searchAllTypeNames(packageName, packageMatchRule, typeName, typeMatchRule, searchFor, scope,
-					nameMatchRequestor, waitingPolicy, monitor);
-
-			IType importDeclarationType = nameMatchRequestor.getIType();
-			this.setTypeDictionary(importDeclarationType);
-			// get subTypes of Import Declaration
-			this.setAllSubITypesFromImDe(importDeclarationType);
-		}
-	}
-//
-//	private void setTypeSystem(IType iType) {
-//		String typeSimpleName = iType.getElementName();
-//		this.setAllSimpleTypes(typeSimpleName);
-//		this.setAllITypes(iType);
-//		this.setTypeDictionary(typeSimpleName, iType);
-//
-//	}
-//
-//	private void setAllSimpleTypes(String typeSimpleName) {
-//		if (!this.allSimpleTypes.contains(typeSimpleName)) {
-//			this.allSimpleTypes.add(typeSimpleName);
-//		} else {
-//			System.out.println("There is two type with same name of : " + typeSimpleName);
-//		}
-//	}
-//
-//	private void setAllITypes(IType iType) {
-//		if (!this.allITypes.contains(iType)) {
-//			this.allITypes.add(iType);
-//		}
-//	}
-//
-
-	/**
-	 * set simpleName, qualifiedName, hierarchy, field, methods of a type
-	 * 
-	 * @param typeSimpleName
-	 * @param iType
-	 * @throws JavaModelException
-	 */
-	private void setTypeDictionary(IType iType) throws JavaModelException {
-		String typeSimpleName = iType.getElementName();
-		if (!this.typeDictionary.containsKey(typeSimpleName)) {
-			this.typeDictionary.put(typeSimpleName, new Type(iType, this));
-		} else {
-			System.out.println("There are more than 2 class named " + typeSimpleName);
-		}
-
-	}
-
-	private void setTypeDictionary(String primitiveType) throws JavaModelException {
-		if (!this.typeDictionary.containsKey(primitiveType)) {
-			this.typeDictionary.put(primitiveType, new Type(primitiveType));
-		} else {
-			System.out.println("There are more than 2 class named " + primitiveType);
-		}
-	}
-
-	private char[] getPackageName(String iimdName, int lastDotPos) {
-		return iimdName.substring(0, lastDotPos).toCharArray();
-
-	}
-
-	private char[] getTypeName(String iimdName, int lastDotPos) {
-		return iimdName.substring(lastDotPos + 1).toCharArray();
-	}
-
-	private void setAllSubITypesFromImDe(IType importDeclarationType) throws JavaModelException {
-		ITypeHierarchy ith = importDeclarationType.newTypeHierarchy(monitor);
-		IType[] subITypes = ith.getAllSubtypes(importDeclarationType);
-		for (IType subIType : subITypes) {
-			this.setTypeDictionary(subIType);
-		}
-
-	}
-
-	/**
-	 * Get ITypes from java.lang.*;
-	 * 
-	 * @throws JavaModelException
-	 */
-	private void setDefaultTypes() throws JavaModelException {
-//		SearchEngine se = new SearchEngine();
-//
-//		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
-//		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
-//		// searchFor : right now just consider classes and interfaces
-//		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
-//		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-//		int waitingPolicy = 0;
-//		char[] packageNameLang = "java.lang".toCharArray();
-//		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
-//		se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
-//				waitingPolicy, monitor);
-//		Vector<IType> iTypesLang = nameMatchRequestorLang.getITypes();
-//
-//		for (IType iTypeLang : iTypesLang) {
-//			this.setTypeDictionary(iTypeLang);
-//		}
-		this.setTypeDictionary("int");
-		this.setTypeDictionary("double");
-		this.setTypeDictionary("float");
-		this.setTypeDictionary("byte");
-		this.setTypeDictionary("short");
-		this.setTypeDictionary("long");
-		this.setTypeDictionary("boolean");
-		this.setTypeDictionary("char");
-		this.setTypeDictionary("void");
-
-		// TODO Delete this later
-		this.setTypeDictionary("int[]");
-
-		// TODO Deal with "Object"
-		this.setTypeDictionary("Object");
-	}
-
-
-//	private void addLocalVariableRec(String thisType, LocalVariable lv) {
-//		if (!this.localVariablesRec.containsKey(thisType)) {
-//			this.localVariablesRec.put(thisType, new HashSet<LocalVariable>());
-//		}
-//		this.localVariablesRec.get(thisType).add(lv);
-//
-//	}
-
-	private void setThisPackageName(String thisPackage) {
-		this.thisPackageName = thisPackage;
-
-	}
-
 	private void addLocalVariableRet(String type, LocalVariable lv) {
 		if (!this.localVariablesRet.containsKey(type)) {
 			this.localVariablesRet.put(type, new HashSet<LocalVariable>());
 		}
 		this.localVariablesRet.get(type).add(lv);
 	}
-
-	public IProgressMonitor getMonitor() {
-		return this.monitor;
+	
+	private void setThisTypeName(String name) {
+		this.thisTypeName = name;
 	}
 
-	public void addFieldRec(String type, Field field) {
-		if (!this.fieldsRec.containsKey(type)) {
-			this.fieldsRec.put(type, new HashSet<Field>());
+	public String getThisTypeName() {
+		return thisTypeName;
+	}
+
+	public String getThisPackageName() {
+		// TODO Auto-generated method stub
+		return this.thisPackageName;
+	}
+
+
+	/**
+	 * Set Field with Return Type
+	 */
+	private void setFieldsWithReturnType() {
+		String THIS = this.thisTypeName;
+		String THISPK = this.thisPackageName;
+		this.fieldsRet = new HashMap<String, Set<Field>>();
+		for (Type4Data type4Data : this.rawTypeInformation) {
+			Set<Field> fields = new HashSet<Field>();
+			String typeSimpleName = type4Data.getSimplifiedName();
+			String typeQualifiedName = type4Data.getQualifiedName();
+			Set<Field4Data> field4Datas = type4Data.getFields();
+			for (Field4Data field4Data : field4Datas) {
+				/**
+				 * modifier=1 : public can be used in every case
+				 * 
+				 * modifier=2 : private can be used in this class only
+				 * 
+				 * modifier=0 : default can be used in a same package
+				 * 
+				 * modifier=4 : protected TODO later
+				 * 
+				 */
+				int modifier = field4Data.getModifier();
+				if (THIS.equals(typeSimpleName)) {
+					setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, fields);
+				} else {
+					if (typeQualifiedName.contains(THISPK)) {
+						if (modifier != 2) {
+							setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, fields);
+						}
+					} else {
+						if (modifier == 1) {
+							setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, fields);
+						}
+					}
+				}
+			}
+			this.fieldsRet.put(typeSimpleName, fields);
 		}
-		this.fieldsRec.get(type).add(field);
 	}
 
-//	public void addMethodRec(String type, MethodName method) {
-//		if (!this.methodsRec.containsKey(type)) {
-//			this.methodsRec.put(type, new HashSet<MethodName>());
-//		}
-//		this.methodsRec.get(type).add(method);
-//	}
+	private void setFieldWithReturnTypeAuxi(String typeSimpleName, Field4Data field4Data, Set<Field> fields) {
+		String simpleTypeName = field4Data.getSimpleTypeName();
+		String fieldName = field4Data.getFieldName();
+		Field field = new Field(fieldName, simpleTypeName, typeSimpleName);
+		fields.add(field);
 
-	public void addFieldRet(String type, Field field) {
-		if (!this.fieldsRet.containsKey(type)) {
-			this.fieldsRet.put(type, new HashSet<Field>());
-		}
-		this.fieldsRet.get(type).add(field);
 	}
+	
+	private void setThisPackageName(String thisPackage) {
+		this.thisPackageName = thisPackage;
 
-	public void addMethodRet(String type, MethodName method) {
-		if (!this.methodsRet.containsKey(type)) {
-			this.methodsRet.put(type, new HashSet<MethodName>());
-		}
-		this.methodsRet.get(type).add(method);
 	}
+	
+	private void setMethodWithReturnType() {
+		this.methodsRet = new HashMap<String, Set<MethodName>>();
+		
+	}
+	
+	
 
+	
+	
+	
 	/**
 	 * get all local variable according to return types
 	 * 
@@ -692,30 +567,13 @@ public class DataFromSource {
 			return new HashSet<LocalVariable>();
 		}
 	}
-
-	public Set<Field> getFieldsFromReceiveType(String type) {
-		return this.fieldsRec.containsKey(type) ? this.fieldsRec.get(type) : new HashSet<Field>();
-	}
-
+	
 	public Set<Field> getFieldsFromReturnType(String type) {
 		return this.fieldsRet.containsKey(type) ? this.fieldsRet.get(type) : new HashSet<Field>();
 	}
-
+	
 	public Set<MethodName> getMethodFromReturnType(String type) {
 		return this.methodsRet.containsKey(type) ? this.methodsRet.get(type) : new HashSet<MethodName>();
-	}
-
-	private void setThisTypeName(String name) {
-		this.thisTypeName = name;
-	}
-
-	public String getThisTypeName() {
-		return thisTypeName;
-	}
-
-	public String getThisPackageName() {
-		// TODO Auto-generated method stub
-		return this.thisPackageName;
 	}
 
 }

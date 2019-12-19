@@ -15,7 +15,7 @@ public class Type4Data {
 	private Set<Method4Data> methods;
 	
 	public Type4Data(String qualifiedName) {
-		this.qualifiedName = qualifiedName;
+		this.setQualifiedName(qualifiedName);
 		this.fields = new HashSet<Field4Data>();
 		this.methods = new HashSet<Method4Data>();
 	}
@@ -61,6 +61,9 @@ public class Type4Data {
 		return this.qualifiedName;
 	}
 	
+	public void setQualifiedName(String qualifiedName) {
+		this.qualifiedName = qualifiedName;
+	}
 	
 
 }
