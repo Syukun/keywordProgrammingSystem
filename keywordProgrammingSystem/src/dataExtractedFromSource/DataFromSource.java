@@ -118,8 +118,8 @@ public class DataFromSource {
 	private ICompilationUnit thisICU;
 
 	/**
-//	 * fields which receive type is the key
-//	 */
+	 * // * fields which receive type is the key //
+	 */
 //	private Map<String, Set<Field>> fieldsRec;
 	/**
 	 * methods which receive type is the key
@@ -160,9 +160,6 @@ public class DataFromSource {
 		this.context = context;
 		this.monitor = monitor;
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
-		
-		
-		
 
 		rawTypeInformation = this.getDataRaw();
 		this.setTypeDictionary();
@@ -467,14 +464,14 @@ public class DataFromSource {
 			this.addLocalVariableRet(localVarType, lv);
 		}
 	}
-	
+
 	private void addLocalVariableRet(String type, LocalVariable lv) {
 		if (!this.localVariablesRet.containsKey(type)) {
 			this.localVariablesRet.put(type, new HashSet<LocalVariable>());
 		}
 		this.localVariablesRet.get(type).add(lv);
 	}
-	
+
 	private void setThisTypeName(String name) {
 		this.thisTypeName = name;
 	}
@@ -488,13 +485,10 @@ public class DataFromSource {
 		return this.thisPackageName;
 	}
 
-
 	/**
 	 * Set Field with Return Type
 	 */
 	private void setFieldsWithReturnType() {
-		String THIS = this.thisTypeName;
-		String THISPK = this.thisPackageName;
 		this.fieldsRet = new HashMap<String, Set<Field>>();
 		for (Type4Data type4Data : this.rawTypeInformation) {
 			Set<Field> fields = new HashSet<Field>();
@@ -513,10 +507,10 @@ public class DataFromSource {
 				 * 
 				 */
 				int modifier = field4Data.getModifier();
-				if (THIS.equals(typeSimpleName)) {
+				if (thisTypeName.equals(typeSimpleName)) {
 					setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, fields);
 				} else {
-					if (typeQualifiedName.contains(THISPK)) {
+					if (typeQualifiedName.contains(thisPackageName)) {
 						if (modifier != 2) {
 							setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, fields);
 						}
@@ -538,22 +532,48 @@ public class DataFromSource {
 		fields.add(field);
 
 	}
-	
+
 	private void setThisPackageName(String thisPackage) {
 		this.thisPackageName = thisPackage;
 
 	}
-	
+
 	private void setMethodWithReturnType() {
 		this.methodsRet = new HashMap<String, Set<MethodName>>();
-		
-	}
-	
-	
+		for (Type4Data type4Data : this.rawTypeInformation) {
+			Set<MethodName> methodNames = new HashSet<MethodName>();
+			String typeSimpleName = type4Data.getSimplifiedName();
+			String typeQualifiedName = type4Data.getQualifiedName();
+			Set<Method4Data> method4Datas = type4Data.getMethods();
+			for (Method4Data method4Data : method4Datas) {
+				int modifier = method4Data.getModifier();
+				if (thisTypeName.equals(typeSimpleName)) {
+					setMethodWithReturnTypeAuxi(typeSimpleName, method4Data, methodNames);
+				} else {
+					if (typeQualifiedName.contains(thisPackageName)) {
+						if (modifier != 2) {
+							setMethodWithReturnTypeAuxi(typeSimpleName, method4Data, methodNames);
+						}
+					} else {
+						if (modifier == 1) {
+							setMethodWithReturnTypeAuxi(typeSimpleName, method4Data, methodNames);
+						}
+					}
+				}
+			}
+		}
 
-	
-	
-	
+	}
+
+	private void setMethodWithReturnTypeAuxi(String typeSimpleName, Method4Data method4Data,
+			Set<MethodName> methodNames) {
+		String simpleReturnTypeName = method4Data.getSimpleReturnType();
+		String methodName = method4Data.getMethodName();
+		String[] parameterSimpleTypes =  method4Data.getSimpleParameterType();
+		MethodName method = new MethodName(methodName, simpleReturnTypeName, typeSimpleName, parameterSimpleTypes);
+		methodNames.add(method);
+	}
+
 	/**
 	 * get all local variable according to return types
 	 * 
@@ -567,11 +587,11 @@ public class DataFromSource {
 			return new HashSet<LocalVariable>();
 		}
 	}
-	
+
 	public Set<Field> getFieldsFromReturnType(String type) {
 		return this.fieldsRet.containsKey(type) ? this.fieldsRet.get(type) : new HashSet<Field>();
 	}
-	
+
 	public Set<MethodName> getMethodFromReturnType(String type) {
 		return this.methodsRet.containsKey(type) ? this.methodsRet.get(type) : new HashSet<MethodName>();
 	}
