@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
@@ -33,7 +34,7 @@ import astNode.Type;
 import astNode.MethodName;
 import plugin.completionProposalComputer.LocalVariableVisitior;
 import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
-import plugin.completionProposalComputer.MyVisitor;
+//import plugin.completionProposalComputer.MyVisitor;
 
 /**
  * the version when assume there is no Type with same Simple name
@@ -174,12 +175,12 @@ public class DataFromSource {
 	private Set<Type4Data> getDataRaw() {
 		Set<Type4Data> res = new HashSet<Type4Data>();
 
-		Set<Type4Data> typesFromImportPackages = getTypesFromImportPackages();
+//		Set<Type4Data> typesFromImportPackages = getTypesFromImportPackages();
 		Set<Type4Data> typesFromSamePackage = getTypesFromSamePackage();
-		Set<Type4Data> defaultTypes = getDefaultTypes();
-		res.addAll(typesFromImportPackages);
+//		Set<Type4Data> defaultTypes = getDefaultTypes();
+//		res.addAll(typesFromImportPackages);
 		res.addAll(typesFromSamePackage);
-		res.addAll(defaultTypes);
+//		res.addAll(defaultTypes);
 
 		return res;
 	}
@@ -508,30 +509,34 @@ public class DataFromSource {
 				 */
 				int modifier = field4Data.getModifier();
 				if (thisTypeName.equals(typeSimpleName)) {
-					setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, fields);
+					Field field = setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, modifier);
+					fields.add(field);
 				} else {
 					if (typeQualifiedName.contains(thisPackageName)) {
-						if (modifier != 2) {
-							setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, fields);
+						if (!Flags.isPrivate(modifier)) {
+							Field field = setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, modifier);
+							fields.add(field);
 						}
 					} else {
-						if (modifier == 1) {
-							setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, fields);
+						if (Flags.isPublic(modifier)) {
+							Field field = setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, modifier);
+							fields.add(field);
 						}
 					}
 				}
+			
 			}
 			this.fieldsRet.put(typeSimpleName, fields);
 		}
 	}
 
-	private void setFieldWithReturnTypeAuxi(String typeSimpleName, Field4Data field4Data, Set<Field> fields) {
-		String simpleTypeName = field4Data.getSimpleTypeName();
+	private Field setFieldWithReturnTypeAuxi(String typeSimpleName, Field4Data field4Data, int modifier) {
 		String fieldName = field4Data.getFieldName();
-		Field field = new Field(fieldName, simpleTypeName, typeSimpleName);
-		fields.add(field);
-
+		String simpleTypeName = field4Data.getSimpleTypeName();
+		Field field = new Field(modifier, fieldName, simpleTypeName, typeSimpleName);
+		return field;
 	}
+
 
 	private void setThisPackageName(String thisPackage) {
 		this.thisPackageName = thisPackage;

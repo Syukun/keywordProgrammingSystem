@@ -21,14 +21,16 @@ public class TypeName extends Expression {
 
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
-		// TODO Auto-generated method stub
-		return null;
+		BigDecimal score = ScoreDef.DEFSCORE;
+		score = ScoreDef.checkInKeyword_LocalVariable(score, this.toString(), keywords);
+		return score;
 	}
 
 	@Override
 	public String getReturnType() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.typeName;
 	}
+
 
 }

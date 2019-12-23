@@ -37,6 +37,14 @@ public class ExpressionGenerator extends AbstractGenerator {
 			res.addAll(localVariables);
 			
 		} else {
+			if(depth == 2) {
+				StaticFieldAccessGenerator staticFieldAccessGenerator = new StaticFieldAccessGenerator();
+				staticFieldAccessGenerator.setParent(this);
+				Vector<Expression> staticFieldAccess = staticFieldAccessGenerator.generateExactExpressionsSub(depth,
+						type, keywords);
+				res.addAll(staticFieldAccess);
+			}
+			
 			/**
 			 * FieldAccessGenerator
 			 */
@@ -44,6 +52,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 			fieldAccessGenerator.setParent(this);
 			Vector<Expression> fieldAccess = fieldAccessGenerator.generateExactExpressionsSub(depth, type, keywords);
 			res.addAll(fieldAccess);
+
 			/**
 			 * MethodInvocationGenerator
 			 */

@@ -44,6 +44,7 @@ public abstract class Expression extends Code{
 //				.multiply(this.getProbability());
 	}
 	
+	
 	public BigDecimal getProbability() {
 		BigDecimal res = null;
 		String serverName = "AochinoMacBook-Pro.local";

@@ -8,6 +8,7 @@ import java.util.List;
 * @date 2019/07/31
 */
 public class MethodName {
+	
 	private String methodName;
 	private String returnType;
 	private String receiveType;
