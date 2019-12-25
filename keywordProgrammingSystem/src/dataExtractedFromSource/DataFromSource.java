@@ -497,44 +497,34 @@ public class DataFromSource {
 			String typeQualifiedName = type4Data.getQualifiedName();
 			Set<Field4Data> field4Datas = type4Data.getFields();
 			for (Field4Data field4Data : field4Datas) {
-				/**
-				 * modifier=1 : public can be used in every case
-				 * 
-				 * modifier=2 : private can be used in this class only
-				 * 
-				 * modifier=0 : default can be used in a same package
-				 * 
-				 * modifier=4 : protected TODO later
-				 * 
-				 */
 				int modifier = field4Data.getModifier();
 				if (thisTypeName.equals(typeSimpleName)) {
-					Field field = setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, modifier);
-					fields.add(field);
+					setFieldWithReturnTypeAuxi(typeSimpleName, field4Data);
 				} else {
 					if (typeQualifiedName.contains(thisPackageName)) {
 						if (!Flags.isPrivate(modifier)) {
-							Field field = setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, modifier);
-							fields.add(field);
+							setFieldWithReturnTypeAuxi(typeSimpleName, field4Data);
 						}
 					} else {
 						if (Flags.isPublic(modifier)) {
-							Field field = setFieldWithReturnTypeAuxi(typeSimpleName, field4Data, modifier);
-							fields.add(field);
+							setFieldWithReturnTypeAuxi(typeSimpleName, field4Data);
 						}
 					}
 				}
 			
 			}
-			this.fieldsRet.put(typeSimpleName, fields);
 		}
 	}
 
-	private Field setFieldWithReturnTypeAuxi(String typeSimpleName, Field4Data field4Data, int modifier) {
+	private void setFieldWithReturnTypeAuxi(String typeSimpleName, Field4Data field4Data) {
+		int modifier = field4Data.getModifier();
 		String fieldName = field4Data.getFieldName();
 		String simpleTypeName = field4Data.getSimpleTypeName();
 		Field field = new Field(modifier, fieldName, simpleTypeName, typeSimpleName);
-		return field;
+		if(!this.fieldsRet.containsKey(simpleTypeName)) {
+			this.fieldsRet.put(simpleTypeName, new HashSet<Field>());
+		}
+		this.fieldsRet.get(simpleTypeName).add(field);
 	}
 
 
@@ -546,37 +536,41 @@ public class DataFromSource {
 	private void setMethodWithReturnType() {
 		this.methodsRet = new HashMap<String, Set<MethodName>>();
 		for (Type4Data type4Data : this.rawTypeInformation) {
-			Set<MethodName> methodNames = new HashSet<MethodName>();
 			String typeSimpleName = type4Data.getSimplifiedName();
 			String typeQualifiedName = type4Data.getQualifiedName();
 			Set<Method4Data> method4Datas = type4Data.getMethods();
 			for (Method4Data method4Data : method4Datas) {
 				int modifier = method4Data.getModifier();
 				if (thisTypeName.equals(typeSimpleName)) {
-					setMethodWithReturnTypeAuxi(typeSimpleName, method4Data, methodNames);
+					setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
+					
 				} else {
 					if (typeQualifiedName.contains(thisPackageName)) {
-						if (modifier != 2) {
-							setMethodWithReturnTypeAuxi(typeSimpleName, method4Data, methodNames);
+						if (!Flags.isPrivate(modifier)) {
+							setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
 						}
 					} else {
-						if (modifier == 1) {
-							setMethodWithReturnTypeAuxi(typeSimpleName, method4Data, methodNames);
+						if (Flags.isPublic(modifier)) {
+							setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
 						}
 					}
 				}
 			}
+			
 		}
 
 	}
 
-	private void setMethodWithReturnTypeAuxi(String typeSimpleName, Method4Data method4Data,
-			Set<MethodName> methodNames) {
+	private void setMethodWithReturnTypeAuxi(String typeSimpleName, Method4Data method4Data) {
+		int modifier = method4Data.getModifier();
 		String simpleReturnTypeName = method4Data.getSimpleReturnType();
 		String methodName = method4Data.getMethodName();
 		String[] parameterSimpleTypes =  method4Data.getSimpleParameterType();
-		MethodName method = new MethodName(methodName, simpleReturnTypeName, typeSimpleName, parameterSimpleTypes);
-		methodNames.add(method);
+		MethodName method = new MethodName(modifier, methodName, simpleReturnTypeName, typeSimpleName, parameterSimpleTypes);
+		if(!this.methodsRet.containsKey(simpleReturnTypeName)) {
+			this.methodsRet.put(simpleReturnTypeName, new HashSet<MethodName>());
+		}
+		this.methodsRet.get(simpleReturnTypeName).add(method);
 	}
 
 	/**
@@ -597,6 +591,11 @@ public class DataFromSource {
 		return this.fieldsRet.containsKey(type) ? this.fieldsRet.get(type) : new HashSet<Field>();
 	}
 
+	/**
+	 * TODO fix this
+	 * @param type
+	 * @return
+	 */
 	public Set<MethodName> getMethodFromReturnType(String type) {
 		return this.methodsRet.containsKey(type) ? this.methodsRet.get(type) : new HashSet<MethodName>();
 	}

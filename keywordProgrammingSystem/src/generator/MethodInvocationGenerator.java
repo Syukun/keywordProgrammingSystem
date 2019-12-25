@@ -32,7 +32,21 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 
 		for (MethodName mthName : methodNames) {
 			int parametersNumber = mthName.getParameterNumber();
-			int arity = parametersNumber + 1;
+			int arity = 0;
+			if(mthName.isStatic()) {
+				
+				arity = parametersNumber;
+				for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
+					Expression[] subExps = new Expression[arity];
+					generateStaticWithArityAuxi(depth, arity, exactFlags, res, subExps, mthName, keywords);
+				}
+				if(arity == 0 && depth == 2) {
+					generateStaticWithSubExps(new Expression[] {}, res, mthName);
+				}
+				
+			}
+			
+			arity = parametersNumber + 1;
 
 			// a trick to get non-duplicated method invocations with bit computation
 			for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
@@ -42,6 +56,38 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 		}
 
 		return res;
+	}
+
+	private void generateStaticWithArityAuxi(int depth, int arity, int exactFlags, Vector<Expression> result,
+			Expression[] subExps, MethodName mthName, String keywords) {
+			
+		if (arity == 0) {
+			generateStaticWithSubExps(subExps, result, mthName);
+		} else {
+//			String elementType = (arity==1)?mthName.getReceiveType():mthName.getParameterTypeOf(arity-1);
+			Set<String> elementTypes;
+			String paraType = mthName.getParameterTypeOf(arity - 1);
+			elementTypes = parent.getAllTypesIncludeSub(paraType);
+			Vector<Expression> candidate;
+			for (String elementType : elementTypes) {
+				if (isBitOn(exactFlags, arity - 1)) {
+					candidate = parent.getExactExpressions(depth - 1, elementType, keywords);
+				} else {
+					if (depth > 2) {
+						candidate = parent.getUnderExpressions(depth - 2, elementType, keywords);
+					} else {
+						candidate = new Vector<Expression>();
+					}
+				}
+				if (candidate.size() > 0) {
+					for (Expression c : candidate) {
+						subExps[arity - 1] = c;
+						generateStaticWithArityAuxi(depth, arity - 1, exactFlags, result, subExps, mthName, keywords);
+					}
+				}
+			}
+		}
+		
 	}
 
 	private void generateWithArityAuxi(int depth, int arity, int exactFlags, Vector<Expression> result,
@@ -78,6 +124,19 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 			}
 		}
 
+	}
+
+	private void generateStaticWithSubExps(Expression[] subExps, Vector<Expression> result, MethodName mthName) {
+		String receiveType = mthName.getReceiveType();
+		int paraNum = mthName.getParameterNumber();
+		Expression[] parameters = new Expression[paraNum];
+		for (int i = 0; i < paraNum; i++) {
+			parameters[i] = subExps[i + 1];
+		}
+		MethodInvocation methodInvocation = new MethodInvocation(receiveType, mthName, parameters);
+		result.add(methodInvocation);
+		
+		
 	}
 
 	private void generateWithSubExps(Expression[] subExps, Vector<Expression> result, MethodName mthName) {

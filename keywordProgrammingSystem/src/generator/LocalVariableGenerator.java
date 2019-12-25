@@ -17,6 +17,12 @@ public class LocalVariableGenerator extends ExpressionGenerator {
 		this.parent = expressionGenerator;
 	}
 	
+	/**
+	 * generate local variable expressions which return type is "type" and depth is exactly "depth"
+	 * @param depth
+	 * @param type
+	 * @return
+	 */
 	public Vector<Expression> generateExactExpressionsSub(int depth, String type){
 		Vector<Expression> res = new Vector<Expression>();
 		Set<LocalVariable> localVariables = parent.dataFromExtraction.getLocalVariablesFromRetType(type);

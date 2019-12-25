@@ -13,8 +13,16 @@ public class MethodInvocation extends Expression {
 	MethodName methodName;
 	Expression[] parameters;
 
+	String typeName = null;
+
 	public MethodInvocation(Expression receiver, MethodName methodName, Expression[] parameters) {
 		this.receiver = receiver;
+		this.methodName = methodName;
+		this.parameters = parameters;
+	}
+
+	public MethodInvocation(String typeName, MethodName methodName, Expression[] parameters) {
+		this.typeName = typeName;
 		this.methodName = methodName;
 		this.parameters = parameters;
 	}
@@ -25,8 +33,12 @@ public class MethodInvocation extends Expression {
 	public String toString() {
 		StringBuffer res = new StringBuffer();
 
-		if (receiver != null) {
-			res.append(receiver.toString() + ".");
+		if (typeName != null) {
+			res.append(typeName.toString() + ".");
+		} else {
+			if (receiver != null) {
+				res.append(receiver.toString() + ".");
+			}
 		}
 
 		res.append(methodName.toString() + "(");
@@ -44,7 +56,13 @@ public class MethodInvocation extends Expression {
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		score = score.add(this.receiver.getScore(keywords));
+		if (typeName != null) {
+			score = score.add(new TypeName(typeName).getScore(keywords));
+		} else {
+			if (receiver != null) {
+				score = score.add(this.receiver.getScore(keywords));
+			}
+		}
 		score = score.add(this.methodName.getScore(keywords));
 		for (Expression paraExpression : this.parameters) {
 			score = score.add(paraExpression.getScore(keywords));

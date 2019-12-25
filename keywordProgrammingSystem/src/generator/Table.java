@@ -37,6 +37,12 @@ public class Table {
 		return maxDepth>=depth;		
 	}
 	
+	/**
+	 * get expression which return type is "type" and depth is "depth"
+	 * @param depth
+	 * @param type
+	 * @return
+	 */
 	public Vector<Expression> getExpression(int depth, String type){
 		return table.get(type).get(depth-1);
 	}

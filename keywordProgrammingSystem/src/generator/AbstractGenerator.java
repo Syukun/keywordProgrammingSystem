@@ -14,6 +14,13 @@ public abstract class AbstractGenerator {
 	Table tableExact = new Table();
 	Table tableUnder = new Table();
 	
+	/**
+	 * return expressions which return type is "type" and depth is exactly "depth" and also sorted by keywords
+	 * @param depth
+	 * @param type
+	 * @param keywords
+	 * @return
+	 */
 	public Vector<Expression> getExactExpressions(int depth, String type,String keywords){
 		if(tableExact.isReady(depth, type)) {
 			return tableExact.getExpression(depth, type);
@@ -35,6 +42,13 @@ public abstract class AbstractGenerator {
 		}
 	}
 	
+	/**
+	 * return expressions which return type is "type" and depth is under "depth" also sorted by keywords. 
+	 * @param depth
+	 * @param type
+	 * @param keywords
+	 * @return
+	 */
 	public Vector<Expression> getUnderExpressions(int depth, String type, String keywords){
 		if(tableUnder.isReady(depth, type)) {
 			return tableUnder.getExpression(depth, type);
@@ -66,6 +80,13 @@ public abstract class AbstractGenerator {
 		}
 	}
 	
+	/**
+	 * generate expressions which return type is "type" and depth is exactly "depth" and sorted by keywords
+	 * @param depth
+	 * @param type
+	 * @param keywords
+	 * @return
+	 */
 	public abstract Vector<Expression> generateExactExpressionsMain(int depth, String type, String keywords);
 	
 }

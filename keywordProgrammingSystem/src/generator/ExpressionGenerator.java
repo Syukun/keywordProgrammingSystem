@@ -18,6 +18,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 	public void setDataFromSource(DataFromSource data) {
 		this.dataFromExtraction = data;
 	}
+
 	@Override
 	public Vector<Expression> generateExactExpressionsMain(int depth, String type, String keywords) {
 		// this is ugly, hope somebody could modify it
@@ -44,6 +45,13 @@ public class ExpressionGenerator extends AbstractGenerator {
 						type, keywords);
 				res.addAll(staticFieldAccess);
 			}
+//			/**
+//			 * Static Method Invocation Generatator
+//			 */
+//			StaticMethodInvocationGenerator staticMethodInvocationGenerator = new StaticMethodInvocationGenerator();
+//			staticMethodInvocationGenerator.setParent(this);
+//			Vector<Expression> staticMethodInvocationGenerator = staticMethodInvocationGenerator.generateExactExpressionSub(depth, type, keywords);
+//			res.addAll(staticMethodInvocationGenerator);
 			
 			/**
 			 * FieldAccessGenerator
@@ -87,7 +95,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 		for (String type : allTypes) {
 			res.addAll(getUnderExpressions(depth, type, keywords));
 		}
-		return ScoreDef.selectMaxExpressions(res, keywords, 12);
+		return ScoreDef.selectMaxExpressions(res, keywords, 20);
 	}
 
 	public boolean isBitOn(int x, int i) {
