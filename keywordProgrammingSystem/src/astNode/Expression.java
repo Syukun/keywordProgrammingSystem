@@ -17,6 +17,7 @@ import java.util.List;
 * @date 2019/05/22
 */
 public abstract class Expression extends Code{
+	
 	/**
 	 * Expression ==> String
 	 */
@@ -41,7 +42,6 @@ public abstract class Expression extends Code{
 //		return this.getScore(ScoreDef.splitKeyword(keywords));
 
 		return this.getScore(ScoreDef.splitKeyword(keywords));
-//				.multiply(this.getProbability());
 	}
 	
 	

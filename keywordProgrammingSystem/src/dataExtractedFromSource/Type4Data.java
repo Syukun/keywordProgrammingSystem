@@ -3,7 +3,7 @@ package dataExtractedFromSource;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Type4Data {
+public class Type4Data implements java.io.Serializable{
 	
 	private String simplifiedName;
 	private String qualifiedName;

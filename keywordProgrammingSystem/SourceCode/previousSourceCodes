@@ -1,70 +1,10 @@
 package example;
+ import java.lang.System;
+ import java.io.PrintStream;
+ import java.lang.String;
  
- 
- public class ScoreTest {
- 	// Local Variable
- //	{
- //		
- //		int score;	 // should be -0.05 + 1 + 0.001 = 0.951 OK
- //		int scoreNumber; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
- //		int score_Number; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
- //		int score_number; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
- //		int score_number_score; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
- //		int score_number_number; // should be -0.05 + 1 + 0.001 - 0.01 = 0.941 OK
- ////		 keyword for Local Variable
- ////		score
- //		
- //	}
- 	// Field Access
- //	{
- //		
- //		
- //		//Simple Field Access
- //		/**
- //		 * Instance of FieldInstanceOne
- //		 */
- //		FieldInstanceScore fieldInstanceOne = new FieldInstanceScore();
- //		FieldInstanceScore instanceOne = new FieldInstanceScore();
- //		
- //		
- ////		 keyword for Field Access
- ////		Field field = fieldInstanceOne.fieldOne; // should be -0.05 + 1 - 0.01*2 + 0.001 -0.05 - 0.01*2 =  0.861 OK 
- ////		Field field2 = instanceOne.fieldOne; // should be -0.05 - 0.01*2 + 0.001 -0.05 + 1 - 0.01 = 0.871 OK
- //
- //	}
- 	// Method Invocation
+ public class Test {
  	{
- 		MethodInvocationScore mis = new MethodInvocationScore();
- //		FieldInstanceScore fieldInstanceOne = new FieldInstanceScore();
- //		Field field = fieldInstanceOne.fieldOne;
- //		method public
- 		mis.methodPublic(); // should be -0.05 - 0.01 + 0.001 - 0.05 + 1 =  0.891 OK
- //		mis.methodPrivate(field); // should be -0.05 - 0.01 + 0.001 - 0.05 + 1 - 0.05 -0.01 + 0.001 = 0.832 OK
- 		mis.methodPublic(); // should be 0.891 - 0.149 =  0.742 OK
- 		
- 	}
- 	// IfElseThenExpression
- 	{
- 		
- 	}
- 	
- //	// array type
- //	{
- //		int[] intArray;
- //		int intValue;
- //		int intValueTwo;
- ////		get array
- //	}
- }
- 
- class FieldInstanceScore{
- //	Field fieldDefault;
- //	private Field fieldPrivate;
- //	public Field fieldPublic;
- //	Field fieldOne;
- 	public static Field fieldStaticPublic;
- 	
- 	public static void getField() {
- 		
- 	}
+ 		char res;
+ 		String str;
  

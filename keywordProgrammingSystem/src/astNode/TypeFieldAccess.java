@@ -31,6 +31,6 @@ public class TypeFieldAccess extends Expression{
 	@Override
 	public String getReturnType() {
 		// TODO Auto-generated method stub
-		return type;
+		return field.getReturnType();
 	}
 }

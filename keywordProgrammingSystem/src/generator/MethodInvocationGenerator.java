@@ -1,14 +1,12 @@
 package generator;
 
-import java.util.HashSet;
-import java.util.Map;
+
 import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
 import astNode.MethodInvocation;
 import astNode.MethodName;
-import astNode.Type;
 
 /**
  * @author Archer Shu
@@ -36,12 +34,15 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 			if(mthName.isStatic()) {
 				
 				arity = parametersNumber;
-				for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
-					Expression[] subExps = new Expression[arity];
-					generateStaticWithArityAuxi(depth, arity, exactFlags, res, subExps, mthName, keywords);
-				}
-				if(arity == 0 && depth == 2) {
-					generateStaticWithSubExps(new Expression[] {}, res, mthName);
+				if(arity==0) {
+					if(depth==2) {
+						generateStaticWithSubExps(new Expression[] {}, res, mthName);
+					}
+				}else {
+					for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
+						Expression[] subExps = new Expression[arity];
+						generateStaticWithArityAuxi(depth, arity, exactFlags, res, subExps, mthName, keywords);
+					}
 				}
 				
 			}
@@ -66,11 +67,11 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 		} else {
 //			String elementType = (arity==1)?mthName.getReceiveType():mthName.getParameterTypeOf(arity-1);
 			Set<String> elementTypes;
-			String paraType = mthName.getParameterTypeOf(arity - 1);
+			String paraType = mthName.getParameterTypeOf(arity);
 			elementTypes = parent.getAllTypesIncludeSub(paraType);
 			Vector<Expression> candidate;
 			for (String elementType : elementTypes) {
-				if (isBitOn(exactFlags, arity - 1)) {
+				if (isBitOn(exactFlags, arity)) {
 					candidate = parent.getExactExpressions(depth - 1, elementType, keywords);
 				} else {
 					if (depth > 2) {
@@ -128,12 +129,12 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 
 	private void generateStaticWithSubExps(Expression[] subExps, Vector<Expression> result, MethodName mthName) {
 		String receiveType = mthName.getReceiveType();
-		int paraNum = mthName.getParameterNumber();
-		Expression[] parameters = new Expression[paraNum];
-		for (int i = 0; i < paraNum; i++) {
-			parameters[i] = subExps[i + 1];
-		}
-		MethodInvocation methodInvocation = new MethodInvocation(receiveType, mthName, parameters);
+//		int paraNum = mthName.getParameterNumber();
+//		Expression[] parameters = new Expression[paraNum];
+//		for (int i = 0; i < paraNum; i++) {
+//			parameters[i] = subExps[i];
+//		}
+		MethodInvocation methodInvocation = new MethodInvocation(receiveType, mthName, subExps);
 		result.add(methodInvocation);
 		
 		

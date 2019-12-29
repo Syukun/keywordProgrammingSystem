@@ -1,6 +1,6 @@
 package dataExtractedFromSource;
 
-public class Method4Data {
+public class Method4Data implements java.io.Serializable {
 	private int modifier;
 	private String methodName;
 	private String simpleReturnType;

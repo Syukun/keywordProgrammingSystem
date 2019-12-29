@@ -167,6 +167,13 @@ public class DataFromSource {
 		this.setLocalVariablesWithReturnType();
 		this.setFieldsWithReturnType();
 		this.setMethodWithReturnType();
+		
+		int count = 0;
+		for(Set<MethodName> method : this.methodsRet.values()) {
+			count += method.size();
+		}
+		
+//		System.out.print(count);
 
 //		this.initTypeSystem();
 
@@ -175,48 +182,49 @@ public class DataFromSource {
 	private Set<Type4Data> getDataRaw() {
 		Set<Type4Data> res = new HashSet<Type4Data>();
 
-//		Set<Type4Data> typesFromImportPackages = getTypesFromImportPackages();
+		Set<Type4Data> typesFromImportPackages = getTypesFromImportPackages();
 		Set<Type4Data> typesFromSamePackage = getTypesFromSamePackage();
-//		Set<Type4Data> defaultTypes = getDefaultTypes();
-//		res.addAll(typesFromImportPackages);
+		Set<Type4Data> defaultTypes = getDefaultTypes();
+		res.addAll(typesFromImportPackages);
 		res.addAll(typesFromSamePackage);
-//		res.addAll(defaultTypes);
+		res.addAll(defaultTypes);
 
 		return res;
 	}
 
 	private Set<Type4Data> getDefaultTypes() {
 		Set<Type4Data> res = new HashSet<Type4Data>();
-		SearchEngine se = new SearchEngine();
-
-		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
-//		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
-		// searchFor : right now just consider classes and interfaces
-		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
-		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-		int waitingPolicy = 0;
-		char[] packageNameLang = "java.lang".toCharArray();
-		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
-		try {
-			se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
-					waitingPolicy, monitor);
-		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Vector<IType> iTypeInJavaDotLang = nameMatchRequestorLang.getITypes();
-
-		for (IType iType : iTypeInJavaDotLang) {
-			Type4Data type4Data = setType4Data(iType);
-			res.add(type4Data);
-		}
+//		SearchEngine se = new SearchEngine();
+//
+//		int packageMatchRule = SearchPattern.R_PREFIX_MATCH;
+////		int typeMatchRule = SearchPattern.R_EXACT_MATCH;
+//		// searchFor : right now just consider classes and interfaces
+//		int searchFor = IJavaSearchConstants.CLASS_AND_INTERFACE;
+//		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+//		int waitingPolicy = 0;
+//		char[] packageNameLang = "java.lang".toCharArray();
+//		MyTypeNameMatchRequestor nameMatchRequestorLang = new MyTypeNameMatchRequestor();
+//		try {
+//			se.searchAllTypeNames(packageNameLang, packageMatchRule, null, 0, searchFor, scope, nameMatchRequestorLang,
+//					waitingPolicy, monitor);
+//		} catch (JavaModelException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		Vector<IType> iTypeInJavaDotLang = nameMatchRequestorLang.getITypes();
+//
+//		for (IType iType : iTypeInJavaDotLang) {
+//			Type4Data type4Data = setType4Data(iType);
+//			res.add(type4Data);
+//		}
 		/**
 		 * add primitive types
 		 */
-		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void" };
+		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void", "String"};
 		for (String primitiveType : primitiveTypes) {
 			Type4Data type4Data = new Type4Data(primitiveType);
 			type4Data.setSimplifiedName(primitiveType);
+			res.add(type4Data);
 		}
 		return res;
 	}
@@ -365,14 +373,15 @@ public class DataFromSource {
 	}
 
 	private String sign2QualifiedType(String signature) {
-		// TODO need to be testified
-		String qualifier = Signature.getSignatureQualifier(signature);
-		String simpleName = Signature.getSignatureSimpleName(signature);
-		if (qualifier.equals("")) {
-			return simpleName;
-		} else {
-			return qualifier + "." + simpleName;
-		}
+		return Signature.getSignatureSimpleName(signature);
+//		// TODO need to be testified
+//		String qualifier = Signature.getSignatureQualifier(signature);
+//		String simpleName = Signature.getSignatureSimpleName(signature);
+//		if (qualifier.equals("")) {
+//			return simpleName;
+//		} else {
+//			return qualifier + "." + simpleName;
+//		}
 	}
 //	========================================================================================-
 
@@ -592,7 +601,6 @@ public class DataFromSource {
 	}
 
 	/**
-	 * TODO fix this
 	 * @param type
 	 * @return
 	 */
