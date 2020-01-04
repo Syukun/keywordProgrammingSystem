@@ -41,7 +41,7 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 				}else {
 					for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
 						Expression[] subExps = new Expression[arity];
-						generateStaticWithArityAuxi(depth, arity, exactFlags, res, subExps, mthName, keywords);
+						generateStaticWithArityAuxi(depth-1, arity, exactFlags, res, subExps, mthName, keywords);
 					}
 				}
 				

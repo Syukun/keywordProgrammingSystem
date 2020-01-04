@@ -18,7 +18,7 @@ public class Table {
 	
 	public Table() {
 		Set<String> allTypes = new HashSet<String>(); 
-		allTypes.add("void");
+//		allTypes.add("void");
 //		String[] allTypes = {"String","int","boolean"};
 		this.table = new HashMap<String, Vector<Vector<Expression>>>();
 		for(String type : allTypes) {
@@ -47,9 +47,24 @@ public class Table {
 		return table.get(type).get(depth-1);
 	}
 	
-	public void addToTable(String type, Vector<Expression> expressions) {
+	/**
+	 * add expression to table in exact depth
+	 * @param type
+	 * @param depth
+	 * @param expressions
+	 */
+	public void addToTable(String type, int depth, Vector<Expression> expressions) {
+		
 		
 		Vector<Vector<Expression>> expressionsForEachDepth = this.table.get(type);
+		
+//		int size = expressionsForEachDepth.size();
+//		int newVector = depth-size;
+//		for(int i = 0; i < newVector; i++) {
+//			expressionsForEachDepth.add(new Vector<Expression>());
+//		}
+		
+//		expressionsForEachDepth.add(expressions);
 		if(expressions.isEmpty()) {
 			expressionsForEachDepth.add(new Vector<Expression>());
 		}else {

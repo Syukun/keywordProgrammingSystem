@@ -18,9 +18,9 @@ public class StaticFieldAccessGenerator extends ExpressionGenerator {
 	
 	public Vector<Expression> generateExactExpressionsSub(int depth, String type, String keywords){
 		Vector<Expression> res = new Vector<Expression>();
-		if(type == "String") {
-			int i = 1;
-		}
+//		if(type == "String") {
+//			int i = 1;
+//		}
 		
 		Set<Field> fields = parent.dataFromExtraction.getFieldsFromReturnType(type);
 		for(Field field : fields) {

@@ -3,6 +3,7 @@ package plugin.completionProposalComputer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.*;
@@ -102,10 +103,12 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
 			expressionGenerator.setDataFromSource(dfs);
 			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth,keywords);
-			int finalResultSize = finalChoicesExpressions.size();
+			//TODO eliminate duplicated one need to be modified
+			Vector<Expression> finalExps = finalChoicesExpressions.stream().distinct().collect(Collectors.toCollection(Vector::new));
+			int finalResultSize = finalExps.size();
 			
 			for(int i=0;i<finalResultSize;i++) {
-				Expression finalChoiceExpression = finalChoicesExpressions.get(i);
+				Expression finalChoiceExpression = finalExps.get(i);
 				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression,i);
 				mcp.setKeywords(keywords);
 				result.add(mcp);
