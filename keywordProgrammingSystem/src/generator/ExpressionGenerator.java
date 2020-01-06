@@ -95,7 +95,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 		for (String type : allTypes) {
 			res.addAll(getUnderExpressions(depth, type, keywords));
 		}
-		return ScoreDef.selectMaxExpressions(res, keywords, 20);
+		return ScoreDef.selectMaxExpressions(res, keywords, 30);
 	}
 
 	public boolean isBitOn(int x, int i) {
