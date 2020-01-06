@@ -220,8 +220,8 @@ public class DataFromSource {
 		/**
 		 * add primitive types
 		 */
-//		String[] primitiveTypes = { "void" };
-		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void", "String"};
+		String[] primitiveTypes = { "void" };
+//		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void", "String"};
 		for (String primitiveType : primitiveTypes) {
 			Type4Data type4Data = new Type4Data(primitiveType);
 			type4Data.setSimplifiedName(primitiveType);

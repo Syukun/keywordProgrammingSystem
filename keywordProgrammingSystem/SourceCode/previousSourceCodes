@@ -1,10 +1,58 @@
-package example;
- import java.lang.System;
- import java.io.PrintStream;
- import java.lang.String;
+package LeetCode.array.ShuffleAnArray_384_;
  
- public class Test {
- 	{
- 		char res;
- 		String str;
+ import java.util.Random;
+ import java.util.Stack;
+ 
+ 
+ public class Solution {
+     private Random random;
+     private Stack<Integer> stack;
+     private int[] nums;
+ 
+     public Solution(int[] nums) {
+         random = new Random();
+         stack = new Stack<>();
+         this.nums = nums;
+     }
+ 
+ 
+     public int[] reset1() {
+         if (stack.isEmpty()) return nums;
+         for (int i=nums.length-Numberliteral; i>=Numberliteral; i--) {
+             int prevRndIndex =  stack.pop();
+             int tmp = nums[i];
+             nums[i] = nums[prevRndIndex];
+             nums[prevRndIndex] = tmp;
+         }
+         return nums;
+     }
+ 
+ 
+     public int[] shuffle1() {
+         for (int i=Numberliteral; i<nums.length; i++) {
+             int rndIndex =  random.nextInt(nums.length);
+             stack.push(rndIndex);
+             int tmp = nums[i];
+             nums[i] = nums[rndIndex];
+             nums[rndIndex] = tmp;
+         }
+         return nums;
+     }
+ 
+     public int[] reset() {
+         return nums;
+     }
+ 
+ 
+     public int[] shuffle() {
+         int[] res = this.nums.clone();
+         for (int i=Numberliteral; i<nums.length; i++) {
+             int rndIndex =  random.nextInt(nums.length-i) + i; // gives random in range [i..nums.length-1]
+             int tmp = res[i];
+             res[i] = res[rndIndex];
+             res[rndIndex] = tmp;
+         }
+         return res;
+     }
+ }
  
