@@ -60,17 +60,79 @@ public class ScoreDef {
 		return selectMaxExpressions(result, keywords, BEAMWIDTH);
 
 	}
+	
 
 	public static Vector<Expression> selectMaxExpressions(Vector<Expression> result, String keywords, int num) {
 		sortExpression(result, keywords);
+		
+		int selected = num+2;
+		int resultLen = result.size();
+		if(resultLen > num) {
+			if(resultLen >= selected) {
+				Vector<Expression> tmp = new Vector<Expression>();
+				for(int i = 0; i < selected; i ++) {
+					tmp.add(result.get(i));
+				}
+				Collections.sort(tmp, new Comparator<Expression>() {
 
-		int lengthResult = result.size();
-		if (lengthResult > num) {
-			for (int i = lengthResult - 1; i >= num; i--) {
-				result.remove(i);
+					@Override
+					public int compare(Expression o1, Expression o2) {
+						// TODO Auto-generated method stub
+						return o2.getProbability().compareTo(o1.getProbability());
+					}
+
+				});
+				
+				Vector<Expression> res_tmp = new Vector<Expression>();
+				for (int j = 0; j < num; j++) {
+					res_tmp.add(tmp.get(j));
+				}
+
+				return res_tmp;
+				
+				
+			}else {
+				return result;
 			}
+		}else {
+			return result;
 		}
-		return result;
+
+//		int selected = num * 2;
+//
+//		int lengthResult = result.size();
+//		if (lengthResult > num) {
+//
+//			if (lengthResult >= selected) {
+//				Vector<Expression> tmp = new Vector<Expression>();
+//				for (int i = 0; i < selected; i++) {
+//					tmp.add(result.get(i));
+//					Collections.sort(tmp, new Comparator<Expression>() {
+//
+//						@Override
+//						public int compare(Expression o1, Expression o2) {
+//							// TODO Auto-generated method stub
+//							return o2.getProbability().compareTo(o1.getProbability());
+//						}
+//
+//					});
+//
+//					Vector<Expression> res_tmp = new Vector<Expression>();
+//					for (int j = 0; j < num; j++) {
+//						res_tmp.add(tmp.get(j));
+//					}
+//
+//					return res_tmp;
+//				}
+//			} else {
+//				return result;
+//			}
+//
+////			for (int i = lengthResult - 1; i >= num; i--) {
+////				result.remove(i);
+////			}
+//		}
+//		return result;
 	}
 
 	public static List<String> splitKeyword(String keywords) {
@@ -82,7 +144,7 @@ public class ScoreDef {
 		Collections.sort(result, new Comparator<Expression>() {
 			@Override
 			public int compare(Expression e1, Expression e2) {
-				
+
 				return e2.getScore(keywords).compareTo(e1.getScore(keywords));
 			}
 
@@ -119,4 +181,5 @@ public class ScoreDef {
 			return word;
 		}
 	}
+
 }

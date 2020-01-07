@@ -100,7 +100,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 	@Override
 	public int getRelevance() {
 		// TODO Use other way to do it without changing it to int
-		return this.expression.getScore(keywords).multiply(BigDecimal.valueOf(100000000)).intValueExact();
+		return this.expression.getScore(keywords).add(this.expression.getProbability()).multiply(BigDecimal.valueOf(100000000)).intValueExact();
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 		StyledString styledDisplayString = new StyledString();
 		String expressionName = this.expression.toString();
 		String expressionType = this.expression.getReturnType();
-		String expressionScore = this.expression.getScore(keywords).toString();
+		String expressionScore = this.expression.getScore(keywords).add(this.expression.getProbability()).toString();
 		styledDisplayString.append(" ");
 		styledDisplayString.append(expressionName);
 		styledDisplayString.append(": ");
