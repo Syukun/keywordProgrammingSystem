@@ -3,7 +3,7 @@ package dataExtractedFromSource;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Type4Data implements java.io.Serializable{
+public class Type4Data{
 	
 	private String simplifiedName;
 	private String qualifiedName;
@@ -14,7 +14,14 @@ public class Type4Data implements java.io.Serializable{
 	private Set<Field4Data> fields; 
 	private Set<Method4Data> methods;
 	
-	public Type4Data(String qualifiedName) {
+//	public Type4Data(String qualifiedName) {
+//		this.setQualifiedName(qualifiedName);
+//		this.fields = new HashSet<Field4Data>();
+//		this.methods = new HashSet<Method4Data>();
+//	}
+	
+	public Type4Data(String simplifiedName, String qualifiedName) {
+		this.setSimplifiedName(simplifiedName);
 		this.setQualifiedName(qualifiedName);
 		this.fields = new HashSet<Field4Data>();
 		this.methods = new HashSet<Method4Data>();
@@ -64,6 +71,6 @@ public class Type4Data implements java.io.Serializable{
 	public void setQualifiedName(String qualifiedName) {
 		this.qualifiedName = qualifiedName;
 	}
-	
+//	
 
 }

@@ -1,11 +1,13 @@
 package generator;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
 import astNode.Field;
 import astNode.FieldAccess;
+import dataExtractedFromSource.DataFromSource;
 
 /**
  * @author Archer Shu
@@ -27,7 +29,8 @@ public class FieldAccessGenerator extends ExpressionGenerator {
 	public Vector<Expression> generateExactExpressionsSub(int depth, String type, String keywords) {
 		Vector<Expression> res = new Vector<Expression>();
 		
-		Set<Field> fields = parent.dataFromExtraction.getFieldsFromReturnType(type);
+//		Set<Field> fields = parent.dataFromExtraction.getFieldsFromReturnType(type);
+		Set<Field> fields = DataFromSource.fieldsRet.containsKey(type) ? DataFromSource.fieldsRet.get(type) : new HashSet<Field>();
 		
 		for(Field field : fields) {
 			String fieldClassName = field.getReceiveType();

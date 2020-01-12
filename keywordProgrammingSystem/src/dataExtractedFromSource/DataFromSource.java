@@ -1,6 +1,6 @@
 package dataExtractedFromSource;
 
-import java.util.Arrays;
+import java.util.Arrays; 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,10 +28,12 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 
+import astNode.ConstructorType;
 import astNode.Field;
 import astNode.LocalVariable;
 import astNode.Type;
 import astNode.MethodName;
+import plugin.completionProposalComputer.JavaCompletionProposalComputer;
 import plugin.completionProposalComputer.LocalVariableVisitior;
 import plugin.completionProposalComputer.MyTypeNameMatchRequestor;
 //import plugin.completionProposalComputer.MyVisitor;
@@ -69,14 +71,14 @@ public class DataFromSource {
 	 * Type : Type for Code Completion System, has current type and subTypes and
 	 * superTypes
 	 */
-	private Map<String, Type> typeDictionary;
+	public static Map<String, Type> typeDictionary;
 
 	/**
 	 * All local variable < variable type : String, localVar : LocalVariable >
 	 * <p>
 	 * For example: String str ==> map of < str, lv >
 	 */
-	private Map<String, Set<LocalVariable>> localVariablesRet;
+	public static Map<String, Set<LocalVariable>> localVariablesRet;
 
 //	private Map<String, Set<LocalVariable>> localVariablesRec;
 	/**
@@ -129,13 +131,17 @@ public class DataFromSource {
 	/**
 	 * fields which return type is the key
 	 */
-	private Map<String, Set<Field>> fieldsRet;
+	public static Map<String, Set<Field>> fieldsRet;
 
 	/**
 	 * methods which return type is the key
 	 */
-	private Map<String, Set<MethodName>> methodsRet;
+	public static Map<String, Set<MethodName>> methodsRet;
 
+	/**
+	 * Constructors
+	 */
+	public static Map<String, Set<ConstructorType>> constructors;
 	/**
 	 * Qualified name of this IType
 	 */
@@ -163,16 +169,25 @@ public class DataFromSource {
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 
 		rawTypeInformation = this.getDataRaw();
-		this.setTypeDictionary();
-		this.setLocalVariablesWithReturnType();
-		this.setFieldsWithReturnType();
-		this.setMethodWithReturnType();
-		
-		int count = 0;
-		for(Set<MethodName> method : this.methodsRet.values()) {
-			count += method.size();
+		if(JavaCompletionProposalComputer.count==0) {
+			this.setTypeDictionary();
 		}
-		
+		this.setLocalVariablesWithReturnType();
+		if(JavaCompletionProposalComputer.count==0) {
+			this.setTypeDictionary();
+			this.setFieldsWithReturnType();
+			this.setConstructor();
+			this.setMethodWithReturnType();
+			JavaCompletionProposalComputer.count=1;
+		}
+
+//		this.setConstructor();
+
+//		int count = 0;
+//		for(Set<MethodName> method : this.methodsRet.values()) {
+//			count += method.size();
+//		}
+
 //		System.out.print(count);
 
 //		this.initTypeSystem();
@@ -220,10 +235,16 @@ public class DataFromSource {
 		/**
 		 * add primitive types
 		 */
-		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void", "String"};
-		for (String primitiveType : primitiveTypes) {
-			Type4Data type4Data = new Type4Data(primitiveType);
+		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void", "Exception", "Object"};
+		String[] objectTypes = { "java.lang.Integer", "java.lang.Double", "java.lang.Float", "java.lang.Byte",
+				"java.lang.Short", "java.lang.Long", "java.lang.Boolean", "java.lang.Character", "void", "java.lang.Exception", "java.lang.Object" };
+		for (int i = 0; i < primitiveTypes.length; i++) {
+			String primitiveType = primitiveTypes[i];
+			String objectType = objectTypes[i];
+
+			Type4Data type4Data = new Type4Data(primitiveType, objectType);
 			type4Data.setSimplifiedName(primitiveType);
+			type4Data.setQualifiedName(objectType);
 			res.add(type4Data);
 		}
 		return res;
@@ -296,7 +317,8 @@ public class DataFromSource {
 
 	private Type4Data setType4Data(IType iType) {
 		String qualifiedName = iType.getFullyQualifiedName();
-		Type4Data res = new Type4Data(qualifiedName);
+		String simplifiedName = iType.getElementName();
+		Type4Data res = new Type4Data(simplifiedName, qualifiedName);
 
 		String simpleName = iType.getElementName();
 		res.setSimplifiedName(simpleName);
@@ -306,8 +328,8 @@ public class DataFromSource {
 			ITypeHierarchy ith = iType.newTypeHierarchy(monitor);
 			IType[] subITypes = ith.getAllSubtypes(iType);
 			IType[] superITypes = ith.getSupertypes(iType);
-			String[] subTypes = Arrays.stream(subITypes).map(x -> x.getFullyQualifiedName()).toArray(String[]::new);
-			String[] superTypes = Arrays.stream(superITypes).map(x -> x.getFullyQualifiedName()).toArray(String[]::new);
+			String[] subTypes = Arrays.stream(subITypes).map(x -> x.getElementName()).toArray(String[]::new);
+			String[] superTypes = Arrays.stream(superITypes).map(x -> x.getElementName()).toArray(String[]::new);
 			res.setSubTypes(subTypes);
 			res.setSuperTypes(superTypes);
 
@@ -316,8 +338,8 @@ public class DataFromSource {
 			for (IField iField : iFields) {
 				int modifier = iField.getFlags();
 				String fieldName = iField.getElementName();
-				String fieldQualifiedTypeName = getFieldQualifiedTypeName(iField);
-				Field4Data field4Data = new Field4Data(modifier, fieldQualifiedTypeName, fieldName);
+				String fieldSimplifiedTypeName = getFieldSimplifiedTypeName(iField);
+				Field4Data field4Data = new Field4Data(modifier, fieldSimplifiedTypeName, fieldName);
 				res.setFields(field4Data);
 
 			}
@@ -326,10 +348,10 @@ public class DataFromSource {
 			for (IMethod iMethod : iMethods) {
 				int modifier = iMethod.getFlags();
 				String methodName = iMethod.getElementName();
-				String returnTypeQualifiedName = getMethodReturnTypeQualifiedName(iMethod);
-				String[] parameterTypeQualifiedNames = getParameterTypeQualifiedNames(iMethod);
-				Method4Data method4Data = new Method4Data(modifier, methodName, returnTypeQualifiedName,
-						parameterTypeQualifiedNames);
+				String returnTypeSimplifiedName = getMethodReturnTypeSimplifiedName(iMethod);
+				String[] parameterTypeSimplifiedNames = getParameterTypeSimplifiedNames(iMethod);
+				Method4Data method4Data = new Method4Data(modifier, methodName, returnTypeSimplifiedName,
+						parameterTypeSimplifiedNames);
 				res.setMethods(method4Data);
 			}
 
@@ -340,30 +362,46 @@ public class DataFromSource {
 		return res;
 	}
 
-	private String[] getParameterTypeQualifiedNames(IMethod iMethod) {
+	private String[] getParameterTypeSimplifiedNames(IMethod iMethod) {
 		String[] parameterTypesSig = iMethod.getParameterTypes();
-		String[] res = Arrays.stream(parameterTypesSig).map(x -> this.sign2QualifiedType(x)).toArray(String[]::new);
+		String[] res = Arrays.stream(parameterTypesSig).map(x -> Signature.getSignatureSimpleName(x))
+				.toArray(String[]::new);
 		return res;
 	}
 
-	private String getMethodReturnTypeQualifiedName(IMethod iMethod) {
-		String res = "";
-		String returnTypeSig;
+	private String getMethodReturnTypeSimplifiedName(IMethod iMethod) {
+//		String res = "";
+//		String returnTypeSig;
+//		try {
+//			returnTypeSig = iMethod.getReturnType();
+//			res += sign2QualifiedType(returnTypeSig);
+//		} catch (JavaModelException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return res;
 		try {
-			returnTypeSig = iMethod.getReturnType();
-			res += sign2QualifiedType(returnTypeSig);
+			return Signature.getSignatureSimpleName(iMethod.getReturnType());
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return res;
+
+		return "";
 	}
 
-	private String getFieldQualifiedTypeName(IField iField) {
+	/**
+	 * Return the simplified type name of a field
+	 * 
+	 * @param iField
+	 * @return
+	 */
+	private String getFieldSimplifiedTypeName(IField iField) {
 		String res = "";
 		try {
-			String iFieldTypeSig = iField.getTypeSignature();
-			res += sign2QualifiedType(iFieldTypeSig);
+//			String iFieldTypeSig = iField.getTypeSignature();
+//			res += sign2QualifiedType(iFieldTypeSig);
+			return Signature.getSignatureSimpleName(iField.getTypeSignature());
 
 		} catch (JavaModelException e) {
 			e.printStackTrace();
@@ -372,21 +410,21 @@ public class DataFromSource {
 		return res;
 	}
 
-	private String sign2QualifiedType(String signature) {
-		return Signature.getSignatureSimpleName(signature);
-//		// TODO need to be testified
-//		String qualifier = Signature.getSignatureQualifier(signature);
-//		String simpleName = Signature.getSignatureSimpleName(signature);
-//		if (qualifier.equals("")) {
-//			return simpleName;
-//		} else {
-//			return qualifier + "." + simpleName;
-//		}
-	}
+//	private String sign2QualifiedType(String signature) {
+//		return Signature.getSignatureSimpleName(signature);
+////		// TODO need to be testified
+////		String qualifier = Signature.getSignatureQualifier(signature);
+////		String simpleName = Signature.getSignatureSimpleName(signature);
+////		if (qualifier.equals("")) {
+////			return simpleName;
+////		} else {
+////			return qualifier + "." + simpleName;
+////		}
+//	}
 //	========================================================================================-
 
 	public void setTypeDictionary() {
-		this.typeDictionary = new HashMap<String, Type>();
+		typeDictionary = new HashMap<String, Type>();
 		for (Type4Data type4Data : this.rawTypeInformation) {
 			String simpleName = type4Data.getSimplifiedName();
 			String qualifiedName = type4Data.getQualifiedName();
@@ -397,22 +435,22 @@ public class DataFromSource {
 		}
 	}
 
-	public Map<String, Type> getTypeDictionary() {
-		return this.typeDictionary;
-	}
+//	public Map<String, Type> getTypeDictionary() {
+//		return this.typeDictionary;
+//	}
 
 	/**
 	 * @since 2019/09/18
 	 * @return all possible type name
 	 */
-	public Set<String> getAllType() {
-		return this.typeDictionary.keySet();
-	}
+//	public Set<String> getAllType() {
+//		return this.typeDictionary.keySet();
+//	}
 
 	public Set<String> getAllTypesIncludeSuper(String type) {
 
 		Set<String> res = new HashSet<String>();
-		Type t = this.typeDictionary.get(type);
+		Type t = typeDictionary.get(type);
 		if (t != null) {
 			String[] superClasses = t.getSuperClass();
 			res.add(type);
@@ -427,7 +465,7 @@ public class DataFromSource {
 
 	public Set<String> getAllTypesIncludeSub(String type) {
 		Set<String> res = new HashSet<String>();
-		Type t = this.typeDictionary.get(type);
+		Type t = typeDictionary.get(type);
 		if (t != null) {
 			String[] subClasses = t.getSubClass();
 			res.add(type);
@@ -448,7 +486,7 @@ public class DataFromSource {
 	 * @throws JavaModelException
 	 */
 	private void setLocalVariablesWithReturnType() {
-		this.localVariablesRet = new HashMap<String, Set<LocalVariable>>();
+		localVariablesRet = new HashMap<String, Set<LocalVariable>>();
 		// Step-1 : create a parser
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
 		parser.setSource(thisICU);
@@ -469,6 +507,7 @@ public class DataFromSource {
 
 		for (String localVarName : localVariables.keySet()) {
 			String localVarType = localVariables.get(localVarName);
+			checkTypeIsSet(localVarType);
 			LocalVariable lv = new LocalVariable(localVarName, localVarType, thisType);
 //			this.addLocalVariableRec(thisType, lv);
 			this.addLocalVariableRet(localVarType, lv);
@@ -476,10 +515,10 @@ public class DataFromSource {
 	}
 
 	private void addLocalVariableRet(String type, LocalVariable lv) {
-		if (!this.localVariablesRet.containsKey(type)) {
-			this.localVariablesRet.put(type, new HashSet<LocalVariable>());
+		if (!localVariablesRet.containsKey(type)) {
+			DataFromSource.localVariablesRet.put(type, new HashSet<LocalVariable>());
 		}
-		this.localVariablesRet.get(type).add(lv);
+		DataFromSource.localVariablesRet.get(type).add(lv);
 	}
 
 	private void setThisTypeName(String name) {
@@ -499,9 +538,9 @@ public class DataFromSource {
 	 * Set Field with Return Type
 	 */
 	private void setFieldsWithReturnType() {
-		this.fieldsRet = new HashMap<String, Set<Field>>();
+		DataFromSource.fieldsRet = new HashMap<String, Set<Field>>();
 		for (Type4Data type4Data : this.rawTypeInformation) {
-			Set<Field> fields = new HashSet<Field>();
+//			Set<Field> fields = new HashSet<Field>();
 			String typeSimpleName = type4Data.getSimplifiedName();
 			String typeQualifiedName = type4Data.getQualifiedName();
 			Set<Field4Data> field4Datas = type4Data.getFields();
@@ -520,7 +559,7 @@ public class DataFromSource {
 						}
 					}
 				}
-			
+
 			}
 		}
 	}
@@ -529,13 +568,20 @@ public class DataFromSource {
 		int modifier = field4Data.getModifier();
 		String fieldName = field4Data.getFieldName();
 		String simpleTypeName = field4Data.getSimpleTypeName();
+		checkTypeIsSet(simpleTypeName);
+
 		Field field = new Field(modifier, fieldName, simpleTypeName, typeSimpleName);
-		if(!this.fieldsRet.containsKey(simpleTypeName)) {
-			this.fieldsRet.put(simpleTypeName, new HashSet<Field>());
+		if (!DataFromSource.fieldsRet.containsKey(simpleTypeName)) {
+			DataFromSource.fieldsRet.put(simpleTypeName, new HashSet<Field>());
 		}
-		this.fieldsRet.get(simpleTypeName).add(field);
+		DataFromSource.fieldsRet.get(simpleTypeName).add(field);
 	}
 
+	private void checkTypeIsSet(String simpleTypeName) {
+		if (!typeDictionary.containsKey(simpleTypeName)) {
+			typeDictionary.put(simpleTypeName, new Type(simpleTypeName, simpleTypeName, null, null));
+		}
+	}
 
 	private void setThisPackageName(String thisPackage) {
 		this.thisPackageName = thisPackage;
@@ -543,30 +589,44 @@ public class DataFromSource {
 	}
 
 	private void setMethodWithReturnType() {
-		this.methodsRet = new HashMap<String, Set<MethodName>>();
+		DataFromSource.methodsRet = new HashMap<String, Set<MethodName>>();
 		for (Type4Data type4Data : this.rawTypeInformation) {
 			String typeSimpleName = type4Data.getSimplifiedName();
 			String typeQualifiedName = type4Data.getQualifiedName();
 			Set<Method4Data> method4Datas = type4Data.getMethods();
+			Set<ConstructorType> constructorsWithCertainType = new HashSet<ConstructorType>();
 			for (Method4Data method4Data : method4Datas) {
-				int modifier = method4Data.getModifier();
-				if (thisTypeName.equals(typeSimpleName)) {
-					setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
-					
+				if (method4Data.getMethodName().equals(typeSimpleName)) {
+					String[] parameterTypes = method4Data.getSimpleParameterType();
+					constructorsWithCertainType.add(new ConstructorType(typeSimpleName, parameterTypes));
 				} else {
-					if (typeQualifiedName.contains(thisPackageName)) {
-						if (!Flags.isPrivate(modifier)) {
-							setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
-						}
+					if (thisTypeName.equals(typeSimpleName)) {
+						setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
+
 					} else {
-						if (Flags.isPublic(modifier)) {
-							setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
+						int modifier = method4Data.getModifier();
+						if (typeQualifiedName.contains(thisPackageName)) {
+							if (!Flags.isPrivate(modifier)) {
+								setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
+							}
+						} else {
+							if (Flags.isPublic(modifier)) {
+								setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
+							}
 						}
 					}
 				}
+
 			}
 			
+			DataFromSource.constructors.put(typeSimpleName, constructorsWithCertainType);
+
 		}
+
+	}
+
+	private void setConstructor() {
+		DataFromSource.constructors = new HashMap<String, Set<ConstructorType>>();
 
 	}
 
@@ -574,12 +634,19 @@ public class DataFromSource {
 		int modifier = method4Data.getModifier();
 		String simpleReturnTypeName = method4Data.getSimpleReturnType();
 		String methodName = method4Data.getMethodName();
-		String[] parameterSimpleTypes =  method4Data.getSimpleParameterType();
-		MethodName method = new MethodName(modifier, methodName, simpleReturnTypeName, typeSimpleName, parameterSimpleTypes);
-		if(!this.methodsRet.containsKey(simpleReturnTypeName)) {
-			this.methodsRet.put(simpleReturnTypeName, new HashSet<MethodName>());
+		String[] parameterSimpleTypes = method4Data.getSimpleParameterType();
+
+		checkTypeIsSet(simpleReturnTypeName);
+		for (String parameterSimpleType : parameterSimpleTypes) {
+			checkTypeIsSet(parameterSimpleType);
 		}
-		this.methodsRet.get(simpleReturnTypeName).add(method);
+
+		MethodName method = new MethodName(modifier, methodName, simpleReturnTypeName, typeSimpleName,
+				parameterSimpleTypes);
+		if (!DataFromSource.methodsRet.containsKey(simpleReturnTypeName)) {
+			DataFromSource.methodsRet.put(simpleReturnTypeName, new HashSet<MethodName>());
+		}
+		DataFromSource.methodsRet.get(simpleReturnTypeName).add(method);
 	}
 
 	/**
@@ -588,24 +655,24 @@ public class DataFromSource {
 	 * @param retType
 	 * @return
 	 */
-	public Set<LocalVariable> getLocalVariablesFromRetType(String retType) {
-		if (this.localVariablesRet.containsKey(retType)) {
-			return this.localVariablesRet.get(retType);
-		} else {
-			return new HashSet<LocalVariable>();
-		}
-	}
+//	public static Set<LocalVariable> getLocalVariablesFromRetType(String retType) {
+//		if (DataFromSource.localVariablesRet.containsKey(retType)) {
+//			return DataFromSource.localVariablesRet.get(retType);
+//		} else {
+//			return new HashSet<LocalVariable>();
+//		}
+//	}
 
-	public Set<Field> getFieldsFromReturnType(String type) {
-		return this.fieldsRet.containsKey(type) ? this.fieldsRet.get(type) : new HashSet<Field>();
-	}
+//	public Set<Field> getFieldsFromReturnType(String type) {
+//		return DataFromSource.fieldsRet.containsKey(type) ? DataFromSource.fieldsRet.get(type) : new HashSet<Field>();
+//	}
 
 	/**
 	 * @param type
 	 * @return
 	 */
-	public Set<MethodName> getMethodFromReturnType(String type) {
-		return this.methodsRet.containsKey(type) ? this.methodsRet.get(type) : new HashSet<MethodName>();
-	}
+//	public Set<MethodName> getMethodFromReturnType(String type) {
+//		return DataFromSource.methodsRet.containsKey(type) ? DataFromSource.methodsRet.get(type) : new HashSet<MethodName>();
+//	}
 
 }

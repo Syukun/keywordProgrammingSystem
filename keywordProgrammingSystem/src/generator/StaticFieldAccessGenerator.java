@@ -1,11 +1,13 @@
 package generator;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
 import astNode.Field;
 import astNode.TypeFieldAccess;
+import dataExtractedFromSource.DataFromSource;
 
 public class StaticFieldAccessGenerator extends ExpressionGenerator {
 	
@@ -22,7 +24,8 @@ public class StaticFieldAccessGenerator extends ExpressionGenerator {
 			int i = 1;
 		}
 		
-		Set<Field> fields = parent.dataFromExtraction.getFieldsFromReturnType(type);
+//		Set<Field> fields = parent.dataFromExtraction.getFieldsFromReturnType(type);
+		Set<Field> fields = DataFromSource.fieldsRet.containsKey(type) ? DataFromSource.fieldsRet.get(type) : new HashSet<Field>();
 		for(Field field : fields) {
 			
 			if(field.isStatic()) {

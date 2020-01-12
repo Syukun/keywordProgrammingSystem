@@ -1,12 +1,14 @@
 package generator;
 
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
 import astNode.MethodInvocation;
 import astNode.MethodName;
+import dataExtractedFromSource.DataFromSource;
 
 /**
  * @author Archer Shu
@@ -24,7 +26,9 @@ public class MethodInvocationGenerator extends ExpressionGenerator {
 	public Vector<Expression> generateExactExpressionsSub(int depth, String type, String keywords) {
 		// inheritance types
 
-		Set<MethodName> methodNames = parent.dataFromExtraction.getMethodFromReturnType(type);
+//		Set<MethodName> methodNames = parent.dataFromExtraction.getMethodFromReturnType(type);
+		
+		Set<MethodName> methodNames = DataFromSource.methodsRet.containsKey(type) ? DataFromSource.methodsRet.get(type) : new HashSet<MethodName>();
 		// result
 		Vector<Expression> res = new Vector<Expression>();
 

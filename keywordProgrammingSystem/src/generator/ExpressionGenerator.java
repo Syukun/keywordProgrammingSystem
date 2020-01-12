@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import astNode.Expression;
 import astNode.ScoreDef;
-import astNode.TypeName;
+//import astNode.TypeName;x
 import dataExtractedFromSource.DataFromSource;
 
 /**
@@ -90,7 +90,7 @@ public class ExpressionGenerator extends AbstractGenerator {
 	public Vector<Expression> getFinalExpressions(int depth, String keywords) {
 		// TODO modify it later
 //		String[] allTypes = { "String", "int", "boolean" };
-		Set<String> allTypes = this.dataFromExtraction.getAllType();
+		Set<String> allTypes = DataFromSource.typeDictionary.keySet();
 		Vector<Expression> res = new Vector<Expression>();
 		for (String type : allTypes) {
 			res.addAll(getUnderExpressions(depth, type, keywords));

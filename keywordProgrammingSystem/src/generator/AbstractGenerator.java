@@ -11,8 +11,8 @@ import astNode.ScoreDef;
 * @date 2019年9月1日
 */
 public abstract class AbstractGenerator {
-	Table tableExact = new Table();
-	Table tableUnder = new Table();
+	public static Table tableExact = new Table();
+	public static Table tableUnder = new Table();
 	
 	/**
 	 * return expressions which return type is "type" and depth is exactly "depth" and also sorted by keywords

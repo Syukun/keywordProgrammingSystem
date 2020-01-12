@@ -33,7 +33,7 @@ public class MethodName {
 	
 	
 	public String getParameterTypeOf(int i) {
-		return parameterTypes[i-1];
+		return parameterTypes[i];
 	}
 	
 	public String getReturnType() {

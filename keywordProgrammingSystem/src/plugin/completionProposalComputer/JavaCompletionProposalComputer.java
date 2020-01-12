@@ -2,6 +2,8 @@ package plugin.completionProposalComputer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -15,12 +17,15 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 
 import astNode.Expression;
+import astNode.Type;
 import dataExtractedFromSource.DataFromSource;
-import generator.ExpressionGenerator;
+//import generator.AbstractGenerator;
+//import generator.ExpressionGenerator;
+import generatorForGraduation.ExpressionGenerator;
 
 public class JavaCompletionProposalComputer implements IJavaCompletionProposalComputer {
 
-//	public static Stack<String> localVariables;
+	public static int count = 0;
 
 	@Override
 	public void sessionStarted() {
@@ -93,25 +98,38 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 //		}
 
 		try {
-			
-			DataFromSource dfs = new DataFromSource(context,monitor);
-			
+
 			// test whether the keyword query have any influence on ast
 			String keywords = getKeywords(context);
-			int depth = 3;
-			
+			int depth = 2;
+			DataFromSource dfs = new DataFromSource(context, monitor);
+
+//			DataFromSource dfs = new DataFromSource(context, monitor);
+
 			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
-			expressionGenerator.setDataFromSource(dfs);
-			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth,keywords);
-			Vector<Expression> finalExps = finalChoicesExpressions.stream().distinct().collect(Collectors.toCollection(Vector::new));
-			int finalResultSize = finalExps.size();
-			
-			for(int i=0;i<finalResultSize;i++) {
-				Expression finalChoiceExpression = finalExps.get(i);
-				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression,i);
+			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth, keywords);
+//			Vector<Expression> finalExps = finalChoicesExpressions.stream().distinct()
+//					.collect(Collectors.toCollection(Vector::new));
+			int finalResultSize = finalChoicesExpressions.size();
+
+			for (int i = 0; i < finalResultSize; i++) {
+				Expression finalChoiceExpression = finalChoicesExpressions.get(i);
+				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression, i);
 				mcp.setKeywords(keywords);
 				result.add(mcp);
 			}
+			
+			DataFromSource.localVariablesRet.clear();
+			ExpressionGenerator.tableExact.clear();
+			ExpressionGenerator.tableUnder.clear();
+			
+			Set<String> allTypes = DataFromSource.typeDictionary.keySet();
+			for(String type : allTypes) {
+				Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
+				ExpressionGenerator.tableExact.table.put(type, expsFromEachDepth);
+				ExpressionGenerator.tableUnder.table.put(type, expsFromEachDepth);
+			}
+			
 
 		} catch (JavaModelException e) {
 			// TODO Auto-generated catch block

@@ -1,6 +1,6 @@
 package dataExtractedFromSource;
 
-public class Field4Data implements java.io.Serializable{
+public class Field4Data{
 	private String simpleTypeName;
 	private String fieldName;
 	private int modifier;

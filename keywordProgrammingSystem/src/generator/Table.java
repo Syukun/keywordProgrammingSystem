@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import astNode.Expression;
+import dataExtractedFromSource.DataFromSource;
 
 /**
 * @author Archer Shu
@@ -14,13 +15,10 @@ import astNode.Expression;
 */
 public class Table {
 	
-	Map<String, Vector<Vector<Expression>>> table;
+	public Map<String, Vector<Vector<Expression>>> table = new HashMap<String, Vector<Vector<Expression>>>();
 	
 	public Table() {
-		Set<String> allTypes = new HashSet<String>(); 
-		allTypes.add("void");
-//		String[] allTypes = {"String","int","boolean"};
-		this.table = new HashMap<String, Vector<Vector<Expression>>>();
+		Set<String> allTypes = DataFromSource.typeDictionary.keySet();
 		for(String type : allTypes) {
 			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
 			this.table.put(type, expsFromEachDepth);
@@ -29,10 +27,10 @@ public class Table {
 	
 	
 	public boolean isReady(int depth, String type) {
-		if(!table.containsKey(type)) {
-			this.addNewKey(type);
-			return false;
-		}
+//		if(!table.containsKey(type)) {
+//			this.addNewKey(type);
+//			return false;
+//		}
 		int maxDepth = table.get(type).size();
 		return maxDepth>=depth;		
 	}
@@ -50,6 +48,7 @@ public class Table {
 	public void addToTable(String type, Vector<Expression> expressions) {
 		
 		Vector<Vector<Expression>> expressionsForEachDepth = this.table.get(type);
+//		expressionsForEachDepth.add(expressions);
 		if(expressions.isEmpty()) {
 			expressionsForEachDepth.add(new Vector<Expression>());
 		}else {
@@ -62,5 +61,11 @@ public class Table {
 			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
 			this.table.put(type, expsFromEachDepth);
 		}
+	}
+
+
+	public void clear() {
+		this.table.clear();
+		
 	}
 }
