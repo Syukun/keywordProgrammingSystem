@@ -101,7 +101,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 
 			// test whether the keyword query have any influence on ast
 			String keywords = getKeywords(context);
-			int depth = 2;
+			int depth = 3;
 			DataFromSource dfs = new DataFromSource(context, monitor);
 
 //			DataFromSource dfs = new DataFromSource(context, monitor);

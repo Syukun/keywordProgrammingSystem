@@ -1,6 +1,6 @@
 package dataExtractedFromSource;
 
-import java.util.Arrays; 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -169,16 +169,16 @@ public class DataFromSource {
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
 
 		rawTypeInformation = this.getDataRaw();
-		if(JavaCompletionProposalComputer.count==0) {
+		if (JavaCompletionProposalComputer.count == 0) {
 			this.setTypeDictionary();
 		}
 		this.setLocalVariablesWithReturnType();
-		if(JavaCompletionProposalComputer.count==0) {
+		if (JavaCompletionProposalComputer.count == 0) {
 			this.setTypeDictionary();
 			this.setFieldsWithReturnType();
 			this.setConstructor();
 			this.setMethodWithReturnType();
-			JavaCompletionProposalComputer.count=1;
+			JavaCompletionProposalComputer.count = 1;
 		}
 
 //		this.setConstructor();
@@ -235,9 +235,11 @@ public class DataFromSource {
 		/**
 		 * add primitive types
 		 */
-		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void", "Exception", "Object"};
+		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void",
+				"Exception", "Object", "String"};
 		String[] objectTypes = { "java.lang.Integer", "java.lang.Double", "java.lang.Float", "java.lang.Byte",
-				"java.lang.Short", "java.lang.Long", "java.lang.Boolean", "java.lang.Character", "void", "java.lang.Exception", "java.lang.Object" };
+				"java.lang.Short", "java.lang.Long", "java.lang.Boolean", "java.lang.Character", "void",
+				"java.lang.Exception", "java.lang.Object", "java.lang.String"};
 		for (int i = 0; i < primitiveTypes.length; i++) {
 			String primitiveType = primitiveTypes[i];
 			String objectType = objectTypes[i];
@@ -429,7 +431,17 @@ public class DataFromSource {
 			String simpleName = type4Data.getSimplifiedName();
 			String qualifiedName = type4Data.getQualifiedName();
 			String[] superClass = type4Data.getSuperTypes();
+			if (superClass != null) {
+				for (String superT : superClass) {
+					checkTypeIsSet(superT);
+				}
+			}
 			String[] subClass = type4Data.getSubTypes();
+			if (subClass != null) {
+				for (String subT : subClass) {
+					checkTypeIsSet(subT);
+				}
+			}
 			Type type = new Type(simpleName, qualifiedName, superClass, subClass);
 			typeDictionary.put(simpleName, type);
 		}
@@ -618,7 +630,16 @@ public class DataFromSource {
 				}
 
 			}
-			
+			Set<String> pt = new HashSet();
+			String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void",
+					"Exception", "Object", "String"};
+			for(String p : primitiveTypes) {
+				pt.add(p);
+			}
+			if(constructorsWithCertainType.size()==0 && (!pt.contains(typeSimpleName))) {
+				constructorsWithCertainType.add(new ConstructorType(typeSimpleName));
+			}
+
 			DataFromSource.constructors.put(typeSimpleName, constructorsWithCertainType);
 
 		}

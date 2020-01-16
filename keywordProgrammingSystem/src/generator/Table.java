@@ -42,7 +42,13 @@ public class Table {
 	 * @return
 	 */
 	public Vector<Expression> getExpression(int depth, String type){
-		return table.get(type).get(depth-1);
+		if(table.containsKey(type)){
+			return table.get(type).get(depth-1);	
+		}else {
+			return new Vector<Expression>();
+		}
+		
+		
 	}
 	
 	public void addToTable(String type, Vector<Expression> expressions) {

@@ -26,8 +26,10 @@ public class ConstructorExpression extends Expression {
 		res.append("(");
 		String seperator = "";
 		for (Expression exp : parameters) {
+			if(exp!=null) {
 			res.append(seperator + exp.toString());
 			seperator = ",";
+			}
 		}
 		res.append(")");
 		return res.toString();
@@ -40,9 +42,19 @@ public class ConstructorExpression extends Expression {
 		for(String word : methodNameArray) {
 			score = score.add(ScoreDef.checkInKeyword(score, word.toLowerCase(), keywords));
 		}
-		for (Expression paraExpression : this.parameters) {
-			score = score.add(paraExpression.getScore(keywords));
+		if(this.parameters!=null) {
+			for (Expression paraExpression : this.parameters) {
+				if(paraExpression!=null) {
+					try {
+					score = score.add(paraExpression.getScore(keywords));
+					}catch(NullPointerException e) {
+						int i =  0;
+					}
+				}
+				
+			}
 		}
+		
 		return score;
 	}
 
