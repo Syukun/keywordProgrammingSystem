@@ -83,7 +83,7 @@ public class ScoreDef {
 			@Override
 			public int compare(Expression e1, Expression e2) {
 				
-				return e2.getScore(keywords).compareTo(e1.getScore(keywords));
+				return e1.getScore(keywords).compareTo(e2.getScore(keywords));
 			}
 
 		});

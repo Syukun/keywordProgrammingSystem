@@ -17,6 +17,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 
 import astNode.Expression;
+import astNode.LocalVariable;
 import astNode.Type;
 import dataExtractedFromSource.DataFromSource;
 //import generator.AbstractGenerator;
@@ -97,44 +98,62 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 //			result.add(icp);
 //		}
 
-		try {
+		String keywords = getKeywords(context);
+		int depth = 2;
+		new DataFromSource().setInitialData(context, monitor);
 
-			// test whether the keyword query have any influence on ast
-			String keywords = getKeywords(context);
-			int depth = 3;
-			DataFromSource dfs = new DataFromSource(context, monitor);
-
-//			DataFromSource dfs = new DataFromSource(context, monitor);
-
-			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
-			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth, keywords);
-//			Vector<Expression> finalExps = finalChoicesExpressions.stream().distinct()
-//					.collect(Collectors.toCollection(Vector::new));
-			int finalResultSize = finalChoicesExpressions.size();
-
-			for (int i = 0; i < finalResultSize; i++) {
-				Expression finalChoiceExpression = finalChoicesExpressions.get(i);
-				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression, i);
-				mcp.setKeywords(keywords);
-				result.add(mcp);
-			}
-			
-			DataFromSource.localVariablesRet.clear();
-			ExpressionGenerator.tableExact.clear();
-			ExpressionGenerator.tableUnder.clear();
-			
-			Set<String> allTypes = DataFromSource.typeDictionary.keySet();
-			for(String type : allTypes) {
-				Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
-				ExpressionGenerator.tableExact.table.put(type, expsFromEachDepth);
-				ExpressionGenerator.tableUnder.table.put(type, expsFromEachDepth);
-			}
-			
-
-		} catch (JavaModelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		ExpressionGenerator expressionGenerator = new ExpressionGenerator();
+		
+		Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth, keywords);
+		int finalResultSize = finalChoicesExpressions.size();
+		
+		for (int i = 0; i < finalResultSize; i++) {
+			Expression finalChoiceExpression = finalChoicesExpressions.get(i);
+			MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression, i);
+			mcp.setKeywords(keywords);
+			result.add(mcp);
 		}
+		
+		ExpressionGenerator.tableExact.clear();
+		ExpressionGenerator.tableUnder.clear();
+		
+		
+		
+		
+
+//			==============================================================
+
+//			// test whether the keyword query have any influence on ast
+//			String keywords = getKeywords(context);
+//			int depth = 3;
+//			
+//			DataFromSource dfs = new DataFromSource(context, monitor);
+//
+//			ExpressionGenerator expressionGenerator = new ExpressionGenerator();
+//			Vector<Expression> finalChoicesExpressions = expressionGenerator.getFinalExpressions(depth, keywords);
+////			Vector<Expression> finalExps = finalChoicesExpressions.stream().distinct()
+////					.collect(Collectors.toCollection(Vector::new));
+//			int finalResultSize = finalChoicesExpressions.size();
+//
+//			for (int i = 0; i < finalResultSize; i++) {
+//				Expression finalChoiceExpression = finalChoicesExpressions.get(i);
+//				MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression, i);
+//				mcp.setKeywords(keywords);
+//				result.add(mcp);
+//			}
+//			
+//			DataFromSource.localVariablesRet.clear();
+//			ExpressionGenerator.tableExact.clear();
+//			ExpressionGenerator.tableUnder.clear();
+//			
+//			Set<String> allTypes = DataFromSource.typeDictionary.keySet();
+//			for(String type : allTypes) {
+//				Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
+//				ExpressionGenerator.tableExact.table.put(type, expsFromEachDepth);
+//				ExpressionGenerator.tableUnder.table.put(type, expsFromEachDepth);
+//			}
+//			
+
 		return result;
 	}
 

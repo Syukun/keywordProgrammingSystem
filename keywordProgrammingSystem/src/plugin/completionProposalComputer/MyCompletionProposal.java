@@ -46,7 +46,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 			int lastPosition = document.getLineOffset(line + 1);
 
 			res.append(currentText.substring(0, firstPosition));
-			res.append("\t\t" + getExpressionString() + "\n");
+			res.append("\t\t\t\t" + getExpressionString() + "\n");
 			res.append(currentText.substring(lastPosition));
 			document.set(res.toString());
 
@@ -100,7 +100,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 	@Override
 	public int getRelevance() {
 		// TODO Use other way to do it without changing it to int
-		return this.expression.getScore(keywords).multiply(BigDecimal.valueOf(100000000)).intValueExact();
+		return index;
 	}
 
 	/**

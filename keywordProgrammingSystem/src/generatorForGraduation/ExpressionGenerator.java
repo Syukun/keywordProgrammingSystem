@@ -17,6 +17,13 @@ public class ExpressionGenerator {
 	Set<String> allTypes = DataFromSource.typeDictionary.keySet();
 
 	public Vector<Expression> getFinalExpressions(int depth, String keywords) {
+		
+		for(String type : allTypes) {
+			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
+			ExpressionGenerator.tableExact.table.put(type, expsFromEachDepth);
+			ExpressionGenerator.tableUnder.table.put(type, expsFromEachDepth);
+		}
+		
 		Vector<Expression> res = new Vector<Expression>();
 		for (int d = 1; d <= depth; d++) {
 			generateAllPossibleExpression(d, keywords);
@@ -26,10 +33,12 @@ public class ExpressionGenerator {
 		
 		}
 		ScoreDef.selectMaxExpressions(res, keywords, 40);
-		Vector<Expression> dummy3 = res.stream().distinct()
-				.collect(Collectors.toCollection(Vector::new));
+//		Vector<Expression> dummy3 = res.stream().distinct()
+//				.collect(Collectors.toCollection(Vector::new));
 		
-		return dummy3;
+		
+		return res;
+//		return dummy3;
 	}
 
 	private void generateAllPossibleExpression(int depth, String keywords) {

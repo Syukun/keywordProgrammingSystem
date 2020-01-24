@@ -156,14 +156,12 @@ public class DataFromSource {
 	 * Raw Data Informations
 	 */
 	private Set<Type4Data> rawTypeInformation;
-
-	/**
-	 * 
-	 * @param context
-	 * @param monitor
-	 * @throws JavaModelException
-	 */
-	public DataFromSource(ContentAssistInvocationContext context, IProgressMonitor monitor) throws JavaModelException {
+	
+	public DataFromSource() {
+		
+	}
+	
+	public void setInitialData(ContentAssistInvocationContext context, IProgressMonitor monitor) {
 		this.context = context;
 		this.monitor = monitor;
 		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
@@ -171,8 +169,12 @@ public class DataFromSource {
 		rawTypeInformation = this.getDataRaw();
 		if (JavaCompletionProposalComputer.count == 0) {
 			this.setTypeDictionary();
-		}
-		this.setLocalVariablesWithReturnType();
+			localVariablesRet = new HashMap<String, Set<LocalVariable>>();
+			this.setLocalVariablesWithReturnType();
+		}else {
+			localVariablesRet.clear();
+			this.setLocalVariablesWithReturnType();
+		}		
 		if (JavaCompletionProposalComputer.count == 0) {
 			this.setTypeDictionary();
 			this.setFieldsWithReturnType();
@@ -180,6 +182,35 @@ public class DataFromSource {
 			this.setMethodWithReturnType();
 			JavaCompletionProposalComputer.count = 1;
 		}
+	}
+
+	/**
+	 * 
+	 * @param context
+	 * @param monitor
+	 * @throws JavaModelException
+	 */
+//	public DataFromSource(ContentAssistInvocationContext context, IProgressMonitor monitor) throws JavaModelException {
+//		this.context = context;
+//		this.monitor = monitor;
+//		this.thisICU = ((JavaContentAssistInvocationContext) context).getCompilationUnit();
+//
+//		rawTypeInformation = this.getDataRaw();
+//		if (JavaCompletionProposalComputer.count == 0) {
+//			this.setTypeDictionary();
+//			localVariablesRet = new HashMap<String, Set<LocalVariable>>();
+//			this.setLocalVariablesWithReturnType();
+//		}else {
+//			localVariablesRet.clear();
+//			this.setLocalVariablesWithReturnType();
+//		}		
+//		if (JavaCompletionProposalComputer.count == 0) {
+//			this.setTypeDictionary();
+//			this.setFieldsWithReturnType();
+//			this.setConstructor();
+//			this.setMethodWithReturnType();
+//			JavaCompletionProposalComputer.count = 1;
+//		}
 
 //		this.setConstructor();
 
@@ -192,7 +223,7 @@ public class DataFromSource {
 
 //		this.initTypeSystem();
 
-	}
+//	}
 
 	private Set<Type4Data> getDataRaw() {
 		Set<Type4Data> res = new HashSet<Type4Data>();
@@ -498,7 +529,6 @@ public class DataFromSource {
 	 * @throws JavaModelException
 	 */
 	private void setLocalVariablesWithReturnType() {
-		localVariablesRet = new HashMap<String, Set<LocalVariable>>();
 		// Step-1 : create a parser
 		ASTParser parser = ASTParser.newParser(AST.JLS11);
 		parser.setSource(thisICU);
@@ -591,6 +621,7 @@ public class DataFromSource {
 
 	private void checkTypeIsSet(String simpleTypeName) {
 		if (!typeDictionary.containsKey(simpleTypeName)) {
+			//TODO supertype has object
 			typeDictionary.put(simpleTypeName, new Type(simpleTypeName, simpleTypeName, null, null));
 		}
 	}
