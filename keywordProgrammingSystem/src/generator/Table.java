@@ -18,11 +18,11 @@ public class Table {
 	public Map<String, Vector<Vector<Expression>>> table = new HashMap<String, Vector<Vector<Expression>>>();
 	
 	public Table() {
-		Set<String> allTypes = DataFromSource.typeDictionary.keySet();
-		for(String type : allTypes) {
-			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
-			this.table.put(type, expsFromEachDepth);
-		}
+//		Set<String> allTypes = DataFromSource.typeDictionary.keySet();
+//		for(String type : allTypes) {
+//			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
+//			this.table.put(type, expsFromEachDepth);
+//		}
 	}
 	
 	

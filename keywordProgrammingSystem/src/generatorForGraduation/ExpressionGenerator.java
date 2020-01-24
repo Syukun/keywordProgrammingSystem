@@ -17,26 +17,26 @@ public class ExpressionGenerator {
 	Set<String> allTypes = DataFromSource.typeDictionary.keySet();
 
 	public Vector<Expression> getFinalExpressions(int depth, String keywords) {
-		
-		for(String type : allTypes) {
-			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
-			ExpressionGenerator.tableExact.table.put(type, expsFromEachDepth);
-			ExpressionGenerator.tableUnder.table.put(type, expsFromEachDepth);
+
+		for (String type : allTypes) {
+			Vector<Vector<Expression>> expsExactFromEachDepth = new Vector<Vector<Expression>>();
+			Vector<Vector<Expression>> expsUnderFromEachDepth = new Vector<Vector<Expression>>();
+			ExpressionGenerator.tableExact.table.put(type, expsExactFromEachDepth);
+			ExpressionGenerator.tableUnder.table.put(type, expsUnderFromEachDepth);
 		}
-		
+
 		Vector<Expression> res = new Vector<Expression>();
 		for (int d = 1; d <= depth; d++) {
 			generateAllPossibleExpression(d, keywords);
 		}
 		for (String type : allTypes) {
 			res.addAll(getExpressionUnderDepth(depth, type));
-		
+
 		}
 		ScoreDef.selectMaxExpressions(res, keywords, 40);
 //		Vector<Expression> dummy3 = res.stream().distinct()
 //				.collect(Collectors.toCollection(Vector::new));
-		
-		
+
 		return res;
 //		return dummy3;
 	}
@@ -87,23 +87,47 @@ public class ExpressionGenerator {
 				allExpressionGreaterThanOneForAType.addAll(staticMethodInvocations);
 				allExpressionGreaterThanOneForAType.addAll(nonStaticMethodInvocations);
 
-				Vector<Expression> dummy = allExpressionGreaterThanOneForAType.stream().distinct()
-						.collect(Collectors.toCollection(Vector::new));
-				tableExact.addToTable(type, dummy);
+				tableExact.addToTable(type, allExpressionGreaterThanOneForAType);
+
+//				Vector<Expression> dummy = allExpressionGreaterThanOneForAType.stream().distinct()
+//						.collect(Collectors.toCollection(Vector::new));
+//				tableExact.addToTable(type, dummy);
 
 				Vector<Expression> exactExpressionsAtDepthMinusOne = tableUnder.getExpression(depth - 1, type);
 				exactExpressionsAtDepthMinusOne.addAll(allExpressionGreaterThanOneForAType);
 
-				Vector<Expression> dummy2 = exactExpressionsAtDepthMinusOne.stream().distinct()
-						.collect(Collectors.toCollection(Vector::new));
+//				Vector<Expression> dummy2 = exactExpressionsAtDepthMinusOne.stream().distinct()
+//						.collect(Collectors.toCollection(Vector::new));
 
-				Vector<Expression> sortedUnderExpressions = ScoreDef.selectMaxBWExpressions(dummy2, keywords);
+				Vector<Expression> sortedUnderExpressions = ScoreDef
+						.selectMaxBWExpressions(exactExpressionsAtDepthMinusOne, keywords);
+//				Vector<Expression> sortedUnderExpressions = ScoreDef.selectMaxBWExpressions(dummy2, keywords);
 				tableUnder.addToTable(type, sortedUnderExpressions);
 
 			}
 		}
 
 	}
+//
+//	public static void addToExactTable(String type, Vector<Expression> expressions) {
+//		Vector<Vector<Expression>> expressionsForEachDepth = tableExact.table.get(type);
+//		if (expressions.isEmpty()) {
+//			expressionsForEachDepth.add(new Vector<Expression>());
+//		} else {
+//			expressionsForEachDepth.add(expressions);
+//		}
+//
+//	}
+//	
+//	public static void addToUnderTable(String type, Vector<Expression> expressions) {
+//		Vector<Vector<Expression>> expressionsForEachDepth = tableUnder.table.get(type);
+//		if (expressions.isEmpty()) {
+//			expressionsForEachDepth.add(new Vector<Expression>());
+//		} else {
+//			expressionsForEachDepth.add(expressions);
+//		}
+//
+//	}
 
 	private Vector<Expression> getExpressionUnderDepth(int depth, String type) {
 
@@ -122,7 +146,7 @@ public class ExpressionGenerator {
 						res.add(subType);
 					}
 				}
-			}else {
+			} else {
 				return new HashSet<String>();
 			}
 		} catch (Exception e) {

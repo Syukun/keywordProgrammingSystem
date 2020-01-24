@@ -35,7 +35,7 @@ public abstract class AbstractGenerator {
 			/**
 			 * set tableExact
 			 */
-			tableExact.addToTable(type, sortedExactExpressions);
+//			tableExact.addToTable(type, sortedExactExpressions);
 	
 			
 			return exactExpressions;
@@ -65,7 +65,7 @@ public abstract class AbstractGenerator {
 //				tableUnder.addNewKey(type);
 				//sort
 				Vector<Expression> sortedExactExpressions = ScoreDef.selectMaxBWExpressions(exactExps, keywords);
-				tableUnder.addToTable(type, sortedExactExpressions);
+//				tableUnder.addToTable(type, sortedExactExpressions);
 				return exactExps;
 			}else {
 				Vector<Expression> lessOneUnderExps = getUnderExpressions(depth-1, type, keywords);
@@ -74,7 +74,7 @@ public abstract class AbstractGenerator {
 				underExps.addAll(exactExps);
 				//sort
 				Vector<Expression> sortedUnderExpressions = ScoreDef.selectMaxBWExpressions(underExps, keywords);
-				tableUnder.addToTable(type, sortedUnderExpressions);
+//				tableUnder.addToTable(type, sortedUnderExpressions);
 				return underExps;
 			}
 		}
