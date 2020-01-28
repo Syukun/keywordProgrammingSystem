@@ -99,7 +99,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 //		}
 
 		String keywords = getKeywords(context);
-		int depth = 1;
+		int depth = 3;
 		new DataFromSource().setInitialData(context, monitor);
 
 		ExpressionGenerator expressionGenerator = new ExpressionGenerator();
@@ -111,6 +111,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 			Expression finalChoiceExpression = finalChoicesExpressions.get(i);
 			MyCompletionProposal mcp = new MyCompletionProposal(context, finalChoiceExpression, i);
 			mcp.setKeywords(keywords);
+			mcp.setSize(finalResultSize);
 			result.add(mcp);
 		}
 		

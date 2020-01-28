@@ -25,7 +25,7 @@ public class ScoreDef {
 	// of the enclosing class;
 	public static final BigDecimal LMVAR = new BigDecimal(Float.toString(0.001f));
 
-	public static int BEAMWIDTH = 10;
+	public static int BEAMWIDTH = 5;
 
 	public static BigDecimal checkInKeyword(BigDecimal score, String word, List<String> keywords) {
 		String[] wordArray = splitName(word);
@@ -83,7 +83,7 @@ public class ScoreDef {
 			@Override
 			public int compare(Expression e1, Expression e2) {
 				
-				return e1.getScore(keywords).compareTo(e2.getScore(keywords));
+				return e2.getScore(keywords).compareTo(e1.getScore(keywords));
 			}
 
 		});

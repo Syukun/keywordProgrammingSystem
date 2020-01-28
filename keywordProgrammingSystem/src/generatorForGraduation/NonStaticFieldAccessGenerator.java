@@ -22,7 +22,8 @@ public class NonStaticFieldAccessGenerator extends ExpressionGenerator {
 			Set<String> typesIncludingSuperType = getAllTypesIncludesSuper(fieldClassName);
 			
 			for(String typeIncludingSuperType : typesIncludingSuperType) {
-				Vector<Expression> exactM1Expressions = ExpressionGenerator.tableExact.getExpression(depth-1, typeIncludingSuperType);
+				Vector<Expression> exactM1Expressions = new Vector<Expression>();
+				exactM1Expressions.addAll(ExpressionGenerator.tableExact.getExpression(depth-1, typeIncludingSuperType));
 				for(Expression exactM1Expression : exactM1Expressions) {
 					FieldAccess fieldAccess = new FieldAccess(exactM1Expression,field);
 					res.add(fieldAccess);

@@ -156,11 +156,11 @@ public class DataFromSource {
 	 * Raw Data Informations
 	 */
 	private Set<Type4Data> rawTypeInformation;
-	
+
 	public DataFromSource() {
-		
+
 	}
-	
+
 	public void setInitialData(ContentAssistInvocationContext context, IProgressMonitor monitor) {
 		this.context = context;
 		this.monitor = monitor;
@@ -171,10 +171,10 @@ public class DataFromSource {
 			this.setTypeDictionary();
 			localVariablesRet = new HashMap<String, Set<LocalVariable>>();
 			this.setLocalVariablesWithReturnType();
-		}else {
+		} else {
 			localVariablesRet.clear();
 			this.setLocalVariablesWithReturnType();
-		}		
+		}
 		if (JavaCompletionProposalComputer.count == 0) {
 			this.setTypeDictionary();
 			this.setFieldsWithReturnType();
@@ -267,10 +267,10 @@ public class DataFromSource {
 		 * add primitive types
 		 */
 		String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void",
-				"Exception", "Object", "String"};
+				"Exception", "Object"};
 		String[] objectTypes = { "java.lang.Integer", "java.lang.Double", "java.lang.Float", "java.lang.Byte",
 				"java.lang.Short", "java.lang.Long", "java.lang.Boolean", "java.lang.Character", "void",
-				"java.lang.Exception", "java.lang.Object", "java.lang.String"};
+				"java.lang.Exception", "java.lang.Object"};
 		for (int i = 0; i < primitiveTypes.length; i++) {
 			String primitiveType = primitiveTypes[i];
 			String objectType = objectTypes[i];
@@ -621,7 +621,7 @@ public class DataFromSource {
 
 	private void checkTypeIsSet(String simpleTypeName) {
 		if (!typeDictionary.containsKey(simpleTypeName)) {
-			//TODO supertype has object
+			// TODO supertype has object
 			typeDictionary.put(simpleTypeName, new Type(simpleTypeName, simpleTypeName, null, null));
 		}
 	}
@@ -638,10 +638,14 @@ public class DataFromSource {
 			String typeQualifiedName = type4Data.getQualifiedName();
 			Set<Method4Data> method4Datas = type4Data.getMethods();
 			Set<ConstructorType> constructorsWithCertainType = new HashSet<ConstructorType>();
+			int constructorSize = 0;
 			for (Method4Data method4Data : method4Datas) {
 				if (method4Data.getMethodName().equals(typeSimpleName)) {
 					String[] parameterTypes = method4Data.getSimpleParameterType();
-					constructorsWithCertainType.add(new ConstructorType(typeSimpleName, parameterTypes));
+					if (Flags.isPublic(method4Data.getModifier())) {
+						constructorsWithCertainType.add(new ConstructorType(typeSimpleName, parameterTypes));
+					}
+					constructorSize+=1;
 				} else {
 					if (thisTypeName.equals(typeSimpleName)) {
 						setMethodWithReturnTypeAuxi(typeSimpleName, method4Data);
@@ -661,13 +665,13 @@ public class DataFromSource {
 				}
 
 			}
-			Set<String> pt = new HashSet();
+			Set<String> pt = new HashSet<String>();
 			String[] primitiveTypes = { "int", "double", "float", "byte", "short", "long", "boolean", "char", "void",
-					"Exception", "Object", "String"};
-			for(String p : primitiveTypes) {
+					"Exception", "Object"};
+			for (String p : primitiveTypes) {
 				pt.add(p);
 			}
-			if(constructorsWithCertainType.size()==0 && (!pt.contains(typeSimpleName))) {
+			if (constructorSize == 0 && (!pt.contains(typeSimpleName))) {
 				constructorsWithCertainType.add(new ConstructorType(typeSimpleName));
 			}
 

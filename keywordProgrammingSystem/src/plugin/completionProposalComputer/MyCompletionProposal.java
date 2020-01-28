@@ -22,6 +22,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 	private Expression expression;
 	private ContentAssistInvocationContext context;
 	private int index;
+	private int size;
 
 	private String keywords;
 
@@ -46,7 +47,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 			int lastPosition = document.getLineOffset(line + 1);
 
 			res.append(currentText.substring(0, firstPosition));
-			res.append("\t\t\t\t" + getExpressionString() + "\n");
+			res.append("\t" + getExpressionString() + "\n");
 			res.append(currentText.substring(lastPosition));
 			document.set(res.toString());
 
@@ -100,7 +101,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 	@Override
 	public int getRelevance() {
 		// TODO Use other way to do it without changing it to int
-		return index;
+		return size-index;
 	}
 
 	/**
@@ -114,7 +115,8 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 		String expressionName = this.expression.toString();
 		String expressionType = this.expression.getReturnType();
 		String expressionScore = this.expression.getScore(keywords).toString();
-		styledDisplayString.append(" ");
+//		int i = this.size-this.index;
+		styledDisplayString.append(index + "      ");
 		styledDisplayString.append(expressionName);
 		styledDisplayString.append(": ");
 		styledDisplayString.append(expressionType, StyledString.DECORATIONS_STYLER);
@@ -123,6 +125,15 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 		styledDisplayString.append(expressionScore, StyledString.QUALIFIER_STYLER);
 
 		return styledDisplayString;
+	}
+	
+	
+	public void setSize(int size) {
+		this.size = size;
+	}
+	
+	public Expression getExpression() {
+		return this.expression;
 	}
 
 }

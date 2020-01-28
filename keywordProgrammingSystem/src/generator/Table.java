@@ -62,12 +62,12 @@ public class Table {
 		}
 	}
 	
-	public void addNewKey(String type) {
-		if(!this.table.containsKey(type)) {
-			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
-			this.table.put(type, expsFromEachDepth);
-		}
-	}
+//	public void addNewKey(String type) {
+//		if(!this.table.containsKey(type)) {
+//			Vector<Vector<Expression>> expsFromEachDepth = new Vector<Vector<Expression>>();
+//			this.table.put(type, expsFromEachDepth);
+//		}
+//	}
 
 
 	public void clear() {

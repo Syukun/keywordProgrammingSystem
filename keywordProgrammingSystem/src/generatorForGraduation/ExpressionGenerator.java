@@ -3,7 +3,6 @@ package generatorForGraduation;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 import astNode.Expression;
 import astNode.ScoreDef;
@@ -48,9 +47,10 @@ public class ExpressionGenerator {
 				LocalVariableGenerator localVariableGenerator = new LocalVariableGenerator();
 				ConstructorGenerator constructorGenerator = new ConstructorGenerator();
 
-				Vector<Expression> localVariables = localVariableGenerator.generateExactExpressionsSub(depth, type);
-				Vector<Expression> constructors = constructorGenerator.generateExactExpressionsSub(depth, type,
-						keywords);
+				Vector<Expression> localVariables = new Vector<Expression>();
+				localVariables.addAll(localVariableGenerator.generateExactExpressionsSub(depth, type));
+				Vector<Expression> constructors = new Vector<Expression>();
+				constructors.addAll(constructorGenerator.generateExactExpressionsSub(depth, type, keywords));
 
 				allExpressionsAtDepthOneForAType.addAll(localVariables);
 				allExpressionsAtDepthOneForAType.addAll(constructors);
@@ -70,16 +70,21 @@ public class ExpressionGenerator {
 				StaticMethodInvocationGenerator staticMethodInvocationGenerator = new StaticMethodInvocationGenerator();
 				NonStaticMethodInvocationGenertor nonStaticMethodInvocationGenertor = new NonStaticMethodInvocationGenertor();
 
-				Vector<Expression> constructors = constructorGenerator.generateExactExpressionsSub(depth, type,
-						keywords);
-				Vector<Expression> staticFieldAccesses = staticFieldAccessGenerator.generateExactExpressionsSub(depth,
-						type);
-				Vector<Expression> nonStaticFieldAccesses = nonStaticFieldAccessGenerator
-						.generateExactExpressionsSub(depth, type);
-				Vector<Expression> staticMethodInvocations = staticMethodInvocationGenerator
-						.generateExactExpressionsSub(depth, type, keywords);
-				Vector<Expression> nonStaticMethodInvocations = nonStaticMethodInvocationGenertor
-						.generateExactExpressionsSub(depth, type, keywords);
+				Vector<Expression> constructors = new Vector<Expression>();
+				constructors.addAll(constructorGenerator.generateExactExpressionsSub(depth, type, keywords));
+
+				Vector<Expression> staticFieldAccesses = new Vector<Expression>();
+				staticFieldAccesses.addAll(staticFieldAccessGenerator.generateExactExpressionsSub(depth, type));
+
+				Vector<Expression> nonStaticFieldAccesses = new Vector<Expression>();
+				nonStaticFieldAccesses.addAll(nonStaticFieldAccessGenerator.generateExactExpressionsSub(depth, type));
+
+				Vector<Expression> staticMethodInvocations = new Vector<Expression>();
+				staticMethodInvocations
+						.addAll(staticMethodInvocationGenerator.generateExactExpressionsSub(depth, type, keywords));
+				Vector<Expression> nonStaticMethodInvocations = new Vector<Expression>();
+				nonStaticMethodInvocations
+						.addAll(nonStaticMethodInvocationGenertor.generateExactExpressionsSub(depth, type, keywords));
 
 				allExpressionGreaterThanOneForAType.addAll(constructors);
 				allExpressionGreaterThanOneForAType.addAll(staticFieldAccesses);
@@ -87,20 +92,25 @@ public class ExpressionGenerator {
 				allExpressionGreaterThanOneForAType.addAll(staticMethodInvocations);
 				allExpressionGreaterThanOneForAType.addAll(nonStaticMethodInvocations);
 
-				tableExact.addToTable(type, allExpressionGreaterThanOneForAType);
+				Vector<Expression> expsExact = new Vector<Expression>();
+				expsExact.addAll(ScoreDef.selectMaxExpressions(allExpressionGreaterThanOneForAType, keywords, 10-depth));
+
+				tableExact.addToTable(type, expsExact);
 
 //				Vector<Expression> dummy = allExpressionGreaterThanOneForAType.stream().distinct()
 //						.collect(Collectors.toCollection(Vector::new));
 //				tableExact.addToTable(type, dummy);
 
-				Vector<Expression> exactExpressionsAtDepthMinusOne = tableUnder.getExpression(depth - 1, type);
+				Vector<Expression> exactExpressionsAtDepthMinusOne = new Vector<Expression>();
+				exactExpressionsAtDepthMinusOne.addAll(tableUnder.getExpression(depth - 1, type));
 				exactExpressionsAtDepthMinusOne.addAll(allExpressionGreaterThanOneForAType);
 
 //				Vector<Expression> dummy2 = exactExpressionsAtDepthMinusOne.stream().distinct()
 //						.collect(Collectors.toCollection(Vector::new));
 
-				Vector<Expression> sortedUnderExpressions = ScoreDef
-						.selectMaxBWExpressions(exactExpressionsAtDepthMinusOne, keywords);
+				Vector<Expression> sortedUnderExpressions = new Vector<Expression>();
+				sortedUnderExpressions
+						.addAll(ScoreDef.selectMaxExpressions(exactExpressionsAtDepthMinusOne, keywords, 10-depth));
 //				Vector<Expression> sortedUnderExpressions = ScoreDef.selectMaxBWExpressions(dummy2, keywords);
 				tableUnder.addToTable(type, sortedUnderExpressions);
 

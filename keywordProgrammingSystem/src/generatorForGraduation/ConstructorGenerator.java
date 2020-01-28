@@ -41,6 +41,9 @@ public class ConstructorGenerator extends ExpressionGenerator {
 		}
 
 		if (depth > 2) {
+			if(type.equals("BufferedReader")) {
+				String str = "123";
+			}
 			if (DataFromSource.constructors.containsKey(type)) {
 				Set<ConstructorType> constructorTypes = DataFromSource.constructors.get(type);
 				for (ConstructorType constructorType : constructorTypes) {
@@ -77,12 +80,14 @@ public class ConstructorGenerator extends ExpressionGenerator {
 			
 			if (isBitOn(exactFlags, arity-1)) {
 				for (String paraT : parameterTypeIncludeSub) {
-					Vector<Expression> exactDepthM1Expression = ExpressionGenerator.tableExact.getExpression(depth - 1, paraT);
+					Vector<Expression> exactDepthM1Expression = new Vector<Expression>();
+					exactDepthM1Expression.addAll(ExpressionGenerator.tableExact.getExpression(depth - 1, paraT));
 					candidate.addAll(exactDepthM1Expression);
 				}
 			} else {
 				for (String paraT : parameterTypeIncludeSub) {
-					Vector<Expression> underDepthM2Expression = ExpressionGenerator.tableUnder.getExpression(depth - 2, paraT);
+					Vector<Expression> underDepthM2Expression = new Vector<Expression>();
+					underDepthM2Expression.addAll(ExpressionGenerator.tableUnder.getExpression(depth - 2, paraT));
 					candidate.addAll(underDepthM2Expression);
 				}
 			}
@@ -107,7 +112,8 @@ public class ConstructorGenerator extends ExpressionGenerator {
 			Set<String> parameterTypeIncludeSub = getAllTypesIncludeSub(parameterType);
 			Vector<Expression> parameterExpressions = new Vector<Expression>();
 			for(String paraT: parameterTypeIncludeSub) {
-				Vector<Expression> parameterExpressionsAtOne = ExpressionGenerator.tableExact.getExpression(1, paraT);
+				Vector<Expression> parameterExpressionsAtOne = new Vector<Expression>();
+				parameterExpressionsAtOne.addAll(ExpressionGenerator.tableExact.getExpression(1, paraT));
 				parameterExpressions.addAll(parameterExpressionsAtOne);
 			}
 			// TODO plus subtype and supertype

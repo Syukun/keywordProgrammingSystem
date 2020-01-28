@@ -16,10 +16,12 @@ public class NonStaticMethodInvocationGenertor extends ExpressionGenerator {
 		Vector<Expression> res = new Vector<Expression>();
 		Set<MethodName> methodNames = DataFromSource.methodsRet.containsKey(type) ? DataFromSource.methodsRet.get(type)
 				: new HashSet<MethodName>();
+
 		if (depth == 2) {
 			for (MethodName methodName : methodNames) {
+				
 				int parameterNumber = methodName.getParameterNumber();
-				if (parameterNumber < 4) {
+				if (parameterNumber < 3) {
 					Expression[] subExps = new Expression[parameterNumber + 1];
 					Vector<Expression> methodInvocationsInDepthTwo = new Vector<Expression>();
 					generateNonStaticMethodInvocation(parameterNumber + 1, methodName, subExps,
@@ -32,15 +34,18 @@ public class NonStaticMethodInvocationGenertor extends ExpressionGenerator {
 		if (depth > 2) {
 			for (MethodName methodName : methodNames) {
 				int parameterNumber = methodName.getParameterNumber();
-				if (parameterNumber < 4) {
-					Vector<Expression> methodInvocationsMoreThanDepthTwo = new Vector<Expression>();
+				if (parameterNumber < 3) {
+					
 					int arity = parameterNumber + 1;
-					for (int exactFlags = 1; exactFlags <= (1 << parameterNumber) - 1; exactFlags++) {
-						Expression[] subExps = new Expression[parameterNumber + 1];
+					for (int exactFlags = 1; exactFlags <= (1 << arity) - 1; exactFlags++) {
+						Vector<Expression> methodInvocationsMoreThanDepthTwo = new Vector<Expression>();
+						Expression[] subExps = new Expression[arity];
 						generateNonStaticMethodInvocationMoreThanDepthTwo(depth, arity, exactFlags, methodName,
 								methodInvocationsMoreThanDepthTwo, subExps, keywords);
+						res.addAll(methodInvocationsMoreThanDepthTwo);
 					}
 				}
+				
 
 			}
 		}
@@ -61,14 +66,16 @@ public class NonStaticMethodInvocationGenertor extends ExpressionGenerator {
 			Vector<Expression> candidate = new Vector<Expression>();
 			if (isBitOn(exactFlags, 0)) {
 				for (String recT : receiverTypesIncludeSub) {
-					Vector<Expression> exactDepthM1Expression = ExpressionGenerator.tableExact.getExpression(depth - 1,
-							recT);
+					Vector<Expression> exactDepthM1Expression = new Vector<Expression>();
+					exactDepthM1Expression.addAll(ExpressionGenerator.tableExact.getExpression(depth - 1,
+							recT));
 					candidate.addAll(exactDepthM1Expression);
 				}
 			} else {
 				for (String recT : receiverTypesIncludeSub) {
-					Vector<Expression> underDepthM2Expression = ExpressionGenerator.tableUnder.getExpression(depth - 2,
-							recT);
+					Vector<Expression> underDepthM2Expression = new Vector<Expression>();
+					underDepthM2Expression.addAll(ExpressionGenerator.tableUnder.getExpression(depth - 2,
+							recT));
 					candidate.addAll(underDepthM2Expression);
 				}
 			}
@@ -88,12 +95,14 @@ public class NonStaticMethodInvocationGenertor extends ExpressionGenerator {
 			
 			if (isBitOn(exactFlags, arity-1)) {
 				for (String paraT : parameterTypeIncludeSub) {
-					Vector<Expression> exactDepthM1Expression = ExpressionGenerator.tableExact.getExpression(depth - 1, paraT);
+					Vector<Expression> exactDepthM1Expression = new Vector<Expression>();
+					exactDepthM1Expression.addAll(ExpressionGenerator.tableExact.getExpression(depth - 1, paraT));
 					candidate.addAll(exactDepthM1Expression);
 				}
 			} else {
 				for (String paraT : parameterTypeIncludeSub) {
-					Vector<Expression> underDepthM2Expression = ExpressionGenerator.tableUnder.getExpression(depth - 2, paraT);
+					Vector<Expression> underDepthM2Expression = new Vector<Expression>();
+					underDepthM2Expression.addAll(ExpressionGenerator.tableUnder.getExpression(depth - 2, paraT));
 					candidate.addAll(underDepthM2Expression);
 				}
 			}
@@ -120,7 +129,8 @@ public class NonStaticMethodInvocationGenertor extends ExpressionGenerator {
 			Set<String> receiverTypesIncludeSub = getAllTypesIncludeSub(receiverType);
 			Vector<Expression> receiverExpressions = new Vector<Expression>();
 			for (String recT : receiverTypesIncludeSub) {
-				Vector<Expression> exactDepthM1Expression = ExpressionGenerator.tableExact.getExpression(1, recT);
+				Vector<Expression> exactDepthM1Expression = new Vector<Expression>();
+				exactDepthM1Expression.addAll(ExpressionGenerator.tableExact.getExpression(1, recT));
 				receiverExpressions.addAll(exactDepthM1Expression);
 			}
 
@@ -137,7 +147,8 @@ public class NonStaticMethodInvocationGenertor extends ExpressionGenerator {
 			Set<String> parameterTypeIncludeSub = getAllTypesIncludeSub(parameterType);
 			Vector<Expression> parameterExpressions = new Vector<Expression>();
 			for (String paraT : parameterTypeIncludeSub) {
-				Vector<Expression> exactDepthM1Expression = ExpressionGenerator.tableExact.getExpression(1, paraT);
+				Vector<Expression> exactDepthM1Expression = new Vector<Expression>();
+				exactDepthM1Expression.addAll(ExpressionGenerator.tableExact.getExpression(1, paraT));
 				parameterExpressions.addAll(exactDepthM1Expression);
 			}
 

@@ -19,7 +19,7 @@ public class StaticMethodInvocationGenerator extends ExpressionGenerator {
 			for (MethodName methodName : methodNames) {
 				if (methodName.isStatic()) {
 					int parameterNumber = methodName.getParameterNumber();
-					if (parameterNumber < 4) {
+					if (parameterNumber < 3) {
 						Expression[] subExps = new Expression[parameterNumber];
 						Vector<Expression> methodInvocationsInDepthTwo = new Vector<Expression>();
 						generateStaticMethodInvocation(parameterNumber, methodName, subExps,
@@ -34,7 +34,7 @@ public class StaticMethodInvocationGenerator extends ExpressionGenerator {
 			for (MethodName methodName : methodNames) {
 				if (methodName.isStatic()) {
 					int parameterNumber = methodName.getParameterNumber();
-					if (parameterNumber < 4) {
+					if (parameterNumber < 3) {
 						Vector<Expression> methodInvocationsMoreThanDepthTwo = new Vector<Expression>();
 						for (int exactFlags = 1; exactFlags <= (1 << parameterNumber) - 1; exactFlags++) {
 							Expression[] subExps = new Expression[parameterNumber];
@@ -60,12 +60,14 @@ public class StaticMethodInvocationGenerator extends ExpressionGenerator {
 			Vector<Expression> candidate = new Vector<Expression>();
 			if (isBitOn(exactFlags, arity-1)) {
 				for (String paraT : parameterTypeIncludeSub) {
-					Vector<Expression> exactDepthM1Expression = ExpressionGenerator.tableExact.getExpression(depth - 1, paraT);
+					Vector<Expression> exactDepthM1Expression = new Vector<Expression>();
+					exactDepthM1Expression.addAll(ExpressionGenerator.tableExact.getExpression(depth - 1, paraT));
 					candidate.addAll(exactDepthM1Expression);
 				}
 			} else {
 				for (String paraT : parameterTypeIncludeSub) {
-					Vector<Expression> underDepthM2Expression = ExpressionGenerator.tableUnder.getExpression(depth - 2, paraT);
+					Vector<Expression> underDepthM2Expression = new Vector<Expression>();
+					underDepthM2Expression.addAll(ExpressionGenerator.tableUnder.getExpression(depth - 2, paraT));
 					candidate.addAll(underDepthM2Expression);
 				}
 			}
@@ -88,7 +90,8 @@ public class StaticMethodInvocationGenerator extends ExpressionGenerator {
 			Set<String> parameterTypeIncludeSub = getAllTypesIncludeSub(parameterType);
 			Vector<Expression> parameterExpressions = new Vector<Expression>();
 			for (String paraT : parameterTypeIncludeSub) {
-				Vector<Expression> exactDepthM1Expression = ExpressionGenerator.tableExact.getExpression(1, paraT);
+				Vector<Expression> exactDepthM1Expression = new Vector<Expression>();
+				exactDepthM1Expression.addAll(ExpressionGenerator.tableExact.getExpression(1, paraT));
 				parameterExpressions.addAll(exactDepthM1Expression);
 			}
 
