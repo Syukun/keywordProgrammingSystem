@@ -63,14 +63,63 @@ public class ScoreDef {
 
 	public static Vector<Expression> selectMaxExpressions(Vector<Expression> result, String keywords, int num) {
 		sortExpression(result, keywords);
+		
 
-		int lengthResult = result.size();
-		if (lengthResult > num) {
-			for (int i = lengthResult - 1; i >= num; i--) {
-				result.remove(i);
+		int selected = num+2;
+		int resultLen = result.size();
+		if(resultLen > num) {
+			if(resultLen >= selected) {
+				Vector<Expression> tmp = new Vector<Expression>();
+				for(int i = 0; i < selected; i ++) {
+					tmp.add(result.get(i));
+				}
+				Collections.sort(tmp, new Comparator<Expression>() {
+
+					@Override
+					public int compare(Expression o1, Expression o2) {
+						// TODO Auto-generated method stub
+						return o2.getProbability().compareTo(o1.getProbability());
+					}
+
+				});
+				
+				Vector<Expression> res_tmp = new Vector<Expression>();
+				for (int j = 0; j < num; j++) {
+					res_tmp.add(tmp.get(j));
+				}
+
+				return res_tmp;
+				
+				
+			}else {
+				return result;
 			}
+		}else {
+			return result;
 		}
-		return result;
+
+//		int lengthResult = result.size();
+//		if (lengthResult > num) {
+//			for (int i = lengthResult - 1; i >= num; i--) {
+//				result.remove(i);
+//			}
+//		}
+//		return result;
+	}
+	
+	public static Vector<Expression> selectMaxFinalExpression(Vector<Expression> result, String keywords){
+		Vector<Expression> res = new Vector<Expression>();
+		
+		Collections.sort(result, new Comparator<Expression>() {
+			@Override
+			public int compare(Expression e1, Expression e2) {
+				
+				return (e2.getFinalScore(keywords)).compareTo(e1.getFinalScore(keywords));
+			}
+
+		});
+		res.addAll(result);
+		return res;
 	}
 
 	public static List<String> splitKeyword(String keywords) {

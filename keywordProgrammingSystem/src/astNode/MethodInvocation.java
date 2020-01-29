@@ -77,4 +77,25 @@ public class MethodInvocation extends Expression {
 		return this.methodName.getReturnType();
 	}
 
+	@Override
+	public String toPredictString() {
+		StringBuffer res = new StringBuffer();
+
+		if (typeName != null) {
+			res.append(typeName.toString() + "  ");
+		} else {
+			if (receiver != null) {
+				res.append(receiver.toString() + "  ");
+			}
+		}
+		res.append("  " + methodName.toString() + "  ");
+		if (parameters != null) {
+			String seperator = " ";
+			for (Expression exp : parameters) {
+				res.append(seperator + exp.toString());
+			}
+		}
+		return res.toString();
+	}
+
 }

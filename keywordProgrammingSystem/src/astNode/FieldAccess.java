@@ -53,4 +53,10 @@ public class FieldAccess extends Expression {
 		return null;
 	}
 
+	@Override
+	public String toPredictString() {
+		// TODO Auto-generated method stub
+		return this.toString();
+	}
+
 }

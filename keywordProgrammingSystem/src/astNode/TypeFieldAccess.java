@@ -33,4 +33,12 @@ public class TypeFieldAccess extends Expression{
 		// TODO Auto-generated method stub
 		return field.getReturnType();
 	}
+
+	@Override
+	public String toPredictString() {
+		// TODO Auto-generated method stub
+		return this.toString();
+	}
+	
+	
 }

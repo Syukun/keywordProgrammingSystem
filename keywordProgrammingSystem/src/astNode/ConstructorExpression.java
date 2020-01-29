@@ -63,6 +63,24 @@ public class ConstructorExpression extends Expression {
 		// TODO Auto-generated method stub
 		return typeName;
 	}
+
+	@Override
+	public String toPredictString() {
+
+		StringBuffer res = new StringBuffer();
+		res.append("new ");
+		res.append(this.typeName);
+		res.append(" ");
+		String seperator = " ";
+		for (Expression exp : parameters) {
+			if(exp!=null) {
+			res.append(seperator + exp.toString());
+			seperator = " ";
+			}
+		}
+
+		return res.toString();
+	}
 	
 	
 

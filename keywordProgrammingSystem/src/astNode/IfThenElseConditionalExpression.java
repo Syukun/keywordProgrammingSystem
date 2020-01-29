@@ -46,4 +46,10 @@ public class IfThenElseConditionalExpression extends Expression{
 		return null;
 	}
 
+	@Override
+	public String toPredictString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

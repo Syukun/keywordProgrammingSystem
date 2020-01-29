@@ -18,6 +18,12 @@ import java.util.List;
 */
 public abstract class Expression extends Code{
 	
+	public BigDecimal score;
+	
+	public void setScore(BigDecimal score) {
+		this.score = score;
+	}
+	
 	/**
 	 * Expression ==> String
 	 */
@@ -44,11 +50,12 @@ public abstract class Expression extends Code{
 		return this.getScore(ScoreDef.splitKeyword(keywords));
 	}
 	
+	public abstract String toPredictString();
 	
 	public BigDecimal getProbability() {
 		BigDecimal res = null;
 		String serverName = "AochinoMacBook-Pro.local";
-		int port = 4957;
+		int port = 11115;
 //		
 //		
 //		Path currentRelativePath = Paths.get("");
@@ -62,7 +69,7 @@ public abstract class Expression extends Code{
 			InputStream in = client.getInputStream();
 			OutputStream out = client.getOutputStream();
 			BufferedReader inRead = new BufferedReader(new InputStreamReader(in));
-			out.write(this.toString().getBytes());
+			out.write(this.toPredictString().getBytes());
 			String line = null;
 			if ((line = inRead.readLine()) != null) {
 				res = new BigDecimal(line);
@@ -81,4 +88,11 @@ public abstract class Expression extends Code{
 		
 	}
 	
+	public BigDecimal getFinalScore(String keywords) {
+		BigDecimal res = this.getScore(keywords).add(this.getProbability());
+		if(this.score==null) {
+			this.setScore(res);
+		}
+		return res;
+	}
 }

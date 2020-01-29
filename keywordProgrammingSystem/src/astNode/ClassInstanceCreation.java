@@ -31,4 +31,10 @@ public class ClassInstanceCreation extends Expression {
 		return this.typeName;
 	}
 
+	@Override
+	public String toPredictString() {
+		// TODO Auto-generated method stub
+		return "new  " + this.typeName ;
+	}
+
 }
