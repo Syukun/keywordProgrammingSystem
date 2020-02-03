@@ -4,15 +4,15 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class ConstructorExpression extends Expression {
-	
+
 	private String typeName;
 	private Expression[] parameters;
-	
+
 	public ConstructorExpression(String typeName) {
 		this.typeName = typeName;
 		this.parameters = new Expression[] {};
 	}
-	
+
 	public ConstructorExpression(String typeName, Expression[] parameters) {
 		this.typeName = typeName;
 		this.parameters = parameters;
@@ -26,9 +26,9 @@ public class ConstructorExpression extends Expression {
 		res.append("(");
 		String seperator = "";
 		for (Expression exp : parameters) {
-			if(exp!=null) {
-			res.append(seperator + exp.toString());
-			seperator = ",";
+			if (exp != null) {
+				res.append(seperator + exp.toString());
+				seperator = ",";
 			}
 		}
 		res.append(")");
@@ -38,23 +38,22 @@ public class ConstructorExpression extends Expression {
 	@Override
 	public BigDecimal getScore(List<String> keywords) {
 		BigDecimal score = ScoreDef.DEFSCORE;
-		String[] methodNameArray = ScoreDef.splitName("new " + typeName);
-		for(String word : methodNameArray) {
-			score = score.add(ScoreDef.checkInKeyword(score, word.toLowerCase(), keywords));
-		}
-		if(this.parameters!=null) {
+		String words = "new " + typeName;
+		score = score.add(ScoreDef.checkInKeyword(score, words, keywords));
+
+		if (this.parameters != null) {
 			for (Expression paraExpression : this.parameters) {
-				if(paraExpression!=null) {
+				if (paraExpression != null) {
 					try {
-					score = score.add(paraExpression.getScore(keywords));
-					}catch(NullPointerException e) {
-						int i =  0;
+						score = score.add(paraExpression.getScore(keywords));
+					} catch (NullPointerException e) {
+						int i = 0;
 					}
 				}
-				
+
 			}
 		}
-		
+
 		return score;
 	}
 
@@ -63,7 +62,5 @@ public class ConstructorExpression extends Expression {
 		// TODO Auto-generated method stub
 		return typeName;
 	}
-	
-	
 
 }
