@@ -63,4 +63,14 @@ public class ConstructorExpression extends Expression {
 		return typeName;
 	}
 
+	@Override
+	public String toPredictString() {
+		StringBuffer res = new StringBuffer();
+		res.append("new " + this.typeName);
+		for(Expression paraExp: this.parameters) {
+			res.append(" " + paraExp.toPredictString());
+		}
+		return res.toString();
+	}
+
 }

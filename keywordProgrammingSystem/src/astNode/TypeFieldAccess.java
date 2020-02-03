@@ -1,4 +1,4 @@
-package astNode;
+ package astNode;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,5 +32,11 @@ public class TypeFieldAccess extends Expression{
 	public String getReturnType() {
 		// TODO Auto-generated method stub
 		return field.getReturnType();
+	}
+
+	@Override
+	public String toPredictString() {
+		// TODO Auto-generated method stub
+		return type + " " + this.field.toString();
 	}
 }

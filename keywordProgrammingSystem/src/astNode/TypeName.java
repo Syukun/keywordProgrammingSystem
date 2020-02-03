@@ -32,5 +32,11 @@ public class TypeName extends Expression {
 		return this.typeName;
 	}
 
+	@Override
+	public String toPredictString() {
+		// TODO Auto-generated method stub
+		return this.typeName;
+	}
+
 
 }

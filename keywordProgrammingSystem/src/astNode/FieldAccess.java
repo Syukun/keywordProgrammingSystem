@@ -53,4 +53,10 @@ public class FieldAccess extends Expression {
 		return null;
 	}
 
+	@Override
+	public String toPredictString() {
+		
+		return this.expression.toPredictString() + " " + this.field.toString();
+	}
+
 }

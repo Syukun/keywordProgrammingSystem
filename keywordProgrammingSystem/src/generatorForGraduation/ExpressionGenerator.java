@@ -32,7 +32,8 @@ public class ExpressionGenerator {
 			res.addAll(getExpressionUnderDepth(depth, type));
 
 		}
-		ScoreDef.selectMaxExpressions(res, keywords, 100);
+//		ScoreDef.selectMaxExpressions(res, keywords, 100);
+		ScoreDef.selectMaxFinalExpression(res, keywords);
 //		Vector<Expression> dummy3 = res.stream().distinct()
 //				.collect(Collectors.toCollection(Vector::new));
 
@@ -93,7 +94,7 @@ public class ExpressionGenerator {
 				allExpressionGreaterThanOneForAType.addAll(nonStaticMethodInvocations);
 
 				Vector<Expression> expsExact = new Vector<Expression>();
-				expsExact.addAll(ScoreDef.selectMaxExpressions(allExpressionGreaterThanOneForAType, keywords, 9-depth));
+				expsExact.addAll(ScoreDef.selectMaxExpressions(allExpressionGreaterThanOneForAType, keywords, 10-depth));
 
 				tableExact.addToTable(type, expsExact);
 

@@ -62,4 +62,10 @@ public class LocalVariable extends Expression{
 		return this.typeName;
 	}
 
+	@Override
+	public String toPredictString() {
+		// TODO Auto-generated method stub
+		return this.varName.toString();
+	}
+
 }
