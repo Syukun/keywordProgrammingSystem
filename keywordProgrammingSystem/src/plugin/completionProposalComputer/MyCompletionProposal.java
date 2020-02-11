@@ -117,7 +117,7 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 //		String expressionScore = this.expression.getScore(keywords).toString();
 		String expressionScore = this.expression.getScore(keywords).add(this.expression.getProbability()).toString();
 //		int i = this.size-this.index;
-		styledDisplayString.append(index + "      ");
+		styledDisplayString.append(index+1 + "      ");
 		styledDisplayString.append(expressionName);
 		styledDisplayString.append(": ");
 		styledDisplayString.append(expressionType, StyledString.DECORATIONS_STYLER);

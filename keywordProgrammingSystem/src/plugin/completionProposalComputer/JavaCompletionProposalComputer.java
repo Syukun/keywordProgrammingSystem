@@ -99,7 +99,7 @@ public class JavaCompletionProposalComputer implements IJavaCompletionProposalCo
 //		}
 
 		String keywords = getKeywords(context);
-		int depth = 3;
+		int depth = 5;
 		new DataFromSource().setInitialData(context, monitor);
 
 		ExpressionGenerator expressionGenerator = new ExpressionGenerator();
