@@ -32,7 +32,7 @@ public class ExpressionGenerator {
 			res.addAll(getExpressionUnderDepth(depth, type));
 
 		}
-		ScoreDef.selectMaxExpressions(res, keywords, 100);
+		ScoreDef.selectMaxExpressions(res, keywords, 20);
 //		Vector<Expression> dummy3 = res.stream().distinct()
 //				.collect(Collectors.toCollection(Vector::new));
 
