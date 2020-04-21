@@ -122,8 +122,8 @@ public class MyCompletionProposal implements IJavaCompletionProposal, ICompletio
 		styledDisplayString.append(": ");
 		styledDisplayString.append(expressionType, StyledString.DECORATIONS_STYLER);
 		styledDisplayString.append("   ");
-		styledDisplayString.append("Score : ", StyledString.COUNTER_STYLER);
-		styledDisplayString.append(expressionScore, StyledString.QUALIFIER_STYLER);
+		styledDisplayString.append("[ACKN]", StyledString.COUNTER_STYLER);
+//		styledDisplayString.append(expressionScore, StyledString.QUALIFIER_STYLER);
 
 		return styledDisplayString;
 	}
